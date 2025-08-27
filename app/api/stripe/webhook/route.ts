@@ -1,142 +1,79 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { verifyWebhookSignature, handleCheckoutSessionCompleted } from '@/lib/stripe';
+import { withRateLimit, RATE_LIMITS } from '@/lib/rateLimit';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16'
-});
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-export async function POST(request: NextRequest) {
-  const body = await request.text();
-  const signature = request.headers.get('stripe-signature');
-
-  if (!signature) {
-    return NextResponse.json({ error: 'No signature' }, { status: 400 });
-  }
-
-  let event: Stripe.Event;
-
+async function webhookHandler(req: NextRequest) {
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
-  } catch (err: any) {
-    console.error('Webhook signature verification failed:', err.message);
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
-  }
+    const body = await req.text();
+    const signature = req.headers.get('stripe-signature');
 
-  try {
+    if (!signature) {
+      return NextResponse.json(
+        { error: 'Missing stripe-signature header' },
+        { status: 400 }
+      );
+    }
+
+    // Verify webhook signature
+    const event = verifyWebhookSignature(body, signature);
+
+    console.log('Received Stripe webhook event:', event.type);
+
+    // Handle different event types
     switch (event.type) {
       case 'checkout.session.completed':
-        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+        await handleCheckoutSessionCompleted(event.data.object);
         break;
-      
+
       case 'payment_intent.succeeded':
-        await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent);
+        // Handle successful payment intent (backup for checkout sessions)
+        console.log('Payment intent succeeded:', event.data.object.id);
         break;
-      
+
       case 'payment_intent.payment_failed':
-        await handlePaymentIntentFailed(event.data.object as Stripe.PaymentIntent);
+        // Handle failed payment
+        console.log('Payment intent failed:', event.data.object.id);
         break;
-      
+
+      case 'invoice.payment_succeeded':
+        // Handle subscription payments (if using subscriptions)
+        console.log('Invoice payment succeeded:', event.data.object.id);
+        break;
+
+      case 'invoice.payment_failed':
+        // Handle failed subscription payments
+        console.log('Invoice payment failed:', event.data.object.id);
+        break;
+
+      case 'customer.subscription.created':
+        // Handle new subscription creation
+        console.log('Subscription created:', event.data.object.id);
+        break;
+
+      case 'customer.subscription.updated':
+        // Handle subscription updates
+        console.log('Subscription updated:', event.data.object.id);
+        break;
+
+      case 'customer.subscription.deleted':
+        // Handle subscription cancellation
+        console.log('Subscription deleted:', event.data.object.id);
+        break;
+
       default:
         console.log(`Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
-  } catch (error: any) {
-    console.error('Webhook handler error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
-
-async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
-  console.log('Processing completed checkout session:', session.id);
-  
-  const bookId = session.metadata?.book_id;
-  const userId = session.metadata?.user_id;
-  
-  if (!bookId) {
-    console.error('No book_id in session metadata');
-    return;
-  }
-
-  try {
-    // Update purchase record
-    const { error } = await supabaseAdmin
-      .from('purchases')
-      .update({
-        paid: true,
-        stripe_session_id: session.id,
-        paid_at: new Date().toISOString()
-      })
-      .eq('book_id', bookId)
-      .eq('user_id', userId);
-
-    if (error) {
-      console.error('Error updating purchase:', error);
-      return;
-    }
-
-    // Create coupon grants for the user
-    await createCouponGrants(bookId, userId);
+  } catch (error) {
+    console.error('Webhook error:', error);
     
-    console.log('Successfully processed checkout session:', session.id);
-  } catch (error) {
-    console.error('Error handling checkout session:', error);
+    return NextResponse.json(
+      { error: 'Webhook handler failed' },
+      { status: 400 }
+    );
   }
 }
 
-async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
-  console.log('Payment intent succeeded:', paymentIntent.id);
-  // Additional payment success logic can be added here
-}
-
-async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentIntent) {
-  console.log('Payment intent failed:', paymentIntent.id);
-  // Handle failed payment logic here
-}
-
-async function createCouponGrants(bookId: string, userId: string) {
-  try {
-    // Get all coupons for this book
-    const { data: coupons, error: couponsError } = await supabaseAdmin
-      .from('coupons')
-      .select('id')
-      .eq('book_id', bookId);
-
-    if (couponsError || !coupons) {
-      console.error('Error fetching coupons:', couponsError);
-      return;
-    }
-
-    // Create grants for each coupon
-    const grants = coupons.map(coupon => ({
-      coupon_id: coupon.id,
-      user_id: userId,
-      grant_type: 'purchased',
-      granted_at: new Date().toISOString(),
-      used: false
-    }));
-
-    const { error: grantsError } = await supabaseAdmin
-      .from('coupon_grants')
-      .insert(grants);
-
-    if (grantsError) {
-      console.error('Error creating coupon grants:', grantsError);
-      return;
-    }
-
-    console.log(`Created ${grants.length} coupon grants for user ${userId}`);
-  } catch (error) {
-    console.error('Error creating coupon grants:', error);
-  }
-}
+// Apply rate limiting to webhook endpoint
+export const POST = withRateLimit(webhookHandler, RATE_LIMITS.API);
