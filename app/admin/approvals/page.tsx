@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 interface PendingItem {
   type: 'offer' | 'book_placement';
@@ -25,7 +25,6 @@ interface ApprovalStats {
 
 export default function ApprovalsQueuePage() {
   const router = useRouter();
-  const supabase = createClient();
   
   const [pendingItems, setPendingItems] = useState<PendingItem[]>([]);
   const [stats, setStats] = useState<ApprovalStats | null>(null);

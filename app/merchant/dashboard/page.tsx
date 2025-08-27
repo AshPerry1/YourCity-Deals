@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import ApprovalModeBanner from '../components/ApprovalModeBanner';
 
 interface Business {
@@ -35,7 +35,7 @@ interface Offer {
 
 export default function MerchantDashboard() {
   const router = useRouter();
-  const supabase = createClient();
+
   
   const [business, setBusiness] = useState<Business | null>(null);
   const [stats, setStats] = useState<OfferStats | null>(null);

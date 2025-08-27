@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, createContext, useContext } from 'react';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 interface Notification {
   id: string;
@@ -29,7 +29,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [currentToast, setCurrentToast] = useState<Notification | null>(null);
-  const supabase = createClient();
+
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 interface TestMerchant {
   id: string;
@@ -21,7 +21,7 @@ export default function TestMerchantsPage() {
   const [merchants, setMerchants] = useState<TestMerchant[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'manual' | 'self_serve'>('manual');
-  const supabase = createClient();
+
 
   useEffect(() => {
     fetchTestMerchants();

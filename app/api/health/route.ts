@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 export async function GET() {
   const startTime = Date.now();
   
   try {
-    const supabase = createClient();
+    
     
     // Test database connection
     const { data, error } = await supabase

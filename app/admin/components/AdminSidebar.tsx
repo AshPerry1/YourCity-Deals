@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -12,7 +12,7 @@ interface AdminSidebarProps {
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
-  const supabase = createClient();
+
   const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
