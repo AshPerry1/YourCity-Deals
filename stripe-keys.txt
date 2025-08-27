@@ -1,0 +1,12 @@
+# Copy these lines into your .env.local file:
+
+# Stripe Configuration
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
+STRIPE_SECRET_KEY=sk_test_your_secret_key_here
+STRIPE_WEBHOOK_SECRET=whsec_we_will_get_this_next
+STRIPE_USE_PAYMENT_LINKS=false
+
+# Replace the placeholder values with your actual Stripe test keys:
+# - Replace "pk_test_your_publishable_key_here" with your actual publishable key
+# - Replace "sk_test_your_secret_key_here" with your actual secret key
+# - We'll get the webhook secret in the next step
