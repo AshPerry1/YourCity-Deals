@@ -5,9 +5,20 @@ import { useState, useEffect } from 'react';
 export default function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    // Listen for the beforeinstallprompt event
+    // Detect iOS
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    setIsIOS(iOS);
+
+    // Detect if already installed
+    const standalone = window.navigator.standalone || 
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    setIsStandalone(standalone);
+
+    // Listen for the beforeinstallprompt event (Chrome/Android)
     const handleBeforeInstallPrompt = (e: any) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
@@ -23,6 +34,11 @@ export default function PWAInstallPrompt() {
       setShowInstallPrompt(false);
       setDeferredPrompt(null);
     };
+
+    // Show iOS install prompt if not standalone and on iOS
+    if (iOS && !standalone) {
+      setShowInstallPrompt(true);
+    }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
@@ -57,6 +73,9 @@ export default function PWAInstallPrompt() {
     setShowInstallPrompt(false);
   };
 
+  // Don't show if already installed
+  if (isStandalone) return null;
+
   if (!showInstallPrompt) return null;
 
   return (
@@ -73,7 +92,10 @@ export default function PWAInstallPrompt() {
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-gray-900">Install YourCity Deals</h3>
           <p className="text-xs text-gray-600 mt-1">
-            Add to home screen for quick access
+            {isIOS 
+              ? 'Add to home screen for quick access' 
+              : 'Add to home screen for quick access'
+            }
           </p>
         </div>
         
@@ -84,14 +106,33 @@ export default function PWAInstallPrompt() {
           >
             Not now
           </button>
-          <button
-            onClick={handleInstallClick}
-            className="px-4 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-xs font-medium rounded-lg hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 shadow-sm"
-          >
-            Install
-          </button>
+          {!isIOS && (
+            <button
+              onClick={handleInstallClick}
+              className="px-4 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-xs font-medium rounded-lg hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 shadow-sm"
+            >
+              Install
+            </button>
+          )}
         </div>
       </div>
+      
+      {/* iOS-specific instructions */}
+      {isIOS && (
+        <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-start space-x-2">
+            <svg className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div className="text-xs text-blue-800">
+              <p className="font-medium">To install:</p>
+              <p>1. Tap the <strong>Share</strong> button <span className="inline-block w-3 h-3 bg-blue-600 rounded"></span></p>
+              <p>2. Scroll down and tap <strong>Add to Home Screen</strong></p>
+              <p>3. Tap <strong>Add</strong></p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
