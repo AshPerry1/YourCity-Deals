@@ -10,6 +10,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Export createClient for direct use
+export { createClient };
+
 // Admin client for server-side operations
 export const supabaseAdmin = supabaseServiceKey 
   ? createClient(supabaseUrl, supabaseServiceKey)

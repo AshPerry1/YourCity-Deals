@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 interface PurchaseButtonProps {
   bookId: string;
@@ -26,7 +26,7 @@ export default function PurchaseButton({
 }: PurchaseButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
+
 
   const formatPrice = (cents: number) => {
     return new Intl.NumberFormat('en-US', {

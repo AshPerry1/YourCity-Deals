@@ -17,16 +17,22 @@ interface ReferralData {
   }>;
 }
 
-export default function ReferralPage({ params }: { params: { code: string } }) {
+export default function ReferralPage({ params }: { params: Promise<{ code: string }> }) {
   const [referralData, setReferralData] = useState<ReferralData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [code, setCode] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch referral data based on the code
-    fetchReferralData(params.code);
-  }, [params.code]);
+    // Handle async params
+    const getParams = async () => {
+      const resolvedParams = await params;
+      setCode(resolvedParams.code);
+      fetchReferralData(resolvedParams.code);
+    };
+    getParams();
+  }, [params]);
 
   const fetchReferralData = async (code: string) => {
     try {
@@ -63,12 +69,12 @@ export default function ReferralPage({ params }: { params: { code: string } }) {
 
   const handlePurchase = (bookId: string) => {
     // Redirect to purchase flow with referral data
-    router.push(`/purchase?ref=${params.code}&book=${bookId}`);
+    router.push(`/purchase?ref=${code}&book=${bookId}`);
   };
 
   const handleSignup = () => {
     // Redirect to signup with referral code
-    router.push(`/signup?ref=${params.code}`);
+    router.push(`/signup?ref=${code}`);
   };
 
   if (loading) {
@@ -111,7 +117,7 @@ export default function ReferralPage({ params }: { params: { code: string } }) {
               </h1>
             </div>
             <div className="text-sm text-gray-600">
-              Referral: {referralData.code}
+              Referral: {code}
             </div>
           </div>
         </div>

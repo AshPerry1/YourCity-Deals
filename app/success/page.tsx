@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 
 interface PurchaseDetails {
@@ -23,7 +23,7 @@ export default function SuccessPage() {
   const [purchase, setPurchase] = useState<PurchaseDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
+
 
   useEffect(() => {
     if (sessionId) {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 interface Business {
   id: string;
@@ -24,7 +24,7 @@ interface ApprovalHistory {
 export default function ApprovalModePage() {
   const params = useParams();
   const router = useRouter();
-  const supabase = createClient();
+
   
   const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
@@ -83,7 +83,7 @@ export default function ApprovalModePage() {
       if (error) throw error;
 
       // Get user emails for the history
-      const userIds = [...new Set(data?.map(item => item.user_id).filter(Boolean) || [])];
+      const userIds = Array.from(new Set(data?.map(item => item.user_id).filter(Boolean) || []));
       const { data: users } = await supabase
         .from('auth.users')
         .select('id, email')

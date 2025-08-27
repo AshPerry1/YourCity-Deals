@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 interface ApprovalModeBannerProps {
   businessId: string;
@@ -14,7 +14,7 @@ interface Business {
 }
 
 export default function ApprovalModeBanner({ businessId }: ApprovalModeBannerProps) {
-  const supabase = createClient();
+
   const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
 

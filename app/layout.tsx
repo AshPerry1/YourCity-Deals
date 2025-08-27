@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
 import PWAStatusChecker from './components/PWAStatusChecker'
+import AdminAccessGuard from './components/AdminAccessGuard'
+import AdminHeader from './components/AdminHeader'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -66,7 +68,10 @@ export default function RootLayout({
         <link rel="preload" href="/icons/icon-192.png" as="image" />
       </head>
       <body className={inter.className}>
-        {children}
+        <AdminHeader />
+        <AdminAccessGuard>
+          {children}
+        </AdminAccessGuard>
         <PWAInstallPrompt />
         <PWAStatusChecker />
         
