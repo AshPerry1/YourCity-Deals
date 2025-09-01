@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const supabaseAdmin = supabaseUrl && supabaseServiceKey && !supabaseUrl.includes('your_supabase_project_url')
-  ? createClient(supabaseUrl, supabaseServiceKey)
-  : null;
+import { getSupabaseAdmin, getDatabaseNotConfiguredResponse } from '@/lib/supabaseAdmin';
 
 interface ConfirmationRequest {
   identifier: string; // phone or email
@@ -18,11 +11,10 @@ interface ConfirmationRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
     if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Supabase not configured' },
-        { status: 500 }
-      );
+      return getDatabaseNotConfiguredResponse();
     }
 
     const { identifier, code, verificationType, referralCode, returnUrl }: ConfirmationRequest = await request.json();
