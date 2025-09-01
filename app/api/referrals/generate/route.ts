@@ -92,6 +92,12 @@ function generateUniqueCode(): string {
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     const { searchParams } = new URL(request.url);
     const schoolId = searchParams.get('schoolId');
     const studentId = searchParams.get('studentId');
