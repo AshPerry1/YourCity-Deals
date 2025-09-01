@@ -1,15 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-// Only create supabase client if environment variables are properly configured
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const supabaseAdmin = (supabaseUrl && supabaseServiceKey && 
-  supabaseUrl !== 'your_supabase_project_url' && 
-  supabaseServiceKey !== 'your_supabase_service_role_key') 
-  ? createClient(supabaseUrl, supabaseServiceKey)
-  : null;
+import { getSupabaseAdmin, getDatabaseNotConfiguredResponse } from '@/lib/supabaseAdmin';
 
 interface VerificationRequest {
   phone?: string;
@@ -20,11 +10,9 @@ interface VerificationRequest {
 export async function POST(request: NextRequest) {
   try {
     // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
     if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Database not configured' },
-        { status: 503 }
-      );
+      return getDatabaseNotConfiguredResponse();
     }
 
     const { phone, email, verificationType }: VerificationRequest = await request.json();

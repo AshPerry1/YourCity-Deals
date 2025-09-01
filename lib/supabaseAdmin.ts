@@ -1,27 +1,42 @@
 import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
 
-// Safely create Supabase admin client only if environment variables are configured
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Lazy initialization of Supabase admin client
+let supabaseAdmin: any = null;
 
-export const supabaseAdmin = (supabaseUrl && supabaseServiceKey && 
-  supabaseUrl !== 'your_supabase_project_url' && 
-  supabaseServiceKey !== 'your_supabase_service_role_key') 
-  ? createClient(supabaseUrl, supabaseServiceKey)
-  : null;
+function initializeSupabaseAdmin() {
+  if (supabaseAdmin !== null) {
+    return supabaseAdmin;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (supabaseUrl && supabaseServiceKey && 
+      supabaseUrl !== 'your_supabase_project_url' && 
+      supabaseServiceKey !== 'your_supabase_service_role_key') {
+    supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+  } else {
+    supabaseAdmin = null;
+  }
+
+  return supabaseAdmin;
+}
+
+// Export a getter function instead of the client directly
+export function getSupabaseAdmin() {
+  return initializeSupabaseAdmin();
+}
 
 // Helper function to check if database is configured
 export function isDatabaseConfigured(): boolean {
-  return supabaseAdmin !== null;
+  return getSupabaseAdmin() !== null;
 }
 
 // Helper function to return a standard "not configured" response
 export function getDatabaseNotConfiguredResponse() {
-  return new Response(
-    JSON.stringify({ error: 'Database not configured' }), 
-    { 
-      status: 503,
-      headers: { 'Content-Type': 'application/json' }
-    }
+  return NextResponse.json(
+    { error: 'Database not configured. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.' },
+    { status: 503 }
   );
 }
