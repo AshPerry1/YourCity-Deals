@@ -207,6 +207,12 @@ export async function POST(request: Request) {
 // PUT - Update payout status
 export async function PUT(request: Request) {
   try {
+    // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     const { payoutId, status, notes } = await request.json();
 
     if (!payoutId || !status) {
