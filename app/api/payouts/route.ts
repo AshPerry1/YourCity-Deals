@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin, getDatabaseNotConfiguredResponse } from '@/lib/supabaseAdmin';
+import { getSupabaseAdmin, getDatabaseNotConfiguredResponse } from '@/lib/supabaseAdmin';
 import { 
   Payout, 
   PayoutReceipt,
@@ -17,6 +17,7 @@ import { generatePayoutEvent } from '@/lib/accounting';
 export async function GET(request: Request) {
   try {
     // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
     if (!supabaseAdmin) {
       return getDatabaseNotConfiguredResponse();
     }
@@ -96,6 +97,12 @@ export async function GET(request: Request) {
 // POST - Create new payout
 export async function POST(request: Request) {
   try {
+    // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     const payoutData = await request.json();
 
     // Validate payout data

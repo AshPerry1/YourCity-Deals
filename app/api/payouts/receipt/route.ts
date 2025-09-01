@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin, getDatabaseNotConfiguredResponse } from '@/lib/supabaseAdmin';
 import { 
   Payout, 
   PayoutReceipt,
@@ -7,25 +7,13 @@ import {
   generatePayoutEmailTemplate
 } from '@/lib/payouts';
 
-// Initialize Supabase client with service role for admin operations
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const supabaseAdmin = (supabaseUrl && supabaseServiceKey && 
-  supabaseUrl !== 'your_supabase_project_url' && 
-  supabaseServiceKey !== 'your_supabase_service_role_key') 
-  ? createClient(supabaseUrl, supabaseServiceKey)
-  : null;
-
 // GET - Generate receipt for a payout
 export async function GET(request: Request) {
   try {
     // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
     if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Database not configured' },
-        { status: 503 }
-      );
+      return getDatabaseNotConfiguredResponse();
     }
 
     const { searchParams } = new URL(request.url);
@@ -83,6 +71,12 @@ export async function GET(request: Request) {
 // POST - Send receipt to school
 export async function POST(request: Request) {
   try {
+    // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     const { payout_id, email_address, include_pdf } = await request.json();
 
     if (!payout_id) {
@@ -186,6 +180,12 @@ export async function POST(request: Request) {
 // PUT - Mark receipt as acknowledged by school
 export async function PUT(request: Request) {
   try {
+    // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     const { form_id, acknowledged } = await request.json();
 
     if (!form_id) {
