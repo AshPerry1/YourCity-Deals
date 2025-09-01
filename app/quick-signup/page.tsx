@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -15,7 +15,7 @@ interface QuickSignupProps {
   onTypeChange: (type: 'phone' | 'email') => void;
 }
 
-export default function QuickSignup() {
+function QuickSignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get('return') || '/student/dashboard';
@@ -307,5 +307,13 @@ export default function QuickSignup() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function QuickSignup() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <QuickSignupContent />
+    </Suspense>
   );
 }
