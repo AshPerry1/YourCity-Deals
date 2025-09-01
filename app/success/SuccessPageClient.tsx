@@ -1,9 +1,10 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function SuccessPageClient() {
+function SuccessPageClientContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
@@ -55,5 +56,13 @@ export default function SuccessPageClient() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SuccessPageClient() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SuccessPageClientContent />
+    </Suspense>
   );
 }

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -36,7 +36,7 @@ interface BookDetails {
   savings: number;
 }
 
-export default function BookPreview() {
+function BookPreviewContent() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -622,5 +622,13 @@ export default function BookPreview() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function BookPreview() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BookPreviewContent />
+    </Suspense>
   );
 }
