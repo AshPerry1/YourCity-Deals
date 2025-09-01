@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin, getDatabaseNotConfiguredResponse } from '@/lib/supabaseAdmin';
 import { TutorialCompletion, OnboardingState } from '@/lib/tutorials';
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 // POST - Mark tutorial as completed or skipped
 export async function POST(request: Request) {
   try {
+    // Check if database is configured
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     // Get the current user from the request
     const authHeader = request.headers.get('authorization');
     if (!authHeader) {
