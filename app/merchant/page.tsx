@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ProtectedRoute from '@/app/components/ProtectedRoute';
 import { UserRole } from '@/lib/auth';
 
@@ -20,10 +20,43 @@ function MerchantOwnerDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h1 className="text-2xl font-bold text-gray-900">Merchant Dashboard</h1>
-        <p className="text-gray-600 mt-2">Business Analytics & Staff Management</p>
+      {/* Content sections only - header is provided by UniversalPortalLayout */}
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Create New Offer</h3>
+              <p className="text-purple-100 mb-4">Build coupons for your customers</p>
+              <a
+                href="/merchant/offers/new"
+                className="inline-flex items-center px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition-colors"
+              >
+                <span className="mr-2">➕</span>
+                Create Offer
+              </a>
+            </div>
+            <div className="text-4xl">🏪</div>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Verify Coupons</h3>
+              <p className="text-green-100 mb-4">Scan or manually verify redemptions</p>
+              <a
+                href="/merchant/verify"
+                className="inline-flex items-center px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 transition-colors"
+              >
+                <span className="mr-2">🎫</span>
+                Verify Now
+              </a>
+            </div>
+            <div className="text-4xl">📱</div>
+          </div>
+        </div>
       </div>
 
       {/* Tab Navigation */}
@@ -36,7 +69,7 @@ function MerchantOwnerDashboard() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-purple-500 text-purple-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -52,10 +85,10 @@ function MerchantOwnerDashboard() {
             <div className="space-y-6">
               {/* Analytics Overview */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+                <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-blue-100">Total Redemptions</p>
+                      <p className="text-purple-100">Total Redemptions</p>
                       <p className="text-3xl font-bold">1,247</p>
                     </div>
                     <div className="text-4xl">🎫</div>
@@ -70,13 +103,13 @@ function MerchantOwnerDashboard() {
                     <div className="text-4xl">💰</div>
                   </div>
                 </div>
-                <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-purple-100">Active Staff</p>
-                      <p className="text-3xl font-bold">{staffMembers.length}</p>
+                      <p className="text-blue-100">Active Offers</p>
+                      <p className="text-3xl font-bold">15</p>
                     </div>
-                    <div className="text-4xl">👥</div>
+                    <div className="text-4xl">🏷️</div>
                   </div>
                 </div>
               </div>
@@ -143,7 +176,16 @@ function MerchantOwnerDashboard() {
 
           {activeTab === 'redemptions' && (
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Redemptions</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Recent Redemptions</h3>
+                <a
+                  href="/merchant/verify"
+                  className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  <span className="mr-2">🎫</span>
+                  Verify New Coupon
+                </a>
+              </div>
               <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -228,40 +270,15 @@ function MerchantStaffDashboard() {
 
 // Main Merchant Page with Role Detection
 export default function MerchantPage() {
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate role detection - in real app, get from auth context
-    const mockRole = Math.random() > 0.5 ? UserRole.MERCHANT_OWNER : UserRole.MERCHANT_STAFF;
-    setUserRole(mockRole);
-    setLoading(false);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const userRole = UserRole.MERCHANT_OWNER; // Simplified for demo mode
 
   return (
-    <ProtectedRoute
-      requiredRole={userRole === UserRole.MERCHANT_OWNER ? UserRole.MERCHANT_OWNER : UserRole.MERCHANT_STAFF}
-    >
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {userRole === UserRole.MERCHANT_OWNER ? (
-            <MerchantOwnerDashboard />
-          ) : (
-            <MerchantStaffDashboard />
-          )}
-        </div>
-      </div>
-    </ProtectedRoute>
+    <div className="p-6">
+      {userRole === UserRole.MERCHANT_OWNER ? (
+        <MerchantOwnerDashboard />
+      ) : (
+        <MerchantStaffDashboard />
+      )}
+    </div>
   );
 }

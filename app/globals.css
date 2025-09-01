@@ -1,4 +1,4 @@
-/* Cache bust: 2025-01-27-3 */
+/* Cache bust: 2025-01-27-4 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,11 +19,11 @@
   /* Colors */
   --color-primary: #1b2c7a;
   --color-secondary: #6b3df0;
-  --color-surface: #121428;
-  --color-surface-light: #1a1d35;
-  --color-border: rgba(255, 255, 255, 0.12);
-  --color-text: #ffffff;
-  --color-text-muted: rgba(255, 255, 255, 0.7);
+  --color-surface: #ffffff;
+  --color-surface-light: #f8fafc;
+  --color-border: rgba(0, 0, 0, 0.12);
+  --color-text: #1f2937;
+  --color-text-muted: rgba(0, 0, 0, 0.7);
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;

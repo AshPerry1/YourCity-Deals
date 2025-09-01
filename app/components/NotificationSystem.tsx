@@ -35,7 +35,16 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     fetchNotifications();
-    subscribeToNotifications();
+    let unsubscribe: (() => void) | undefined;
+    
+    const setupSubscription = async () => {
+      unsubscribe = await subscribeToNotifications();
+    };
+    setupSubscription();
+    
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const fetchNotifications = async () => {
@@ -57,8 +66,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
   };
 
-  const subscribeToNotifications = () => {
-    const { data: { user } } = supabase.auth.getUser();
+  const subscribeToNotifications = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
     const subscription = supabase

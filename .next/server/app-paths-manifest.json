@@ -1,1 +1,9 @@
-{}
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js",
+  "/login/page": "app/login/page.js",
+  "/merchant/page": "app/merchant/page.js",
+  "/merchant/verify/page": "app/merchant/verify/page.js",
+  "/merchant/offers/new/page": "app/merchant/offers/new/page.js",
+  "/student/page": "app/student/page.js"
+}

@@ -99,6 +99,10 @@ export default function CreateOfferPage() {
         .eq('id', user.id)
         .single();
 
+      if (!userProfile) {
+        throw new Error('User profile not found');
+      }
+
       // Create the offer
       const { data: offer, error: offerError } = await supabase
         .from('offers')

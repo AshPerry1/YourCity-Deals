@@ -174,16 +174,16 @@ export function generatePurchaseEvent(
     created_by: createdBy,
     lines: [
       // Debit cash for gross amount
-      { account_code: ACCOUNT_CODES.CASH, side: 'debit', amount_cents: grossAmountCents },
+      { account_code: ACCOUNT_CODES.CASH, side: 'debit' as const, amount_cents: grossAmountCents },
       
       // Credit sales for net revenue
-      { account_code: ACCOUNT_CODES.SALES, side: 'credit', amount_cents: netRevenue },
+      { account_code: ACCOUNT_CODES.SALES, side: 'credit' as const, amount_cents: netRevenue },
       
       // Credit discounts if any
-      ...(discountCents > 0 ? [{ account_code: ACCOUNT_CODES.DISCOUNTS, side: 'credit', amount_cents: discountCents }] : []),
+      ...(discountCents > 0 ? [{ account_code: ACCOUNT_CODES.DISCOUNTS, side: 'credit' as const, amount_cents: discountCents }] : []),
       
       // Credit stripe fees
-      { account_code: ACCOUNT_CODES.STRIPE_FEES, side: 'credit', amount_cents: stripeFeeCents },
+      { account_code: ACCOUNT_CODES.STRIPE_FEES, side: 'credit' as const, amount_cents: stripeFeeCents },
     ]
   };
 }
@@ -205,15 +205,15 @@ export function generateRefundEvent(
     created_by: createdBy,
     lines: [
       // Debit refunds
-      { account_code: ACCOUNT_CODES.REFUNDS, side: 'debit', amount_cents: refundAmountCents },
+      { account_code: ACCOUNT_CODES.REFUNDS, side: 'debit' as const, amount_cents: refundAmountCents },
       
       // Credit cash
-      { account_code: ACCOUNT_CODES.CASH, side: 'credit', amount_cents: refundAmountCents },
+      { account_code: ACCOUNT_CODES.CASH, side: 'credit' as const, amount_cents: refundAmountCents },
       
       // If stripe fee is refunded, debit stripe fees and credit cash
       ...(stripeFeeRefundCents > 0 ? [
-        { account_code: ACCOUNT_CODES.STRIPE_FEES, side: 'debit', amount_cents: stripeFeeRefundCents },
-        { account_code: ACCOUNT_CODES.CASH, side: 'credit', amount_cents: stripeFeeRefundCents }
+        { account_code: ACCOUNT_CODES.STRIPE_FEES, side: 'debit' as const, amount_cents: stripeFeeRefundCents },
+        { account_code: ACCOUNT_CODES.CASH, side: 'credit' as const, amount_cents: stripeFeeRefundCents }
       ] : []),
     ]
   };
@@ -235,10 +235,10 @@ export function generateDiscountEvent(
     created_by: createdBy,
     lines: [
       // Debit discounts (contra-revenue)
-      { account_code: ACCOUNT_CODES.DISCOUNTS, side: 'debit', amount_cents: discountAmountCents },
+      { account_code: ACCOUNT_CODES.DISCOUNTS, side: 'debit' as const, amount_cents: discountAmountCents },
       
       // Credit sales
-      { account_code: ACCOUNT_CODES.SALES, side: 'credit', amount_cents: discountAmountCents },
+      { account_code: ACCOUNT_CODES.SALES, side: 'credit' as const, amount_cents: discountAmountCents },
     ]
   };
 }
@@ -260,10 +260,10 @@ export function generatePayoutEvent(
     created_by: createdBy,
     lines: [
       // Debit partner payouts (COGS)
-      { account_code: ACCOUNT_CODES.PARTNER_PAYOUTS, side: 'debit', amount_cents: payoutAmountCents },
+      { account_code: ACCOUNT_CODES.PARTNER_PAYOUTS, side: 'debit' as const, amount_cents: payoutAmountCents },
       
       // Credit cash
-      { account_code: ACCOUNT_CODES.CASH, side: 'credit', amount_cents: payoutAmountCents },
+      { account_code: ACCOUNT_CODES.CASH, side: 'credit' as const, amount_cents: payoutAmountCents },
     ]
   };
 }

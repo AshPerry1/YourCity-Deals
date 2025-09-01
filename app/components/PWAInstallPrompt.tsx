@@ -14,7 +14,7 @@ export default function PWAInstallPrompt() {
     setIsIOS(iOS);
 
     // Detect if already installed
-    const standalone = window.navigator.standalone || 
+    const standalone = (window.navigator as any).standalone || 
       (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
     setIsStandalone(standalone);
 

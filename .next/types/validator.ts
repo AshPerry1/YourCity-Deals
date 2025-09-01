@@ -47,6 +47,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 }
 
 
+// Validate ../../app/admin-login/page.tsx
+{
+  const handler = {} as typeof import("../../app/admin-login/page.js")
+  handler satisfies AppPageConfig<"/admin-login">
+}
+
 // Validate ../../app/admin/accounting/page.tsx
 {
   const handler = {} as typeof import("../../app/admin/accounting/page.js")
@@ -359,6 +365,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/success">
 }
 
+// Validate ../../app/teacher/page.tsx
+{
+  const handler = {} as typeof import("../../app/teacher/page.js")
+  handler satisfies AppPageConfig<"/teacher">
+}
+
 // Validate ../../app/test-merchants/page.tsx
 {
   const handler = {} as typeof import("../../app/test-merchants/page.js")
@@ -483,8 +495,20 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies LayoutConfig<"/">
 }
 
+// Validate ../../app/merchant/layout.tsx
+{
+  const handler = {} as typeof import("../../app/merchant/layout.js")
+  handler satisfies LayoutConfig<"/merchant">
+}
+
 // Validate ../../app/student/layout.tsx
 {
   const handler = {} as typeof import("../../app/student/layout.js")
   handler satisfies LayoutConfig<"/student">
+}
+
+// Validate ../../app/teacher/layout.tsx
+{
+  const handler = {} as typeof import("../../app/teacher/layout.js")
+  handler satisfies LayoutConfig<"/teacher">
 }

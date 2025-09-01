@@ -39,7 +39,13 @@ export default function ProtectedRoute({
         }
 
         // Check role-based access
-        if (requiredRole && currentUser.role !== requiredRole) {
+        // In demo mode, allow access to all portals for testing
+        const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true' ||
+                          !process.env.NEXT_PUBLIC_SUPABASE_URL || 
+                          process.env.NEXT_PUBLIC_SUPABASE_URL === 'your_supabase_project_url';
+        
+        // In demo mode, bypass all role checks - allow access to everything
+        if (!isDemoMode && requiredRole && currentUser.role !== requiredRole) {
           setHasAccess(false);
           setLoading(false);
           return;
@@ -70,10 +76,24 @@ export default function ProtectedRoute({
   }, [requiredRole, requiredPermission]);
 
   if (loading) {
+    // Detect theme based on current path for appropriate spinner color
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+    let spinnerColor = 'border-blue-600'; // default
+    
+    if (currentPath.startsWith('/student')) {
+      spinnerColor = 'border-green-600';
+    } else if (currentPath.startsWith('/teacher')) {
+      spinnerColor = 'border-orange-600';
+    } else if (currentPath.startsWith('/merchant')) {
+      spinnerColor = 'border-purple-600';
+    } else if (currentPath.startsWith('/purchaser')) {
+      spinnerColor = 'border-indigo-600';
+    }
+    
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${spinnerColor} mx-auto`}></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>

@@ -16,14 +16,12 @@ interface StudentStats {
 
 export default function StudentDashboard() {
   const [stats, setStats] = useState<StudentStats | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchStudentData();
   }, []);
 
   const fetchStudentData = async () => {
-    setLoading(true);
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 800));
@@ -41,25 +39,12 @@ export default function StudentDashboard() {
       setStats(mockStats);
     } catch (error) {
       console.error('Error fetching student data:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <ProtectedRoute requiredRole={UserRole.STUDENT}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Header */}
@@ -70,10 +55,10 @@ export default function StudentDashboard() {
 
             {/* Personal Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-blue-100">Total Sales</p>
+                    <p className="text-green-100">Total Sales</p>
                     <p className="text-3xl font-bold">${stats?.totalSales?.toLocaleString()}</p>
                   </div>
                   <div className="text-4xl">💰</div>
@@ -109,7 +94,7 @@ export default function StudentDashboard() {
               </div>
               <div className="w-full bg-gray-200 rounded-full h-4">
                 <div 
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full transition-all duration-300"
+                  className="bg-gradient-to-r from-green-500 to-green-600 h-4 rounded-full transition-all duration-300"
                   style={{ width: `${stats?.progress}%` }}
                 ></div>
               </div>
@@ -124,9 +109,9 @@ export default function StudentDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Link 
                   href="/student/referrals"
-                  className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-left"
+                  className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-left"
                 >
-                  <div className="text-blue-600 text-2xl mb-2">🔗</div>
+                  <div className="text-green-600 text-2xl mb-2">🔗</div>
                   <p className="font-medium text-gray-900">Manage Referral Links</p>
                   <p className="text-sm text-gray-600">{stats?.referralLinks} active links</p>
                 </Link>
@@ -173,7 +158,7 @@ export default function StudentDashboard() {
                 </div>
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <span className="text-sm text-gray-600">New referral link created</span>
                   </div>
                   <span className="text-xs text-gray-500">1 day ago</span>

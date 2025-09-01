@@ -1,5 +1,5 @@
-import StudentSidebar from './components/StudentSidebar';
-import StudentHeader from './components/StudentHeader';
+import StudentSidebarNew from './components/StudentSidebarNew';
+import StudentHeaderNew from './components/StudentHeaderNew';
 
 export default function StudentLayout({
   children,
@@ -9,12 +9,12 @@ export default function StudentLayout({
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <StudentSidebar />
+      <StudentSidebarNew />
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden ml-72">
         {/* Header */}
-        <StudentHeader />
+        <StudentHeaderNew />
         
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto">

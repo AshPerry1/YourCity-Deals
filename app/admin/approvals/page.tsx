@@ -42,8 +42,7 @@ export default function ApprovalsQueuePage() {
     try {
       const { data, error } = await supabase
         .from('pending_approvals')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*');
 
       if (error) throw error;
       setPendingItems(data || []);

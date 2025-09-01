@@ -13,12 +13,12 @@ export function checkRateLimit(
   req: NextRequest, 
   config: RateLimitConfig = { limit: 100, window: 60000 }
 ): { allowed: boolean; remaining: number; resetTime: number } {
-  const ip = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
   const identifier = config.identifier || ip;
   const now = Date.now();
   
   // Clean up expired entries
-  for (const [key, value] of rateLimit.entries()) {
+  for (const [key, value] of Array.from(rateLimit.entries())) {
     if (now > value.resetTime) {
       rateLimit.delete(key);
     }

@@ -90,7 +90,7 @@ export default function PurchasePage() {
       });
 
       if (stripeError) {
-        setError(stripeError.message);
+        setError(stripeError.message || 'Stripe error occurred');
       }
     } catch (err: any) {
       setError(err.message);

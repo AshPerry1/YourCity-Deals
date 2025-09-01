@@ -1,10 +1,7 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
-import './globals.css'
+import './globals.css?v=2025-01-27-4'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
-import PWAStatusChecker from './components/PWAStatusChecker'
-import AdminAccessGuard from './components/AdminAccessGuard'
-import AdminHeader from './components/AdminHeader'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -12,13 +9,6 @@ export const metadata: Metadata = {
   title: 'YourCity Deals',
   description: 'Digital coupon books for schools and local businesses',
   manifest: '/manifest.json',
-  themeColor: '#1b2c7a',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -36,6 +26,14 @@ export const metadata: Metadata = {
       { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
     ],
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#1b2c7a',
 }
 
 export default function RootLayout({
@@ -68,12 +66,8 @@ export default function RootLayout({
         <link rel="preload" href="/icons/icon-192.png" as="image" />
       </head>
       <body className={inter.className}>
-        <AdminHeader />
-        <AdminAccessGuard>
-          {children}
-        </AdminAccessGuard>
+        {children}
         <PWAInstallPrompt />
-        <PWAStatusChecker />
         
         {/* Service Worker Registration */}
         <script
@@ -81,7 +75,16 @@ export default function RootLayout({
             __html: `
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
+                  // Clear old caches first
+                  if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                      for (let name of names) {
+                        caches.delete(name);
+                      }
+                    });
+                  }
+                  
+                  navigator.serviceWorker.register('/sw.js?v=2025-01-27-4')
                     .then(function(registration) {
                       console.log('SW registered: ', registration);
                     })

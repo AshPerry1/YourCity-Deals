@@ -18,8 +18,8 @@ export default function AdminAccessGuard({ children }: { children: React.ReactNo
       const hasAdminAccess = sessionStorage.getItem('adminAccess') === 'true';
       
       if (!hasAdminAccess) {
-        // Redirect to coming soon page if no admin access
-        router.push('/');
+        // Redirect to admin login page if no admin access
+        router.push('/admin-login');
       }
     }
   }, [pathname, router]);

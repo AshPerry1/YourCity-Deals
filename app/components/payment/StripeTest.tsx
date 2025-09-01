@@ -44,7 +44,7 @@ export default function StripeTest() {
       });
 
       if (stripeError) {
-        setError(stripeError.message);
+        setError(stripeError.message || 'Stripe error occurred');
       }
     } catch (err: any) {
       setError(err.message);

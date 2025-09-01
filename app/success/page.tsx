@@ -54,13 +54,17 @@ export default function SuccessPage() {
       if (error) throw error;
 
       if (data) {
+        const bookData = Array.isArray(data.coupon_books) && data.coupon_books.length > 0 
+          ? data.coupon_books[0] 
+          : { name: 'Unknown Book', description: '' };
+          
         setPurchase({
           id: data.id,
           book_id: data.book_id,
           amount_cents: data.amount_cents,
           ref_code: data.ref_code,
           created_at: data.created_at,
-          book: data.coupon_books
+          book: bookData
         });
       }
     } catch (err) {

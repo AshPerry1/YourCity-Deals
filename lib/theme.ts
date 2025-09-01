@@ -8,14 +8,14 @@ export interface ThemeColors {
 }
 
 export interface BusinessBranding {
-  brand_primary: string;
+  brand_primary?: string;
   brand_secondary?: string;
   logo_url?: string;
 }
 
 export interface BookBranding {
   cover_image_url?: string;
-  theme_primary: string;
+  theme_primary?: string;
   theme_secondary?: string;
 }
 

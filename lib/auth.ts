@@ -1,9 +1,41 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create a mock client for development when environment variables are missing
+const createMockClient = () => {
+  return {
+    auth: {
+      getUser: async () => ({ data: { user: null }, error: null }),
+      signOut: async () => ({ error: null }),
+    },
+    from: (table: string) => ({
+      select: (columns?: string) => ({
+        eq: (column: string, value: any) => ({
+          single: async () => ({ data: null, error: null }),
+          count: 0,
+        }),
+        count: async () => ({ count: 0, error: null }),
+      }),
+    }),
+  };
+};
+
+// Check if environment variables are valid URLs (not placeholder values)
+const isValidUrl = (url: string) => {
+  try {
+    new URL(url);
+    return !url.includes('your_supabase_project_url') && !url.includes('your_supabase_anon_key');
+  } catch {
+    return false;
+  }
+};
+
+// Use real Supabase client if environment variables are available and valid, otherwise use mock
+export const supabase = (supabaseUrl && supabaseAnonKey && isValidUrl(supabaseUrl)) 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : createMockClient();
 
 // User roles enum
 export enum UserRole {
@@ -132,11 +164,14 @@ export async function getCurrentUser(): Promise<User | null> {
                       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === 'your_supabase_anon_key';
 
     if (isDemoMode) {
-      // Return a demo admin user for development
+      // Return a demo admin user with all permissions for development
+      const demoRole = UserRole.ADMIN;
+      const demoEmail = 'admin@demo.com';
+      
       const demoUser: User = {
         id: 'demo-user-id',
-        email: 'admin@demo.com',
-        role: UserRole.ADMIN,
+        email: demoEmail,
+        role: demoRole,
         created_at: new Date().toISOString()
       };
       return demoUser;
