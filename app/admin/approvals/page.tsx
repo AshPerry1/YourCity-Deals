@@ -40,12 +40,50 @@ export default function ApprovalsQueuePage() {
 
   const fetchPendingApprovals = async () => {
     try {
-      const { data, error } = await supabase
-        .from('pending_approvals')
-        .select('*');
+      // Try to fetch from the view first, fallback to direct table queries if view doesn't exist
+      let pendingData: PendingItem[] = [];
+      
+      try {
+        const { data, error } = await supabase
+          .from('pending_approvals')
+          .select('*');
 
-      if (error) throw error;
-      setPendingItems(data || []);
+        if (error) {
+          console.error('View query error:', error);
+          throw error;
+        }
+        pendingData = data || [];
+      } catch (viewError) {
+        console.log('View not available, using direct table queries');
+        
+        // Fallback: Query offers directly
+        const { data: offersData } = await supabase
+          .from('offers')
+          .select(`
+            id,
+            title,
+            status,
+            created_at,
+            businesses!inner(name),
+            created_by
+          `)
+          .eq('status', 'pending_review');
+
+        // Transform offers data to match PendingItem interface
+        const transformedOffers: PendingItem[] = (offersData || []).map(offer => ({
+          type: 'offer' as const,
+          id: offer.id,
+          item_name: offer.title,
+          merchant_name: offer.businesses?.name || 'Unknown',
+          status: offer.status,
+          created_at: offer.created_at,
+          submitted_by: offer.created_by || 'Unknown'
+        }));
+
+        pendingData = transformedOffers;
+      }
+      
+      setPendingItems(pendingData);
     } catch (err) {
       console.error('Error fetching pending approvals:', err);
       setError('Failed to load pending approvals');
