@@ -83,16 +83,16 @@ export default function ApprovalModePage() {
       if (error) throw error;
 
       // Get user emails for the history
-      const userIds = Array.from(new Set(data?.map(item => item.user_id).filter(Boolean) || []));
+      const userIds = Array.from(new Set(data?.map((item: any) => item.user_id).filter(Boolean) || []));
       const { data: users } = await supabase
         .from('auth.users')
         .select('id, email')
         .in('id', userIds);
 
-      const userMap = new Map(users?.map(u => [u.id, u.email]) || []);
+      const userMap = new Map(users?.map((u: any) => [u.id, u.email]) || []);
 
       setApprovalHistory(
-        data?.map(item => ({
+        data?.map((item: any) => ({
           ...item,
           user_email: userMap.get(item.user_id) || 'Unknown User'
         })) || []

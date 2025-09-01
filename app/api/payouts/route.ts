@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin, getDatabaseNotConfiguredResponse } from '@/lib/supabaseAdmin';
 import { 
   Payout, 
   PayoutReceipt,
@@ -11,15 +11,16 @@ import {
 } from '@/lib/payouts';
 import { generatePayoutEvent } from '@/lib/accounting';
 
-// Initialize Supabase client with service role for admin operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// supabaseAdmin is imported from lib/supabaseAdmin
 
 // GET - Retrieve payouts with filters
 export async function GET(request: Request) {
   try {
+    // Check if database is configured
+    if (!supabaseAdmin) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const schoolId = searchParams.get('school_id');

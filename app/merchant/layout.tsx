@@ -8,11 +8,11 @@ export default function MerchantLayout({
   children: React.ReactNode;
 }) {
   const navigation = [
-    { name: 'Analytics', href: '/merchant', icon: '📊', current: true },
-    { name: 'Create Offers', href: '/merchant/offers/new', icon: '➕', current: false },
-    { name: 'Verify Coupons', href: '/merchant/verify', icon: '🎫', current: false },
-    { name: 'Staff Management', href: '/merchant/staff', icon: '👥', current: false },
-    { name: 'Store Settings', href: '/merchant/settings', icon: '⚙️', current: false },
+    { name: 'Analytics', href: '/merchant', icon: '📊', current: true, description: 'View business analytics and reports' },
+    { name: 'Create Offers', href: '/merchant/offers/new', icon: '➕', current: false, description: 'Create new coupon offers' },
+    { name: 'Verify Coupons', href: '/merchant/verify', icon: '🎫', current: false, description: 'Verify and redeem coupons' },
+    { name: 'Staff Management', href: '/merchant/staff', icon: '👥', current: false, description: 'Manage staff and permissions' },
+    { name: 'Store Settings', href: '/merchant/settings', icon: '⚙️', current: false, description: 'Configure store settings' },
   ];
 
   const userInfo = {

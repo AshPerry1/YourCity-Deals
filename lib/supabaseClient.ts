@@ -6,31 +6,45 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Create a mock client for development when environment variables are missing
 const createMockClient = () => {
+  // Create a promise-like object that resolves to empty data
+  const createMockPromise = () => Promise.resolve({ data: [], error: null, count: 0 });
+  
+  const mockQueryBuilder: any = new Proxy({}, {
+    get: (target, prop) => {
+      // Special methods that should return promises
+      if (prop === 'then' || prop === 'catch' || prop === 'finally') {
+        const promise = createMockPromise();
+        const method = promise[prop as keyof Promise<any>];
+        if (typeof method === 'function') {
+          return method.bind(promise);
+        }
+        return method;
+      }
+      
+      // Methods that should return promises directly
+      if (prop === 'single' || prop === 'maybeSingle') {
+        return () => Promise.resolve({ data: null, error: null });
+      }
+      
+      // All other methods return the builder for chaining
+      return () => mockQueryBuilder;
+    }
+  });
+
   return {
     auth: {
       getUser: async () => ({ data: { user: null }, error: null }),
       signOut: async () => ({ error: null }),
     },
-    from: (table: string) => ({
-      select: (columns?: string) => ({
-        eq: (column: string, value: any) => ({
-          single: async () => ({ data: null, error: null }),
-          count: 0,
-        }),
-        count: async () => ({ count: 0, error: null }),
-      }),
-      insert: (data: any) => ({
-        select: async () => ({ data: null, error: null }),
-      }),
-      update: (data: any) => ({
-        eq: (column: string, value: any) => ({
-          select: async () => ({ data: null, error: null }),
-        }),
-      }),
-      delete: () => ({
-        eq: async (column: string, value: any) => ({ data: null, error: null }),
-      }),
-    }),
+    from: () => mockQueryBuilder,
+    rpc: () => Promise.resolve({ data: null, error: null }),
+    channel: () => {
+      const mockChannel: any = {
+        on: () => mockChannel,
+        subscribe: () => ({ unsubscribe: () => {} }),
+      };
+      return mockChannel;
+    },
   };
 };
 

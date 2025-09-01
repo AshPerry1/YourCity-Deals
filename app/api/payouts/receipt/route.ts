@@ -8,14 +8,26 @@ import {
 } from '@/lib/payouts';
 
 // Initialize Supabase client with service role for admin operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabaseAdmin = (supabaseUrl && supabaseServiceKey && 
+  supabaseUrl !== 'your_supabase_project_url' && 
+  supabaseServiceKey !== 'your_supabase_service_role_key') 
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null;
 
 // GET - Generate receipt for a payout
 export async function GET(request: Request) {
   try {
+    // Check if database is configured
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Database not configured' },
+        { status: 503 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const payoutId = searchParams.get('payout_id');
 

@@ -10,6 +10,12 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
   },
+  // Skip static optimization for API routes to avoid build-time execution
+  experimental: {
+    isrMemoryCacheSize: 0,
+  },
+  // Disable static optimization to prevent API routes from being called during build
+  output: 'standalone',
   async headers() {
     return [
       {
