@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin, getDatabaseNotConfiguredResponse } from '@/lib/supabaseAdmin';
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     const { code, userAgent, ipAddress, referrer } = await request.json();
     
     if (!code) {
@@ -74,6 +75,12 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
     

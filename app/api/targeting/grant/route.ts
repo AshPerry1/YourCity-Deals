@@ -1,15 +1,16 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin, getDatabaseNotConfiguredResponse } from '@/lib/supabaseAdmin';
 import { TargetingEngine } from '@/lib/targeting';
 import { CouponTargetingRule, UserProfile, CouponGrant, TargetingRule } from '@/lib/types';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(request: Request) {
   try {
+    // Check if database is configured
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return getDatabaseNotConfiguredResponse();
+    }
+
     const { ruleId, userId } = await request.json();
     
     if (!ruleId) {
