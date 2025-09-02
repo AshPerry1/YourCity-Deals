@@ -280,9 +280,6 @@ export default function AboutUs() {
               Explore Platform
             </Link>
           </div>
-          <p className="text-blue-100 mt-6">
-            <a href="mailto:adperry18@gmail.com?subject=YourCity%20Deals%20-%20General%20Inquiry&body=Hi%20Ash%2C%0A%0AI%20would%20like%20to%20learn%20more%20about%20YourCity%20Deals.%0A%0ABest%20regards%2C%0A%5BYour%20Name%5D" className="underline hover:text-white">adperry18@gmail.com</a>
-          </p>
         </div>
       </section>
 
