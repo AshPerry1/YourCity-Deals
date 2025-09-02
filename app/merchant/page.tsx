@@ -14,9 +14,6 @@ export default function MerchantConsole() {
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Debug logging
-  console.log('Merchant Console Debug:', { currentRole, isAuthenticated, availableRoles });
-
   useEffect(() => {
     if (currentRole === 'merchant_manager') {
       fetchData();
