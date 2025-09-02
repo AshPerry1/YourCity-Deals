@@ -6,11 +6,13 @@ export default function MarketingLanding() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">YourCity Deals</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+                YourCity Deals
+              </h1>
             </div>
             <nav className="flex space-x-6">
               <Link href="/admin" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
@@ -34,113 +36,145 @@ export default function MarketingLanding() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">YourCity Deals</h1>
-          <p className="text-xl mb-8 max-w-3xl mx-auto">
-            The modern digital coupon book platform that transforms school fundraising. 
-            Students earn points, schools get funding, and communities save money.
+      <section className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mb-8">
+            <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
+              <span className="text-sm font-medium text-blue-200">Trusted by 15+ Schools Nationwide</span>
+            </div>
+          </div>
+          <h1 className="text-6xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent leading-tight">
+            YourCity Deals
+          </h1>
+          <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-4xl mx-auto leading-relaxed">
+            The enterprise-grade digital coupon platform revolutionizing school fundraising. 
+            Where technology meets community impact.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
             <Link 
               href="/admin"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
+              className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             >
-              <div className="text-2xl mb-1">👨‍💼</div>
-              <div>Admin</div>
+              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">👨‍💼</div>
+              <div className="font-semibold text-white">Admin Portal</div>
+              <div className="text-sm text-blue-200 mt-1">Manage & Analytics</div>
             </Link>
             <Link 
               href="/student"
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
+              className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             >
-              <div className="text-2xl mb-1">👨‍🎓</div>
-              <div>Student</div>
+              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">👨‍🎓</div>
+              <div className="font-semibold text-white">Student Hub</div>
+              <div className="text-sm text-blue-200 mt-1">Earn & Track</div>
             </Link>
             <Link 
               href="/teacher"
-              className="bg-gradient-to-r from-orange-600 to-red-700 hover:from-orange-700 hover:to-red-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
+              className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             >
-              <div className="text-2xl mb-1">👩‍🏫</div>
-              <div>Teacher</div>
+              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">👩‍🏫</div>
+              <div className="font-semibold text-white">Teacher Console</div>
+              <div className="text-sm text-blue-200 mt-1">Monitor Progress</div>
             </Link>
             <Link 
               href="/merchant"
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
+              className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             >
-              <div className="text-2xl mb-1">🏪</div>
-              <div>Merchant</div>
+              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">🏪</div>
+              <div className="font-semibold text-white">Merchant Suite</div>
+              <div className="text-sm text-blue-200 mt-1">Business Tools</div>
             </Link>
             <Link 
               href="/"
-              className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
+              className="group bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-6 hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
             >
-              <div className="text-2xl mb-1">🛒</div>
-              <div>Buy Coupons</div>
+              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">🛒</div>
+              <div className="font-semibold text-white">Marketplace</div>
+              <div className="text-sm text-blue-100 mt-1">Browse Deals</div>
             </Link>
           </div>
         </div>
       </section>
 
       {/* Statistics Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-24 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Trusted by Educational Leaders</h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">Join hundreds of schools already transforming their fundraising with enterprise-grade technology</p>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-2">500+</div>
-              <div className="text-gray-600">Students Active</div>
+            <div className="text-center group">
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                <div className="text-5xl font-bold text-blue-600 mb-3">500+</div>
+                <div className="text-slate-600 font-medium">Active Students</div>
+                <div className="text-sm text-slate-500 mt-1">Engaged Learners</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-2">50+</div>
-              <div className="text-gray-600">Local Businesses</div>
+            <div className="text-center group">
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                <div className="text-5xl font-bold text-indigo-600 mb-3">50+</div>
+                <div className="text-slate-600 font-medium">Local Businesses</div>
+                <div className="text-sm text-slate-500 mt-1">Community Partners</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">$25K+</div>
-              <div className="text-gray-600">Funds Raised</div>
+            <div className="text-center group">
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                <div className="text-5xl font-bold text-emerald-600 mb-3">$25K+</div>
+                <div className="text-slate-600 font-medium">Funds Raised</div>
+                <div className="text-sm text-slate-500 mt-1">Impact Generated</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-orange-500 mb-2">15</div>
-              <div className="text-gray-600">Schools Partnered</div>
+            <div className="text-center group">
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                <div className="text-5xl font-bold text-orange-600 mb-3">15</div>
+                <div className="text-slate-600 font-medium">Schools Partnered</div>
+                <div className="text-sm text-slate-500 mt-1">Growing Network</div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Platform Features */}
-      <section className="py-16">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Platform Features</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Enterprise-Grade Features</h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">Built for scale, designed for impact. Every feature engineered to maximize fundraising success.</p>
+          </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="group bg-gradient-to-br from-slate-50 to-blue-50 p-8 rounded-3xl border border-slate-200/50 hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <div className="text-center mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Digital Coupon Books</h3>
-                <p className="text-gray-600">Create and manage digital coupon books with instant redemption tracking, real-time analytics, and seamless customer experience.</p>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">Digital Coupon Books</h3>
+                <p className="text-slate-600 leading-relaxed">Enterprise-grade digital coupon management with real-time analytics, instant redemption tracking, and seamless customer experience across all devices.</p>
               </div>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="group bg-gradient-to-br from-slate-50 to-emerald-50 p-8 rounded-3xl border border-slate-200/50 hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <div className="text-center mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Student Rewards System</h3>
-                <p className="text-gray-600">Students earn points for sales and coupon redemptions, unlocking school rewards, recognition, and building valuable business skills.</p>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">Student Rewards System</h3>
+                <p className="text-slate-600 leading-relaxed">Comprehensive gamification platform where students earn points, unlock achievements, and build valuable business skills while supporting their school.</p>
               </div>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="group bg-gradient-to-br from-slate-50 to-purple-50 p-8 rounded-3xl border border-slate-200/50 hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <div className="text-center mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h3a2 2 0 012 2v14a2 2 0 01-2 2h-3a2 2 0 01-2-2z"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Advanced Analytics</h3>
-                <p className="text-gray-600">Comprehensive reporting and insights to track performance, monitor sales trends, and optimize your fundraising strategy for maximum success.</p>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">Advanced Analytics</h3>
+                <p className="text-slate-600 leading-relaxed">Comprehensive business intelligence dashboard with predictive analytics, performance insights, and data-driven optimization strategies.</p>
               </div>
             </div>
           </div>
