@@ -69,6 +69,7 @@ export default function YourCityDealsApp() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSharing, setShowSharing] = useState<CouponOffer | null>(null);
   const [showGiftModal, setShowGiftModal] = useState<CouponBook | null>(null);
+  const [showPreviewModal, setShowPreviewModal] = useState<CouponBook | null>(null);
   const [activatedCoupon, setActivatedCoupon] = useState<CouponOffer | null>(null);
   const [activationTimer, setActivationTimer] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<'discover' | 'my-books' | 'my-coupons' | 'nearby'>('discover');
@@ -273,7 +274,7 @@ export default function YourCityDealsApp() {
 
   const handlePreviewBook = (book: CouponBook) => {
     // Show a modal with book details and sample offers
-    setShowGiftModal(book); // Temporarily use gift modal for preview
+    setShowPreviewModal(book);
   };
 
   const activateCoupon = (coupon: CouponOffer) => {
@@ -1064,6 +1065,91 @@ export default function YourCityDealsApp() {
             // In real app, this would trigger the gift purchase flow
           }}
         />
+      )}
+
+      {/* Preview Modal */}
+      {showPreviewModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Preview: {showPreviewModal.title}</h2>
+                <button
+                  onClick={() => setShowPreviewModal(null)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Book Details</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">School:</span>
+                      <p className="font-medium">{showPreviewModal.school}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Price:</span>
+                      <p className="font-medium">${showPreviewModal.price.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Offers:</span>
+                      <p className="font-medium">{showPreviewModal.totalOffers} amazing deals</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Valid Until:</span>
+                      <p className="font-medium">{formatDate(showPreviewModal.validTo)}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Sample Offers</h3>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h4 className="font-medium text-gray-900">Local Restaurant - 20% Off</h4>
+                      <p className="text-sm text-gray-600 mt-1">Valid for dine-in or takeout. Cannot be combined with other offers.</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h4 className="font-medium text-gray-900">Coffee Shop - Buy One Get One Free</h4>
+                      <p className="text-sm text-gray-600 mt-1">Any size drink. Valid Monday-Friday before 3pm.</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h4 className="font-medium text-gray-900">Movie Theater - $5 Off</h4>
+                      <p className="text-sm text-gray-600 mt-1">Any movie, any time. Valid for up to 4 tickets per visit.</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-blue-50 rounded-xl p-4">
+                  <h3 className="font-medium text-blue-900 mb-2">Ready to Purchase?</h3>
+                  <p className="text-sm text-blue-700 mb-4">Get access to all {showPreviewModal.totalOffers} amazing offers and support {showPreviewModal.school}!</p>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setShowPreviewModal(null)}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors font-medium"
+                    >
+                      Close Preview
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowPreviewModal(null);
+                        setShowAuth('signup');
+                      }}
+                      className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium"
+                    >
+                      Sign Up to Buy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Activation Modal */}
