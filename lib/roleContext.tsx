@@ -26,20 +26,29 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     
     setCurrentUser(mockUser);
     setAvailableRoles(mockRoles);
-    setCurrentRole('buyer'); // Default to buyer role
     setIsAuthenticated(true);
 
-    // Load saved role from localStorage
-    const savedRole = localStorage.getItem('currentRole') as UserRole['role'];
-    if (savedRole && mockRoles.includes(savedRole)) {
-      setCurrentRole(savedRole);
+    // Load saved role from localStorage first, then fall back to buyer
+    // Check if we're in browser environment
+    if (typeof window !== 'undefined') {
+      const savedRole = localStorage.getItem('currentRole') as UserRole['role'];
+      if (savedRole && mockRoles.includes(savedRole)) {
+        setCurrentRole(savedRole);
+      } else {
+        setCurrentRole('buyer'); // Default to buyer role only if no saved role
+      }
+    } else {
+      setCurrentRole('buyer'); // Default for SSR
     }
   }, []);
 
   const switchRole = (role: UserRole['role']) => {
     if (availableRoles.includes(role)) {
       setCurrentRole(role);
-      localStorage.setItem('currentRole', role);
+      // Only save to localStorage if we're in browser environment
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('currentRole', role);
+      }
     }
   };
 
