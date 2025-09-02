@@ -30,6 +30,9 @@ export default function MarketingLanding() {
               <Link href="/merchant" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
                 Merchant Console
               </Link>
+              <Link href="/about-us" className="text-gray-700 hover:text-red-600 font-medium transition-colors">
+                Our Story
+              </Link>
             </nav>
           </div>
         </div>
@@ -367,6 +370,26 @@ export default function MarketingLanding() {
             <Link href="/" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold border border-blue-200 transition-colors">
               Browse Marketplace
             </Link>
+          </div>
+          
+          {/* Contact Section */}
+          <div className="mt-12 text-center">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Get in Touch</h3>
+            <p className="text-gray-600 mb-6">Ready to transform your organization's fundraising? Let's discuss how YourCity Deals can work for you.</p>
+            <div className="flex justify-center">
+              <a 
+                href="mailto:adperry18@gmail.com" 
+                className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Contact Us
+              </a>
+            </div>
+            <p className="text-sm text-gray-500 mt-3">
+              <a href="mailto:adperry18@gmail.com" className="text-blue-600 hover:text-blue-700">adperry18@gmail.com</a>
+            </p>
           </div>
         </div>
       </section>

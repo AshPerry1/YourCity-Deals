@@ -482,6 +482,9 @@ export default function YourCityDealsApp() {
                 <Link href="/about" className="text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors">
                   About
                 </Link>
+                <Link href="/about-us" className="text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors">
+                  Our Story
+                </Link>
               </div>
               
               {isAuthenticated ? (
