@@ -465,13 +465,13 @@ export default function YourCityDealsApp() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 sticky top-0 z-40">
+      <div className="bg-white/90 backdrop-blur-xl shadow-sm border-b border-gray-200/30 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 YourCity Deals
               </h1>
             </div>
@@ -517,7 +517,7 @@ export default function YourCityDealsApp() {
                   </button>
                   <button
                     onClick={() => setShowAuth('signup')}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl"
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
                     Sign Up
                   </button>
@@ -529,7 +529,7 @@ export default function YourCityDealsApp() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-8">
             {isAuthenticated && (
