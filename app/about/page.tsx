@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function MarketingLanding() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -34,13 +36,66 @@ export default function MarketingLanding() {
                 Our Story
               </Link>
             </nav>
-            <button className="md:hidden text-gray-700">
+            <button 
+              className="md:hidden text-gray-700 hover:text-gray-900 transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-200">
+            <nav className="px-4 py-4 space-y-3">
+              <Link 
+                href="/" 
+                className="block text-gray-700 hover:text-indigo-600 font-medium transition-colors text-sm py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Marketplace
+              </Link>
+              <Link 
+                href="/admin" 
+                className="block text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Admin
+              </Link>
+              <Link 
+                href="/student" 
+                className="block text-gray-700 hover:text-green-600 font-medium transition-colors text-sm py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Seller
+              </Link>
+              <Link 
+                href="/org" 
+                className="block text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Org Hub
+              </Link>
+              <Link 
+                href="/merchant" 
+                className="block text-gray-700 hover:text-purple-600 font-medium transition-colors text-sm py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Merchant
+              </Link>
+              <Link 
+                href="/about-us" 
+                className="block text-gray-700 hover:text-red-600 font-medium transition-colors text-sm py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Our Story
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
