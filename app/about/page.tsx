@@ -19,10 +19,10 @@ export default function MarketingLanding() {
                 Admin
               </Link>
               <Link href="/student" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
-                Student
+                Seller
               </Link>
-              <Link href="/teacher" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
-                Teacher
+              <Link href="/org" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
+                Organization
               </Link>
               <Link href="/merchant" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
                 Merchant
@@ -41,15 +41,15 @@ export default function MarketingLanding() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-8">
             <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-              <span className="text-sm font-medium text-blue-200">Trusted by 15+ Schools Nationwide</span>
+              <span className="text-sm font-medium text-blue-200">Trusted by 50+ Organizations Nationwide</span>
             </div>
           </div>
           <h1 className="text-6xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent leading-tight">
             YourCity Deals
           </h1>
           <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-4xl mx-auto leading-relaxed">
-            The enterprise-grade digital coupon platform revolutionizing school fundraising. 
-            Where technology meets community impact.
+            The enterprise-grade digital coupon platform revolutionizing community fundraising. 
+            Where technology meets local impact for schools, neighborhoods, events, and cities.
           </p>
           <div className="flex justify-center">
             <Link 
@@ -71,35 +71,35 @@ export default function MarketingLanding() {
       <section className="py-24 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Trusted by Educational Leaders</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">Join hundreds of schools already transforming their fundraising with enterprise-grade technology</p>
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">Trusted by Community Leaders</h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">Join hundreds of organizations already transforming their fundraising with enterprise-grade technology</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center group">
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                <div className="text-5xl font-bold text-blue-600 mb-3">500+</div>
-                <div className="text-slate-600 font-medium">Active Students</div>
-                <div className="text-sm text-slate-500 mt-1">Engaged Learners</div>
+                <div className="text-5xl font-bold text-blue-600 mb-3">2,500+</div>
+                <div className="text-slate-600 font-medium">Active Sellers</div>
+                <div className="text-sm text-slate-500 mt-1">Community Ambassadors</div>
               </div>
             </div>
             <div className="text-center group">
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                <div className="text-5xl font-bold text-indigo-600 mb-3">50+</div>
+                <div className="text-5xl font-bold text-indigo-600 mb-3">200+</div>
                 <div className="text-slate-600 font-medium">Local Businesses</div>
                 <div className="text-sm text-slate-500 mt-1">Community Partners</div>
               </div>
             </div>
             <div className="text-center group">
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                <div className="text-5xl font-bold text-emerald-600 mb-3">$25K+</div>
+                <div className="text-5xl font-bold text-emerald-600 mb-3">$150K+</div>
                 <div className="text-slate-600 font-medium">Funds Raised</div>
                 <div className="text-sm text-slate-500 mt-1">Impact Generated</div>
               </div>
             </div>
             <div className="text-center group">
               <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                <div className="text-5xl font-bold text-orange-600 mb-3">15</div>
-                <div className="text-slate-600 font-medium">Schools Partnered</div>
+                <div className="text-5xl font-bold text-orange-600">50</div>
+                <div className="text-slate-600 font-medium">Organizations</div>
                 <div className="text-sm text-slate-500 mt-1">Growing Network</div>
               </div>
             </div>
@@ -133,8 +133,8 @@ export default function MarketingLanding() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">Student Rewards System</h3>
-                <p className="text-slate-600 leading-relaxed">Comprehensive gamification platform where students earn points, unlock achievements, and build valuable business skills while supporting their school.</p>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4">Community Rewards System</h3>
+                <p className="text-slate-600 leading-relaxed">Comprehensive gamification platform where community members earn points, unlock achievements, and build valuable business skills while supporting their organizations.</p>
               </div>
             </div>
             <div className="group bg-gradient-to-br from-slate-50 to-purple-50 p-8 rounded-3xl border border-slate-200/50 hover:shadow-2xl transition-all duration-300 hover:scale-105">
@@ -161,29 +161,29 @@ export default function MarketingLanding() {
               <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold text-xl">1</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Schools Sign Up</h3>
-              <p className="text-gray-600">Register your school and set fundraising goals</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Organizations Sign Up</h3>
+              <p className="text-gray-600">Register your organization and set fundraising goals</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold text-xl">2</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Students Join</h3>
-              <p className="text-gray-600">Students create accounts and start earning points</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Sellers Join</h3>
+              <p className="text-gray-600">Community members create accounts and start earning points</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold text-xl">3</span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Sell Coupons</h3>
-              <p className="text-gray-600">Students sell digital coupons to friends and family</p>
+              <p className="text-gray-600">Sellers share digital coupons with friends and family</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold text-xl">4</span>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Earn Rewards</h3>
-              <p className="text-gray-600">Schools receive funding, students earn rewards</p>
+              <p className="text-gray-600">Organizations receive funding, sellers earn rewards</p>
             </div>
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function MarketingLanding() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">For Schools</h3>
+                <h3 className="text-xl font-semibold text-gray-900">For Organizations</h3>
               </div>
               <ul className="space-y-3">
                 <li className="flex items-start">
@@ -226,7 +226,7 @@ export default function MarketingLanding() {
                   <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  <span className="text-gray-600">Better student engagement and motivation</span>
+                  <span className="text-gray-600">Better community engagement and motivation</span>
                 </li>
                 <li className="flex items-start">
                   <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,14 +243,14 @@ export default function MarketingLanding() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">For Students</h3>
+                <h3 className="text-xl font-semibold text-gray-900">For Sellers</h3>
               </div>
               <ul className="space-y-3">
                 <li className="flex items-start">
                   <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  <span className="text-gray-600">Earn points and recognition for school</span>
+                  <span className="text-gray-600">Earn points and recognition for your community</span>
                 </li>
                 <li className="flex items-start">
                   <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,7 +359,7 @@ export default function MarketingLanding() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Get Started?</h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Join the digital fundraising revolution and see how YourCity Deals can transform your school's fundraising efforts.</p>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Join the digital fundraising revolution and see how YourCity Deals can transform your organization's fundraising efforts.</p>
           <div className="flex justify-center space-x-4">
             <Link href="/admin-login" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
               Start Admin Console
@@ -375,10 +375,11 @@ export default function MarketingLanding() {
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h3 className="text-2xl font-bold mb-4">YourCity Deals</h3>
-          <p className="text-gray-400 mb-6">Digital coupon book platform for schools and communities</p>
+          <p className="text-gray-400 mb-6">Digital coupon book platform for communities and organizations</p>
           <div className="flex justify-center space-x-6">
-            <Link href="/admin-login" className="text-gray-400 hover:text-white">Admin Portal</Link>
-            <Link href="/student" className="text-gray-400 hover:text-white">Student Portal</Link>
+            <Link href="/admin" className="text-gray-400 hover:text-white">Admin Portal</Link>
+            <Link href="/student" className="text-gray-400 hover:text-white">Seller Portal</Link>
+            <Link href="/org" className="text-gray-400 hover:text-white">Organization Hub</Link>
             <Link href="/merchant" className="text-gray-400 hover:text-white">Merchant Console</Link>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-800">
