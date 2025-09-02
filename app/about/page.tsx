@@ -394,7 +394,7 @@ export default function MarketingLanding() {
             
             <div className="flex justify-center">
               <a 
-                href="mailto:adperry18@gmail.com" 
+                href="mailto:adperry18@gmail.com?subject=YourCity%20Deals%20-%20Organization%20Inquiry&body=Hi%20Ash%2C%0A%0AI%20saw%20YourCity%20Deals%20and%20would%20like%20to%20learn%20more%20about%20how%20it%20could%20help%20our%20organization%20with%20fundraising.%0A%0AOrganization%20Name%3A%0AOrganization%20Type%20(school%2Fneighborhood%2Fevent%2Fcity)%3A%0AExpected%20Fundraising%20Goal%3A%0A%0AI%20look%20forward%20to%20hearing%20from%20you%21%0A%0ABest%20regards%2C%0A%5BYour%20Name%5D" 
                 className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -404,7 +404,7 @@ export default function MarketingLanding() {
               </a>
             </div>
             <p className="text-sm text-gray-500 mt-3">
-              <a href="mailto:adperry18@gmail.com" className="text-blue-600 hover:text-blue-700">adperry18@gmail.com</a>
+              <a href="mailto:adperry18@gmail.com?subject=YourCity%20Deals%20-%20Organization%20Inquiry&body=Hi%20Ash%2C%0A%0AI%20saw%20YourCity%20Deals%20and%20would%20like%20to%20learn%20more%20about%20how%20it%20could%20help%20our%20organization%20with%20fundraising.%0A%0AOrganization%20Name%3A%0AOrganization%20Type%20(school%2Fneighborhood%2Fevent%2Fcity)%3A%0AExpected%20Fundraising%20Goal%3A%0A%0AI%20look%20forward%20to%20hearing%20from%20you%21%0A%0ABest%20regards%2C%0A%5BYour%20Name%5D" className="text-blue-600 hover:text-blue-700">adperry18@gmail.com</a>
             </p>
           </div>
         </div>

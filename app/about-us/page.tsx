@@ -255,7 +255,7 @@ export default function AboutUs() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <a 
-              href="mailto:adperry18@gmail.com" 
+              href="mailto:adperry18@gmail.com?subject=YourCity%20Deals%20-%20Partnership%20Inquiry&body=Hi%20Ash%2C%0A%0AI%20visited%20your%20About%20Us%20page%20and%20would%20like%20to%20discuss%20a%20potential%20partnership%20or%20learn%20more%20about%20YourCity%20Deals.%0A%0AOrganization%20Name%3A%0AOrganization%20Type%3A%0AHow%20we%20heard%20about%20you%3A%0A%0AI%20look%20forward%20to%20hearing%20from%20you%21%0A%0ABest%20regards%2C%0A%5BYour%20Name%5D" 
               className="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,7 +271,7 @@ export default function AboutUs() {
             </Link>
           </div>
           <p className="text-blue-100 mt-6">
-            <a href="mailto:adperry18@gmail.com" className="underline hover:text-white">adperry18@gmail.com</a>
+            <a href="mailto:adperry18@gmail.com?subject=YourCity%20Deals%20-%20General%20Inquiry&body=Hi%20Ash%2C%0A%0AI%20would%20like%20to%20learn%20more%20about%20YourCity%20Deals.%0A%0ABest%20regards%2C%0A%5BYour%20Name%5D" className="underline hover:text-white">adperry18@gmail.com</a>
           </p>
         </div>
       </section>
