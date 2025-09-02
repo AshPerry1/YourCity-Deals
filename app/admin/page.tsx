@@ -105,16 +105,16 @@ export default function AdminConsole() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Admin Console</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Admin Console</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">Admin Dashboard</span>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">Role:</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <span className="hidden sm:inline text-sm text-gray-500">Admin Dashboard</span>
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                <span className="hidden sm:inline text-sm text-gray-500">Role:</span>
                 <select
                   value={currentRole || ''}
                   onChange={(e) => switchRole(e.target.value as any)}
-                  className="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
+                  className="text-xs sm:text-sm border border-gray-300 rounded px-1 sm:px-2 py-1 bg-white"
                 >
                   {availableRoles.map(role => (
                     <option key={role} value={role}>
@@ -131,7 +131,7 @@ export default function AdminConsole() {
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
+          <nav className="flex space-x-4 sm:space-x-6 lg:space-x-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab('books')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${

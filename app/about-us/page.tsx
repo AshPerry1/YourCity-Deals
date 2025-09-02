@@ -10,27 +10,32 @@ export default function AboutUs() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <Link href="/" className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 YourCity Deals
               </Link>
             </div>
-            <nav className="flex space-x-6">
-              <Link href="/" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">
+            <nav className="hidden md:flex space-x-4 lg:space-x-6">
+              <Link href="/" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors text-sm">
                 Marketplace
               </Link>
-              <Link href="/admin" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-                Admin Console
+              <Link href="/admin" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm">
+                Admin
               </Link>
-              <Link href="/student" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
-                Seller Portal
+              <Link href="/student" className="text-gray-700 hover:text-green-600 font-medium transition-colors text-sm">
+                Seller
               </Link>
-              <Link href="/org" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
-                Organization Hub
+              <Link href="/org" className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm">
+                Org Hub
               </Link>
-              <Link href="/merchant" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
-                Merchant Console
+              <Link href="/merchant" className="text-gray-700 hover:text-purple-600 font-medium transition-colors text-sm">
+                Merchant
               </Link>
             </nav>
+            <button className="md:hidden text-gray-700">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
@@ -38,12 +43,12 @@ export default function AboutUs() {
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24">
           <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
               Our Story
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed px-4">
               From a simple idea to revolutionize fundraising, YourCity Deals was born from a passion to connect communities and empower organizations. Currently in development, launching Summer 2026.
             </p>
           </div>

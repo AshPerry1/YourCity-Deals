@@ -10,57 +10,62 @@ export default function MarketingLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
                 YourCity Deals
               </h1>
             </div>
-            <nav className="flex space-x-6">
-              <Link href="/" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">
+            <nav className="hidden md:flex space-x-4 lg:space-x-6">
+              <Link href="/" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors text-sm">
                 Marketplace
               </Link>
-              <Link href="/admin" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-                Admin Console
+              <Link href="/admin" className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-sm">
+                Admin
               </Link>
-              <Link href="/student" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
-                Seller Portal
+              <Link href="/student" className="text-gray-700 hover:text-green-600 font-medium transition-colors text-sm">
+                Seller
               </Link>
-              <Link href="/org" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
-                Organization Hub
+              <Link href="/org" className="text-gray-700 hover:text-orange-600 font-medium transition-colors text-sm">
+                Org Hub
               </Link>
-              <Link href="/merchant" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
-                Merchant Console
+              <Link href="/merchant" className="text-gray-700 hover:text-purple-600 font-medium transition-colors text-sm">
+                Merchant
               </Link>
-              <Link href="/about-us" className="text-gray-700 hover:text-red-600 font-medium transition-colors">
+              <Link href="/about-us" className="text-gray-700 hover:text-red-600 font-medium transition-colors text-sm">
                 Our Story
               </Link>
             </nav>
+            <button className="md:hidden text-gray-700">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white py-32 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white py-16 sm:py-24 md:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-8">
-              <span className="text-sm font-medium text-blue-200">Trusted by 50+ Organizations Nationwide</span>
+          <div className="mb-6 sm:mb-8">
+            <div className="inline-flex items-center px-3 sm:px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-6 sm:mb-8">
+              <span className="text-xs sm:text-sm font-medium text-blue-200">Trusted by 50+ Organizations Nationwide</span>
             </div>
           </div>
-          <h1 className="text-6xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent leading-tight">
             YourCity Deals
           </h1>
-          <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl text-blue-100 mb-8 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-4">
             The enterprise-grade digital coupon platform revolutionizing community fundraising. 
             Where technology meets local impact for schools, neighborhoods, events, and cities.
           </p>
           <div className="flex justify-center">
             <Link 
               href="/"
-              className="group bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl px-8 py-4 hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 hover:shadow-2xl text-white font-semibold text-lg"
+              className="group bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl px-6 sm:px-8 py-3 sm:py-4 hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 hover:shadow-2xl text-white font-semibold text-base sm:text-lg"
             >
-              <span className="mr-3">
-                <svg className="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span className="mr-2 sm:mr-3">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
                 </svg>
               </span>
@@ -71,18 +76,18 @@ export default function MarketingLanding() {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-24 bg-gradient-to-br from-slate-50 to-blue-50">
+      <section className="py-12 sm:py-16 md:py-24 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Trusted by Community Leaders</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">Join hundreds of organizations already transforming their fundraising with enterprise-grade technology</p>
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">Trusted by Community Leaders</h2>
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-3xl mx-auto px-4">Join hundreds of organizations already transforming their fundraising with enterprise-grade technology</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             <div className="text-center group">
-              <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                <div className="text-5xl font-bold text-blue-600 mb-3">2,500+</div>
-                <div className="text-slate-600 font-medium">Active Sellers</div>
-                <div className="text-sm text-slate-500 mt-1">Community Ambassadors</div>
+              <div className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-slate-200/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-600 mb-2 sm:mb-3">2,500+</div>
+                <div className="text-slate-600 font-medium text-sm sm:text-base">Active Sellers</div>
+                <div className="text-xs sm:text-sm text-slate-500 mt-1">Community Ambassadors</div>
               </div>
             </div>
             <div className="text-center group">
