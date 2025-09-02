@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css?v=2025-01-27-4'
 import PWAInstallPrompt from './components/PWAInstallPrompt'
-import { RoleProvider } from './lib/roleContext'
+import { RoleProvider } from '../lib/roleContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
