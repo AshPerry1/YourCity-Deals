@@ -22,7 +22,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Mock authentication - in real app this would come from auth service
     const mockUser = 'user-1'; // John Doe has buyer and admin roles
-    const mockRoles: UserRole['role'][] = ['buyer', 'admin', 'merchant_manager'];
+    const mockRoles: UserRole['role'][] = ['buyer', 'admin', 'merchant_manager', 'seller'];
     
     setCurrentUser(mockUser);
     setAvailableRoles(mockRoles);

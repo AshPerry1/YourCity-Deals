@@ -10,6 +10,7 @@ import NearbyOffers from './components/NearbyOffers';
 import CouponSharing from './components/coupons/CouponSharing';
 import { useLocationNotifications } from './hooks/useLocationNotifications';
 import RoleSwitcher from './components/RoleSwitcher';
+import GiftModal from './components/GiftModal';
 
 interface User {
   id: string;
@@ -64,6 +65,7 @@ export default function YourCityDealsApp() {
   const [showPayment, setShowPayment] = useState<CouponBook | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSharing, setShowSharing] = useState<CouponOffer | null>(null);
+  const [showGiftModal, setShowGiftModal] = useState<CouponBook | null>(null);
   const [activeTab, setActiveTab] = useState<'discover' | 'my-books' | 'my-coupons' | 'nearby'>('discover');
   const [couponBooks, setCouponBooks] = useState<CouponBook[]>([]);
   const [userCoupons, setUserCoupons] = useState<CouponOffer[]>([]);
@@ -644,12 +646,20 @@ export default function YourCityDealsApp() {
                       <div className="flex items-center justify-between">
                         <div className="text-2xl font-bold text-blue-600">${book.price.toFixed(2)}</div>
                         {isAuthenticated ? (
-                          <button
-                            onClick={() => handlePurchaseBook(book)}
-                            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
-                          >
-                            Buy Now
-                          </button>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => setShowGiftModal(book)}
+                              className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                            >
+                              Gift
+                            </button>
+                            <button
+                              onClick={() => handlePurchaseBook(book)}
+                              className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                            >
+                              Buy Now
+                            </button>
+                          </div>
                         ) : (
                           <button
                             onClick={() => setShowAuth('signup')}
@@ -953,6 +963,19 @@ export default function YourCityDealsApp() {
           </div>
         )}
       </div>
+
+      {/* Gift Modal */}
+      {showGiftModal && (
+        <GiftModal
+          book={showGiftModal}
+          onClose={() => setShowGiftModal(null)}
+          onGiftSent={(recipientEmail, recipientPhone) => {
+            console.log('Gift sent to:', { recipientEmail, recipientPhone });
+            setShowGiftModal(null);
+            // In real app, this would trigger the gift purchase flow
+          }}
+        />
+      )}
     </div>
   );
 }
