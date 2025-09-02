@@ -12,6 +12,7 @@ import { useLocationNotifications } from './hooks/useLocationNotifications';
 import RoleSwitcher from './components/RoleSwitcher';
 import GiftModal from './components/GiftModal';
 import ActivationModal from './components/ActivationModal';
+import ShareModal from './components/ShareModal';
 
 interface User {
   id: string;
@@ -1028,6 +1029,19 @@ export default function YourCityDealsApp() {
             console.log('Coupon verified:', activatedCoupon.id);
             deactivateCoupon();
             // In real app, this would mark the coupon as redeemed
+          }}
+        />
+      )}
+
+      {/* Share Modal */}
+      {showSharing && (
+        <ShareModal
+          coupon={showSharing}
+          onClose={() => setShowSharing(null)}
+          onShare={(recipientEmail, recipientPhone) => {
+            console.log('Coupon shared to:', { recipientEmail, recipientPhone });
+            setShowSharing(null);
+            // In real app, this would transfer the coupon and create claim link
           }}
         />
       )}
