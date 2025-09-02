@@ -51,46 +51,13 @@ export default function MarketingLanding() {
             The enterprise-grade digital coupon platform revolutionizing school fundraising. 
             Where technology meets community impact.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-6xl mx-auto">
-            <Link 
-              href="/admin"
-              className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-            >
-              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">👨‍💼</div>
-              <div className="font-semibold text-white">Admin Portal</div>
-              <div className="text-sm text-blue-200 mt-1">Manage & Analytics</div>
-            </Link>
-            <Link 
-              href="/student"
-              className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-            >
-              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">👨‍🎓</div>
-              <div className="font-semibold text-white">Student Hub</div>
-              <div className="text-sm text-blue-200 mt-1">Earn & Track</div>
-            </Link>
-            <Link 
-              href="/teacher"
-              className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-            >
-              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">👩‍🏫</div>
-              <div className="font-semibold text-white">Teacher Console</div>
-              <div className="text-sm text-blue-200 mt-1">Monitor Progress</div>
-            </Link>
-            <Link 
-              href="/merchant"
-              className="group bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-            >
-              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">🏪</div>
-              <div className="font-semibold text-white">Merchant Suite</div>
-              <div className="text-sm text-blue-200 mt-1">Business Tools</div>
-            </Link>
+          <div className="flex justify-center">
             <Link 
               href="/"
-              className="group bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-6 hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+              className="group bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl px-8 py-4 hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 hover:scale-105 hover:shadow-2xl text-white font-semibold text-lg"
             >
-              <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">🛒</div>
-              <div className="font-semibold text-white">Marketplace</div>
-              <div className="text-sm text-blue-100 mt-1">Browse Deals</div>
+              <span className="mr-3">🛒</span>
+              Browse the Marketplace
             </Link>
           </div>
         </div>
