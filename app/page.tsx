@@ -443,15 +443,6 @@ export default function YourCityDealsApp() {
                 <Link href="/marketing" className="text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors">
                   About
                 </Link>
-                <Link href="/admin" className="text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors">
-                  Admin
-                </Link>
-                <Link href="/student" className="text-gray-600 hover:text-green-600 text-sm font-medium transition-colors">
-                  Student
-                </Link>
-                <Link href="/merchant" className="text-gray-600 hover:text-purple-600 text-sm font-medium transition-colors">
-                  Merchant
-                </Link>
               </div>
               
               {isAuthenticated ? (
