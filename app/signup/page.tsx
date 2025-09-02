@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ReferralUtils } from '@/lib/targeting';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -110,7 +109,8 @@ export default function SignupPage() {
 
   const validateReferrerCode = (code: string) => {
     if (!code) return true; // Optional field
-    return ReferralUtils.isValidReferralCode(code);
+    // Mock validation - in real app this would check against valid referral codes
+    return code.length >= 3;
   };
 
   return (
