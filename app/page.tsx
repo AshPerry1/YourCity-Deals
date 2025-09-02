@@ -271,6 +271,11 @@ export default function YourCityDealsApp() {
     setShowPayment(book);
   };
 
+  const handlePreviewBook = (book: CouponBook) => {
+    // Show a modal with book details and sample offers
+    setShowGiftModal(book); // Temporarily use gift modal for preview
+  };
+
   const activateCoupon = (coupon: CouponOffer) => {
     setActivatedCoupon(coupon);
     setActivationTimer(180); // 3 minutes = 180 seconds
@@ -589,15 +594,33 @@ export default function YourCityDealsApp() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Discover Tab */}
         {activeTab === 'discover' && (
-          <div className="space-y-8">
+          <div className="space-y-12">
             {/* Hero Section */}
             <div className="text-center bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl p-12 text-white relative overflow-hidden shadow-2xl">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+              
+              {/* Visual Elements */}
+              <div className="absolute top-8 left-8 w-16 h-16 bg-white/10 rounded-full flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div className="absolute top-12 right-12 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div className="absolute bottom-8 left-12 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              
               <div className="relative z-10">
-                <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
                   Discover Amazing Deals
                 </h1>
-                <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-8 leading-relaxed">
+                <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-10 leading-relaxed">
                   Support local schools while saving money on dining, services, and entertainment. 
                   Every purchase helps fund education and community programs.
                 </p>
@@ -621,7 +644,7 @@ export default function YourCityDealsApp() {
             </div>
 
             {/* Search and Filters */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-gray-200/30">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200/30">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
                 <div className="flex-1 max-w-md">
                   <div className="relative group">
@@ -684,34 +707,34 @@ export default function YourCityDealsApp() {
               <h2 className="text-3xl font-bold text-gray-900 mb-8">Available Coupon Books</h2>
               
               {/* Trust Indicators */}
-              <div className="mb-8 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 border border-green-200/50">
-                <div className="grid md:grid-cols-3 gap-6">
+              <div className="mb-12 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-8 border border-green-200/50">
+                <div className="grid md:grid-cols-3 gap-8">
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Trusted by Schools</h3>
-                    <p className="text-sm text-gray-600">Supporting education across the country</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Trusted by Schools</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">Supporting education across the country</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Instant Access</h3>
-                    <p className="text-sm text-gray-600">Get your coupons immediately</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Instant Access</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">Get your coupons immediately</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                       </svg>
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Secure Payments</h3>
-                    <p className="text-sm text-gray-600">Bank-level security protection</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Secure Payments</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">Bank-level security protection</p>
                   </div>
                 </div>
               </div>
@@ -738,7 +761,7 @@ export default function YourCityDealsApp() {
                         </div>
                       </div>
                       
-                      <div className="p-6">
+                      <div className="p-8">
                         <p className="text-gray-600 text-sm mb-6 leading-relaxed">{book.description}</p>
                         
                         <div className="space-y-3 mb-6">
@@ -773,7 +796,7 @@ export default function YourCityDealsApp() {
                             ${book.price.toFixed(2)}
                           </div>
                           {isAuthenticated ? (
-                            <div className="flex space-x-3">
+                            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                               <button
                                 onClick={() => setShowGiftModal(book)}
                                 className="px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
@@ -798,10 +821,10 @@ export default function YourCityDealsApp() {
                               </button>
                             </div>
                           ) : (
-                            <div className="flex space-x-3">
+                            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
                               <button
-                                onClick={() => setShowAuth('signup')}
-                                className="px-4 py-3 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-all duration-300 font-medium shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95"
+                                onClick={() => handlePreviewBook(book)}
+                                className="px-4 py-3 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200 transition-all duration-300 font-medium shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95 border border-gray-200"
                               >
                                 <span className="flex items-center space-x-2">
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -844,7 +867,7 @@ export default function YourCityDealsApp() {
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">Get quick access to your coupons and deals! Install YourCity Deals on your phone or desktop for the best experience.</p>
               </div>
               
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="bg-white p-6 rounded-xl shadow-lg">
                   <div className="text-center mb-4">
                     <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
