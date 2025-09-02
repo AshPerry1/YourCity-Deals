@@ -44,7 +44,7 @@ export default function AboutUs() {
               Our Story
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              From a simple idea to revolutionize fundraising, YourCity Deals was born from a passion to connect communities and empower organizations.
+              From a simple idea to revolutionize fundraising, YourCity Deals was born from a passion to connect communities and empower organizations. Currently in development, launching Summer 2026.
             </p>
           </div>
         </div>
@@ -79,9 +79,9 @@ export default function AboutUs() {
                   communities and local businesses.
                 </p>
                 <p>
-                  What started as a passion project has grown into a comprehensive platform that's helping 
-                  organizations across the country transform their fundraising efforts and build stronger 
-                  connections with their communities.
+                  What started as a passion project in June 2025 has grown into a comprehensive platform that's currently in development. 
+                  We're building the MVP with plans to launch in Summer 2026, helping organizations transform their fundraising efforts 
+                  and build stronger connections with their communities.
                 </p>
               </div>
               
@@ -91,7 +91,14 @@ export default function AboutUs() {
                     src="/AshleyPerry90525.jpg" 
                     alt="Ash Perry - Founder of YourCity Deals" 
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling.style.display = 'flex';
+                    }}
                   />
+                  <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center" style={{display: 'none'}}>
+                    <span className="text-white text-xl font-bold">AP</span>
+                  </div>
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900">Ash Perry</h3>
@@ -153,7 +160,7 @@ export default function AboutUs() {
             <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-gradient-to-b from-blue-600 to-purple-600"></div>
             
             <div className="space-y-12">
-              {/* 2023 - Concept */}
+              {/* 2025 - Concept */}
               <div className="relative flex items-center">
                 <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-blue-600 rounded-full border-4 border-white shadow-lg"></div>
                 <div className="w-5/12 pr-8 text-right">
@@ -162,37 +169,37 @@ export default function AboutUs() {
                 </div>
                 <div className="w-5/12 pl-8">
                   <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="font-semibold text-gray-900">2023</h4>
+                    <h4 className="font-semibold text-gray-900">June 2025</h4>
                     <p className="text-gray-600">Concept development and market research</p>
                   </div>
                 </div>
               </div>
               
-              {/* 2024 - Development */}
+              {/* 2025-2026 - Development */}
               <div className="relative flex items-center">
                 <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-purple-600 rounded-full border-4 border-white shadow-lg"></div>
                 <div className="w-5/12 pr-8 text-right">
                   <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="font-semibold text-gray-900">2024</h4>
-                    <p className="text-gray-600">Platform development and beta testing</p>
+                    <h4 className="font-semibold text-gray-900">June 2025 - Present</h4>
+                    <p className="text-gray-600">MVP development and platform building</p>
                   </div>
                 </div>
                 <div className="w-5/12 pl-8">
                   <h3 className="text-xl font-semibold text-gray-900">Building the Platform</h3>
-                  <p className="text-gray-600 mt-2">Developed the core technology and user experience</p>
+                  <p className="text-gray-600 mt-2">Developing the core technology and user experience</p>
                 </div>
               </div>
               
-              {/* 2025 - Launch */}
+              {/* 2026 - Launch */}
               <div className="relative flex items-center">
                 <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-green-600 rounded-full border-4 border-white shadow-lg"></div>
                 <div className="w-5/12 pr-8 text-right">
                   <h3 className="text-xl font-semibold text-gray-900">Going Live</h3>
-                  <p className="text-gray-600 mt-2">Launched the platform and began serving organizations</p>
+                  <p className="text-gray-600 mt-2">Launch the platform and begin serving organizations</p>
                 </div>
                 <div className="w-5/12 pl-8">
                   <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="font-semibold text-gray-900">2025</h4>
+                    <h4 className="font-semibold text-gray-900">Summer 2026</h4>
                     <p className="text-gray-600">Platform launch and community expansion</p>
                   </div>
                 </div>
