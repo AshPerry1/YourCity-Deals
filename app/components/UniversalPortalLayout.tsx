@@ -11,7 +11,7 @@ export interface PortalTheme {
   headerGradient: string;
   hoverColor: string;
   lightBg: string;
-  emoji: string;
+  emoji: React.ReactNode;
 }
 
 export const portalThemes: Record<string, PortalTheme> = {
