@@ -6,7 +6,7 @@ import { mockDataService } from '../../lib/mockDataService';
 import { Book, Merchant, Organization, BookOffer, Offer } from '../../lib/types';
 
 export default function AdminConsole() {
-  const { currentRole, isAuthenticated } = useRole();
+  const { currentRole, isAuthenticated, availableRoles, switchRole } = useRole();
   const [activeTab, setActiveTab] = useState<'books' | 'merchants' | 'organizations' | 'analytics' | 'blasts'>('books');
   const [books, setBooks] = useState<Book[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
