@@ -11,6 +11,7 @@ import CouponSharing from './components/coupons/CouponSharing';
 import { useLocationNotifications } from './hooks/useLocationNotifications';
 import RoleSwitcher from './components/RoleSwitcher';
 import GiftModal from './components/GiftModal';
+import ActivationModal from './components/ActivationModal';
 
 interface User {
   id: string;
@@ -66,6 +67,8 @@ export default function YourCityDealsApp() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSharing, setShowSharing] = useState<CouponOffer | null>(null);
   const [showGiftModal, setShowGiftModal] = useState<CouponBook | null>(null);
+  const [activatedCoupon, setActivatedCoupon] = useState<CouponOffer | null>(null);
+  const [activationTimer, setActivationTimer] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<'discover' | 'my-books' | 'my-coupons' | 'nearby'>('discover');
   const [couponBooks, setCouponBooks] = useState<CouponBook[]>([]);
   const [userCoupons, setUserCoupons] = useState<CouponOffer[]>([]);
@@ -91,6 +94,27 @@ export default function YourCityDealsApp() {
     checkAuthStatus();
     fetchData();
   }, []);
+
+  // Timer effect for activated coupon
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (activatedCoupon && activationTimer > 0) {
+      interval = setInterval(() => {
+        setActivationTimer(prev => {
+          if (prev <= 1) {
+            deactivateCoupon();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [activatedCoupon, activationTimer]);
 
   const checkAuthStatus = () => {
     const storedUser = localStorage.getItem('user');
@@ -243,6 +267,16 @@ export default function YourCityDealsApp() {
 
   const handlePurchaseBook = (book: CouponBook) => {
     setShowPayment(book);
+  };
+
+  const activateCoupon = (coupon: CouponOffer) => {
+    setActivatedCoupon(coupon);
+    setActivationTimer(180); // 3 minutes = 180 seconds
+  };
+
+  const deactivateCoupon = () => {
+    setActivatedCoupon(null);
+    setActivationTimer(0);
   };
 
   const handlePaymentSuccess = (paymentData: any) => {
@@ -909,6 +943,13 @@ export default function YourCityDealsApp() {
                       
                       <div className="flex space-x-2">
                         <button
+                          onClick={() => activateCoupon(coupon)}
+                          disabled={coupon.redeemed || activatedCoupon?.id === coupon.id}
+                          className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium shadow-lg"
+                        >
+                          {activatedCoupon?.id === coupon.id ? 'Activated' : 'Activate'}
+                        </button>
+                        <button
                           onClick={() => setShowSharing(coupon)}
                           disabled={coupon.shared || coupon.redeemed}
                           className="flex-1 px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-xl hover:from-emerald-700 hover:to-teal-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium shadow-lg"
@@ -973,6 +1014,20 @@ export default function YourCityDealsApp() {
             console.log('Gift sent to:', { recipientEmail, recipientPhone });
             setShowGiftModal(null);
             // In real app, this would trigger the gift purchase flow
+          }}
+        />
+      )}
+
+      {/* Activation Modal */}
+      {activatedCoupon && (
+        <ActivationModal
+          coupon={activatedCoupon}
+          timer={activationTimer}
+          onClose={deactivateCoupon}
+          onVerify={() => {
+            console.log('Coupon verified:', activatedCoupon.id);
+            deactivateCoupon();
+            // In real app, this would mark the coupon as redeemed
           }}
         />
       )}
