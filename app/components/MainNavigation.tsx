@@ -14,14 +14,22 @@ const portals = [
     name: 'Merchant Console',
     href: '/merchant',
     description: 'Coupon verification and business analytics',
-    icon: '🏪',
+            icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+        ),
     color: 'from-green-500 to-green-600'
   },
   {
     name: 'Student Portal',
     href: '/student',
     description: 'Personal sales tracking and referral management',
-    icon: '👨‍🎓',
+            icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+          </svg>
+        ),
     color: 'from-purple-500 to-purple-600'
   },
   {
@@ -35,7 +43,11 @@ const portals = [
     name: 'Purchaser Portal',
     href: '/purchaser',
     description: 'Buy and manage digital coupons',
-    icon: '🛒',
+            icon: (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+          </svg>
+        ),
     color: 'from-red-500 to-red-600'
   }
 ];
