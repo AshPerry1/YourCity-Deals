@@ -162,48 +162,60 @@ export default function AboutUs() {
             {/* Timeline Line */}
             <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-gradient-to-b from-blue-600 to-purple-600"></div>
             
-            <div className="space-y-12">
+            <div className="space-y-16">
               {/* 2025 - Concept */}
-              <div className="relative flex items-center">
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-blue-600 rounded-full border-4 border-white shadow-lg"></div>
-                <div className="w-5/12 pr-8 text-right">
-                  <h3 className="text-xl font-semibold text-gray-900">The Beginning</h3>
-                  <p className="text-gray-600 mt-2">Identified the need for modern digital fundraising solutions</p>
-                </div>
-                <div className="w-5/12 pl-8">
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="font-semibold text-gray-900">June 2025</h4>
-                    <p className="text-gray-600">Concept development and market research</p>
+              <div className="relative">
+                <div className="flex items-center">
+                  <div className="w-1/2 pr-8">
+                    <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">The Beginning</h3>
+                      <p className="text-gray-600">Identified the need for modern digital fundraising solutions</p>
+                    </div>
+                  </div>
+                  <div className="w-4 h-4 bg-blue-600 rounded-full border-4 border-white shadow-lg z-10 relative"></div>
+                  <div className="w-1/2 pl-8">
+                    <div className="bg-gray-50 rounded-lg p-6">
+                      <h4 className="font-semibold text-gray-900 mb-2">June 2025</h4>
+                      <p className="text-gray-600">Concept development and market research</p>
+                    </div>
                   </div>
                 </div>
               </div>
               
               {/* 2025-2026 - Development */}
-              <div className="relative flex items-center">
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-purple-600 rounded-full border-4 border-white shadow-lg"></div>
-                <div className="w-5/12 pr-8 text-right">
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="font-semibold text-gray-900">June 2025 - Present</h4>
-                    <p className="text-gray-600">MVP development and platform building</p>
+              <div className="relative">
+                <div className="flex items-center">
+                  <div className="w-1/2 pr-8">
+                    <div className="bg-gray-50 rounded-lg p-6">
+                      <h4 className="font-semibold text-gray-900 mb-2">June 2025 - Present</h4>
+                      <p className="text-gray-600">MVP development and platform building</p>
+                    </div>
                   </div>
-                </div>
-                <div className="w-5/12 pl-8">
-                  <h3 className="text-xl font-semibold text-gray-900">Building the Platform</h3>
-                  <p className="text-gray-600 mt-2">Developing the core technology and user experience</p>
+                  <div className="w-4 h-4 bg-purple-600 rounded-full border-4 border-white shadow-lg z-10 relative"></div>
+                  <div className="w-1/2 pl-8">
+                    <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Building the Platform</h3>
+                      <p className="text-gray-600">Developing the core technology and user experience</p>
+                    </div>
+                  </div>
                 </div>
               </div>
               
               {/* 2026 - Launch */}
-              <div className="relative flex items-center">
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-green-600 rounded-full border-4 border-white shadow-lg"></div>
-                <div className="w-5/12 pr-8 text-right">
-                  <h3 className="text-xl font-semibold text-gray-900">Going Live</h3>
-                  <p className="text-gray-600 mt-2">Launch the platform and begin serving organizations</p>
-                </div>
-                <div className="w-5/12 pl-8">
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="font-semibold text-gray-900">Summer 2026</h4>
-                    <p className="text-gray-600">Platform launch and community expansion</p>
+              <div className="relative">
+                <div className="flex items-center">
+                  <div className="w-1/2 pr-8">
+                    <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Going Live</h3>
+                      <p className="text-gray-600">Launch the platform and begin serving organizations</p>
+                    </div>
+                  </div>
+                  <div className="w-4 h-4 bg-green-600 rounded-full border-4 border-white shadow-lg z-10 relative"></div>
+                  <div className="w-1/2 pl-8">
+                    <div className="bg-gray-50 rounded-lg p-6">
+                      <h4 className="font-semibold text-gray-900 mb-2">Summer 2026</h4>
+                      <p className="text-gray-600">Platform launch and community expansion</p>
+                    </div>
                   </div>
                 </div>
               </div>
