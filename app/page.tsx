@@ -575,13 +575,13 @@ export default function YourCityDealsApp() {
         {activeTab === 'discover' && (
           <div className="space-y-8">
             {/* Hero Section */}
-            <div className="text-center bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-12 text-white relative overflow-hidden">
-              <div className="absolute inset-0 bg-black/10"></div>
+            <div className="text-center bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl p-12 text-white relative overflow-hidden shadow-2xl">
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
               <div className="relative z-10">
-                <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                   Discover Amazing Deals
                 </h1>
-                <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
+                <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-8 leading-relaxed">
                   Support local schools while saving money on dining, services, and entertainment. 
                   Every purchase helps fund education and community programs.
                 </p>
@@ -589,13 +589,13 @@ export default function YourCityDealsApp() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
                       onClick={() => setShowAuth('signup')}
-                      className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-2xl hover:bg-gray-50 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105"
                     >
                       Get Started
                     </button>
                     <button
                       onClick={() => setShowAuth('login')}
-                      className="px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white/30 hover:bg-white/10 transition-all duration-200"
+                      className="px-8 py-4 bg-transparent text-white font-semibold rounded-2xl border-2 border-white/30 hover:bg-white/10 transition-all duration-300 transform hover:scale-105"
                     >
                       Sign In
                     </button>
@@ -605,11 +605,11 @@ export default function YourCityDealsApp() {
             </div>
 
             {/* Search and Filters */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200/50">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-gray-200/30">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
                 <div className="flex-1 max-w-md">
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
@@ -619,7 +619,7 @@ export default function YourCityDealsApp() {
                       placeholder="Search coupon books..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      className="block w-full pl-12 pr-4 py-4 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
                     />
                   </div>
                 </div>
@@ -628,7 +628,7 @@ export default function YourCityDealsApp() {
                   <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="px-4 py-4 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   >
                     <option value="all">All Categories</option>
                     <option value="elementary">Elementary</option>
@@ -642,71 +642,87 @@ export default function YourCityDealsApp() {
 
             {/* Available Coupon Books */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Available Coupon Books</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <h2 className="text-3xl font-bold text-gray-900 mb-8">Available Coupon Books</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredBooks.map((book) => (
-                  <div key={book.id} className="bg-white rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getCategoryColor(book.category)}`}>
-                          {book.category.charAt(0).toUpperCase() + book.category.slice(1)}
-                        </span>
-                        {book.featured && (
-                          <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
-                            Featured
+                  <div key={book.id} className="group">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/30 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
+                      {/* Card Header with Gradient */}
+                      <div className="relative h-32 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600">
+                        <div className="absolute inset-0 bg-black/10"></div>
+                        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                          <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border border-white/20 bg-white/20 backdrop-blur-sm text-white`}>
+                            {book.category.charAt(0).toUpperCase() + book.category.slice(1)}
                           </span>
-                        )}
-                      </div>
-                      
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{book.title}</h3>
-                      <p className="text-gray-600 text-sm mb-4">{book.description}</p>
-                      
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center text-sm text-gray-500">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                          </svg>
-                          {book.school}
+                          {book.featured && (
+                            <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
+                              ⭐ Featured
+                            </span>
+                          )}
                         </div>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                          </svg>
-                          {book.totalOffers} offers
-                        </div>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                          Valid {formatDate(book.validFrom)} - {formatDate(book.validTo)}
+                        <div className="absolute bottom-4 left-4 right-4">
+                          <h3 className="text-lg font-bold text-white leading-tight">{book.title}</h3>
                         </div>
                       </div>
                       
-                      <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-blue-600">${book.price.toFixed(2)}</div>
-                        {isAuthenticated ? (
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => setShowGiftModal(book)}
-                              className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
-                            >
-                              Gift
-                            </button>
-                            <button
-                              onClick={() => handlePurchaseBook(book)}
-                              className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
-                            >
-                              Buy Now
-                            </button>
+                      <div className="p-6">
+                        <p className="text-gray-600 text-sm mb-6 leading-relaxed">{book.description}</p>
+                        
+                        <div className="space-y-3 mb-6">
+                          <div className="flex items-center text-sm text-gray-500">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                              </svg>
+                            </div>
+                            {book.school}
                           </div>
-                        ) : (
-                          <button
-                            onClick={() => setShowAuth('signup')}
-                            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
-                          >
-                            Sign Up to Buy
-                          </button>
-                        )}
+                          <div className="flex items-center text-sm text-gray-500">
+                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                              </svg>
+                            </div>
+                            {book.totalOffers} amazing offers
+                          </div>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                              <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            Valid until {formatDate(book.validTo)}
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                            ${book.price.toFixed(2)}
+                          </div>
+                          {isAuthenticated ? (
+                            <div className="flex space-x-3">
+                              <button
+                                onClick={() => setShowGiftModal(book)}
+                                className="px-4 py-3 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                              >
+                                🎁 Gift
+                              </button>
+                              <button
+                                onClick={() => handlePurchaseBook(book)}
+                                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                              >
+                                Buy Now
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setShowAuth('signup')}
+                              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                            >
+                              Sign Up to Buy
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
