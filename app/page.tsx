@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import LoginForm from '../components/auth/LoginForm';
-import SignupForm from '../components/auth/SignupForm';
-import PaymentForm from '../components/payment/PaymentForm';
-import NotificationPreferences from '../components/NotificationPreferences';
-import NearbyOffers from '../components/NearbyOffers';
-import CouponSharing from '../components/coupons/CouponSharing';
-import { useLocationNotifications } from '../hooks/useLocationNotifications';
+import LoginForm from './components/auth/LoginForm';
+import SignupForm from './components/auth/SignupForm';
+import PaymentForm from './components/payment/PaymentForm';
+import NotificationPreferences from './components/NotificationPreferences';
+import NearbyOffers from './components/NearbyOffers';
+import CouponSharing from './components/coupons/CouponSharing';
+import { useLocationNotifications } from './hooks/useLocationNotifications';
 
 interface User {
   id: string;
