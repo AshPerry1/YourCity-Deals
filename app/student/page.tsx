@@ -6,7 +6,7 @@ import { mockDataService } from '../../lib/mockDataService';
 import { Referral, Book } from '../../lib/types';
 
 export default function SellerPortal() {
-  const { currentRole, isAuthenticated, currentUser } = useRole();
+  const { currentRole, isAuthenticated, currentUser, availableRoles, switchRole } = useRole();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'referrals' | 'earnings' | 'leaderboard'>('dashboard');
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [books, setBooks] = useState<Book[]>([]);
@@ -70,7 +70,15 @@ export default function SellerPortal() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You need seller privileges to access this portal.</p>
+          <p className="text-gray-600 mb-6">You need seller privileges to access this portal.</p>
+          {availableRoles.includes('seller') && (
+            <button
+              onClick={() => switchRole('seller')}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Switch to Seller Role
+            </button>
+          )}
         </div>
       </div>
     );

@@ -6,7 +6,7 @@ import { mockDataService } from '../../lib/mockDataService';
 import { Organization, Book, Merchant } from '../../lib/types';
 
 export default function OrganizationHub() {
-  const { currentRole, isAuthenticated, currentUser } = useRole();
+  const { currentRole, isAuthenticated, currentUser, availableRoles, switchRole } = useRole();
   const [activeTab, setActiveTab] = useState<'overview' | 'books' | 'merchants' | 'requests'>('overview');
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [books, setBooks] = useState<Book[]>([]);
@@ -56,7 +56,15 @@ export default function OrganizationHub() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You need organization admin privileges to access this portal.</p>
+          <p className="text-gray-600 mb-6">You need organization admin privileges to access this portal.</p>
+          {availableRoles.includes('org_admin') && (
+            <button
+              onClick={() => switchRole('org_admin')}
+              className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Switch to Organization Admin Role
+            </button>
+          )}
         </div>
       </div>
     );
