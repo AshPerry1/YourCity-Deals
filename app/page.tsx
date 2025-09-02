@@ -440,7 +440,7 @@ export default function YourCityDealsApp() {
             <div className="flex items-center space-x-4">
               {/* Portal Links */}
               <div className="hidden md:flex items-center space-x-4 mr-4">
-                <Link href="/marketing" className="text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors">
+                <Link href="/about" className="text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors">
                   About
                 </Link>
               </div>
