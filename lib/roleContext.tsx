@@ -14,10 +14,10 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleProvider({ children }: { children: React.ReactNode }) {
-  const [currentRole, setCurrentRole] = useState<UserRole['role'] | null>(null);
-  const [availableRoles, setAvailableRoles] = useState<UserRole['role'][]>([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [currentRole, setCurrentRole] = useState<UserRole['role'] | null>('buyer'); // Default to buyer
+  const [availableRoles, setAvailableRoles] = useState<UserRole['role'][]>(['buyer', 'admin', 'merchant_manager', 'seller', 'org_admin']); // Default roles
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // Default to authenticated
+  const [currentUser, setCurrentUser] = useState<string | null>('user-1'); // Default user
 
   useEffect(() => {
     // Mock authentication - in real app this would come from auth service
