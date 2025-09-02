@@ -672,6 +672,81 @@ export default function YourCityDealsApp() {
                 ))}
               </div>
             </div>
+            
+            {/* PWA Installation Section */}
+            <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 border border-blue-200/50">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Install YourCity Deals App</h2>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">Get quick access to your coupons and deals! Install YourCity Deals on your phone or desktop for the best experience.</p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded-xl shadow-lg">
+                  <div className="text-center mb-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-gray-900">iOS (iPhone/iPad)</h3>
+                  </div>
+                  <ol className="space-y-2 text-sm text-gray-600">
+                    <li>1. Open Safari browser (not Chrome)</li>
+                    <li>2. Tap the Share button (square with arrow up) at bottom</li>
+                    <li>3. Scroll down and tap 'Add to Home Screen'</li>
+                    <li>4. Tap 'Add' to confirm</li>
+                  </ol>
+                </div>
+                
+                <div className="bg-white p-6 rounded-xl shadow-lg">
+                  <div className="text-center mb-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-gray-900">Android</h3>
+                  </div>
+                  <ol className="space-y-2 text-sm text-gray-600">
+                    <li>1. Open Chrome browser</li>
+                    <li>2. Tap the three dots menu (:) at top right</li>
+                    <li>3. Tap 'Add to Home screen'</li>
+                    <li>4. Tap 'Add' to confirm</li>
+                  </ol>
+                </div>
+                
+                <div className="bg-white p-6 rounded-xl shadow-lg">
+                  <div className="text-center mb-4">
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-gray-900">Desktop (Chrome/Edge)</h3>
+                  </div>
+                  <ol className="space-y-2 text-sm text-gray-600">
+                    <li>1. Look for the install icon (+) in address bar</li>
+                    <li>2. Click the install icon when it appears</li>
+                    <li>3. Click 'Install' in the popup</li>
+                    <li>4. App will install and appear on desktop</li>
+                  </ol>
+                </div>
+              </div>
+              
+              <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <p className="text-blue-800 text-sm"><strong>Pro Tip:</strong> After installation, the app will work just like a native app with its own icon, full-screen experience, and offline functionality!</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
