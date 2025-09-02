@@ -1,423 +1,900 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import LoginForm from '../components/auth/LoginForm';
+import SignupForm from '../components/auth/SignupForm';
+import PaymentForm from '../components/payment/PaymentForm';
+import NotificationPreferences from '../components/NotificationPreferences';
+import NearbyOffers from '../components/NearbyOffers';
+import CouponSharing from '../components/coupons/CouponSharing';
+import { useLocationNotifications } from '../hooks/useLocationNotifications';
 
-export default function Home() {
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+}
+
+interface CouponBook {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  school: string;
+  totalOffers: number;
+  validFrom: string;
+  validTo: string;
+  coverImage?: string;
+  featured: boolean;
+  category: 'elementary' | 'middle' | 'high' | 'community';
+  purchased: boolean;
+  purchaseDate?: string;
+}
+
+interface CouponOffer {
+  id: string;
+  title: string;
+  business: string;
+  businessAddress: string;
+  businessCoordinates: {
+    lat: number;
+    lng: number;
+  };
+  discount: string;
+  category: string;
+  description: string;
+  validFrom: string;
+  validTo: string;
+  bookId: string;
+  bookTitle: string;
+  school: string;
+  redeemed: boolean;
+  redeemedDate?: string;
+  shared: boolean;
+}
+
+export default function YourCityDealsApp() {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuth, setShowAuth] = useState<'login' | 'signup' | null>(null);
+  const [showPayment, setShowPayment] = useState<CouponBook | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSharing, setShowSharing] = useState<CouponOffer | null>(null);
+  const [activeTab, setActiveTab] = useState<'discover' | 'my-books' | 'my-coupons' | 'nearby'>('discover');
+  const [couponBooks, setCouponBooks] = useState<CouponBook[]>([]);
+  const [userCoupons, setUserCoupons] = useState<CouponOffer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+
+  const {
+    userLocation,
+    locationPermission,
+    nearbyBusinesses,
+    notificationPreferences,
+    isTracking,
+    requestLocationPermission,
+    startLocationTracking,
+    stopLocationTracking,
+    updateNotificationPreference,
+    calculateDistance,
+    sendNotification
+  } = useLocationNotifications();
+
+  useEffect(() => {
+    checkAuthStatus();
+    fetchData();
+  }, []);
+
+  const checkAuthStatus = () => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setIsAuthenticated(true);
+    }
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const mockBooks: CouponBook[] = [
+        {
+          id: '1',
+          title: 'Lincoln High School 2025 Coupon Book',
+          description: 'Amazing deals from local businesses to support our school fundraising efforts.',
+          price: 25.00,
+          school: 'Lincoln High School',
+          totalOffers: 8,
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          featured: true,
+          category: 'high',
+          purchased: false
+        },
+        {
+          id: '2',
+          title: 'Washington Middle School Fundraiser',
+          description: 'Support our middle school with great local business deals.',
+          price: 20.00,
+          school: 'Washington Middle School',
+          totalOffers: 6,
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          featured: true,
+          category: 'middle',
+          purchased: false
+        },
+        {
+          id: '3',
+          title: 'Elementary School Community Book',
+          description: 'Building community through local business partnerships.',
+          price: 15.00,
+          school: 'Elementary School',
+          totalOffers: 4,
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          featured: false,
+          category: 'elementary',
+          purchased: false
+        }
+      ];
+
+      const mockUserCoupons: CouponOffer[] = [
+        {
+          id: '1',
+          title: '20% Off Pizza',
+          business: 'Pizza Palace',
+          businessAddress: '123 Main St, Omaha, NE',
+          businessCoordinates: { lat: 41.2565, lng: -95.9345 },
+          discount: '20% Off',
+          category: 'Food & Dining',
+          description: 'Get 20% off any large pizza, any toppings',
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          bookId: '1',
+          bookTitle: 'Lincoln High School 2025 Coupon Book',
+          school: 'Lincoln High School',
+          redeemed: false,
+          shared: false
+        },
+        {
+          id: '2',
+          title: 'Buy 1 Get 1 Free Coffee',
+          business: 'Coffee Corner',
+          businessAddress: '456 Oak Ave, Omaha, NE',
+          businessCoordinates: { lat: 41.2570, lng: -95.9350 },
+          discount: 'Buy 1 Get 1 Free',
+          category: 'Food & Dining',
+          description: 'Purchase any coffee and get a second one free',
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          bookId: '1',
+          bookTitle: 'Lincoln High School 2025 Coupon Book',
+          school: 'Lincoln High School',
+          redeemed: false,
+          shared: false
+        }
+      ];
+      
+      setCouponBooks(mockBooks);
+      setUserCoupons(mockUserCoupons);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const mockUser: User = {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: email,
+        phone: '555-0123'
+      };
+      
+      setUser(mockUser);
+      setIsAuthenticated(true);
+      setShowAuth(null);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
+  };
+
+  const handleSignup = async (userData: any) => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const newUser: User = {
+        id: '1',
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        phone: userData.phone
+      };
+      
+      setUser(newUser);
+      setIsAuthenticated(true);
+      setShowAuth(null);
+      localStorage.setItem('user', JSON.stringify(newUser));
+    } catch (error) {
+      console.error('Signup failed:', error);
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('user');
+  };
+
+  const handlePurchaseBook = (book: CouponBook) => {
+    setShowPayment(book);
+  };
+
+  const handlePaymentSuccess = (paymentData: any) => {
+    setCouponBooks(prev => prev.map(book => 
+      book.id === showPayment?.id 
+        ? { ...book, purchased: true, purchaseDate: new Date().toISOString() }
+        : book
+    ));
+    
+    setShowPayment(null);
+  };
+
+  const handlePaymentError = (error: string) => {
+    console.error('Payment failed:', error);
+  };
+
+  const handleShareCoupon = async (shareData: any) => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setUserCoupons(prev => prev.map(coupon => 
+        coupon.id === shareData.couponId 
+          ? { ...coupon, shared: true }
+          : coupon
+      ));
+      
+      setShowSharing(null);
+    } catch (error) {
+      console.error('Sharing failed:', error);
+    }
+  };
+
+  const filteredBooks = couponBooks
+    .filter(book => {
+      const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           book.school.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = categoryFilter === 'all' || book.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'elementary':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'middle':
+        return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'high':
+        return 'bg-purple-50 text-purple-700 border-purple-200';
+      case 'community':
+        return 'bg-orange-50 text-orange-700 border-orange-200';
+      default:
+        return 'bg-gray-50 text-gray-700 border-gray-200';
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const getDaysUntilExpiry = (validTo: string) => {
+    const today = new Date();
+    const expiry = new Date(validTo);
+    const diffTime = expiry.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const getExpiryColor = (days: number) => {
+    if (days <= 7) return 'text-red-600';
+    if (days <= 30) return 'text-orange-600';
+    return 'text-emerald-600';
+  };
+
+  // Show authentication forms
+  if (showAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {showAuth === 'login' ? (
+            <LoginForm
+              onLogin={handleLogin}
+              onSwitchToSignup={() => setShowAuth('signup')}
+            />
+          ) : (
+            <SignupForm
+              onSignup={handleSignup}
+              onSwitchToLogin={() => setShowAuth('login')}
+            />
+          )}
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setShowAuth(null)}
+              className="text-gray-600 hover:text-gray-800 font-medium transition-colors"
+            >
+              ← Back to Deals
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show payment form
+  if (showPayment) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
+          <PaymentForm
+            amount={showPayment.price}
+            bookTitle={showPayment.title}
+            onPaymentSuccess={handlePaymentSuccess}
+            onPaymentError={handlePaymentError}
+          />
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setShowPayment(null)}
+              className="text-gray-600 hover:text-gray-800 font-medium transition-colors"
+            >
+              ← Back to Deals
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show notification preferences
+  if (showNotifications) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl">
+          <NotificationPreferences
+            couponBookId="1"
+            offers={userCoupons}
+            onPreferencesChange={(preferences) => {
+              preferences.forEach(pref => {
+                updateNotificationPreference(pref.couponId, pref);
+              });
+            }}
+          />
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setShowNotifications(false)}
+              className="text-gray-600 hover:text-gray-800 font-medium transition-colors"
+            >
+              ← Back to My Coupons
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show coupon sharing
+  if (showSharing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
+          <CouponSharing
+            coupon={showSharing}
+            onShare={handleShareCoupon}
+            onCancel={() => setShowSharing(null)}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 font-medium">Loading amazing deals...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">YourCity Deals</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+                YourCity Deals
+              </h1>
             </div>
-            <nav className="flex space-x-6">
-              <Link href="/admin" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-                Admin
-              </Link>
-              <Link href="/student" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
-                Student
-              </Link>
-              <Link href="/teacher" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
-                Teacher
-              </Link>
-              <Link href="/merchant" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
-                Merchant
-              </Link>
-              <Link href="/purchaser" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">
-                Purchaser
-              </Link>
-            </nav>
+            
+            <div className="flex items-center space-x-4">
+              {/* Portal Links */}
+              <div className="hidden md:flex items-center space-x-4 mr-4">
+                <Link href="/marketing" className="text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors">
+                  About
+                </Link>
+                <Link href="/admin" className="text-gray-600 hover:text-blue-600 text-sm font-medium transition-colors">
+                  Admin
+                </Link>
+                <Link href="/student" className="text-gray-600 hover:text-green-600 text-sm font-medium transition-colors">
+                  Student
+                </Link>
+                <Link href="/merchant" className="text-gray-600 hover:text-purple-600 text-sm font-medium transition-colors">
+                  Merchant
+                </Link>
+              </div>
+              
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-white">
+                        {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-700 font-medium">
+                      {user?.firstName} {user?.lastName}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setShowAuth('login')}
+                    className="text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => setShowAuth('signup')}
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl"
+                  >
+                    Sign Up
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold mb-6">YourCity Deals</h1>
-          <p className="text-xl mb-8 max-w-3xl mx-auto">
-            The modern digital coupon book platform that transforms school fundraising. 
-            Students earn points, schools get funding, and communities save money.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
-            <Link 
-              href="/admin"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
-            >
-              <div className="text-2xl mb-1">👨‍💼</div>
-              <div>Admin</div>
-            </Link>
-            <Link 
-              href="/student"
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
-            >
-              <div className="text-2xl mb-1">👨‍🎓</div>
-              <div>Student</div>
-            </Link>
-            <Link 
-              href="/teacher"
-              className="bg-gradient-to-r from-orange-600 to-red-700 hover:from-orange-700 hover:to-red-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
-            >
-              <div className="text-2xl mb-1">👩‍🏫</div>
-              <div>Teacher</div>
-            </Link>
-            <Link 
-              href="/merchant"
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
-            >
-              <div className="text-2xl mb-1">🏪</div>
-              <div>Merchant</div>
-            </Link>
-            <Link 
-              href="/purchaser"
-              className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-4 rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:scale-105 text-center"
-            >
-              <div className="text-2xl mb-1">🛒</div>
-              <div>Purchaser</div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Statistics Section */}
-      <section className="py-16 bg-gray-50">
+      {/* Navigation Tabs */}
+      <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-2">500+</div>
-              <div className="text-gray-600">Students Active</div>
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('discover')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'discover'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Discover Deals
+            </button>
+            {isAuthenticated && (
+              <>
+                <button
+                  onClick={() => setActiveTab('my-books')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                    activeTab === 'my-books'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  My Books
+                </button>
+                <button
+                  onClick={() => setActiveTab('my-coupons')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                    activeTab === 'my-coupons'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  My Coupons
+                </button>
+                <button
+                  onClick={() => setActiveTab('nearby')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                    activeTab === 'nearby'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Nearby Offers
+                </button>
+              </>
+            )}
+          </nav>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Discover Tab */}
+        {activeTab === 'discover' && (
+          <div className="space-y-8">
+            {/* Hero Section */}
+            <div className="text-center bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-12 text-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="relative z-10">
+                <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                  Discover Amazing Deals
+                </h1>
+                <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
+                  Support local schools while saving money on dining, services, and entertainment. 
+                  Every purchase helps fund education and community programs.
+                </p>
+                {!isAuthenticated && (
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button
+                      onClick={() => setShowAuth('signup')}
+                      className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                      Get Started
+                    </button>
+                    <button
+                      onClick={() => setShowAuth('login')}
+                      className="px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white/30 hover:bg-white/10 transition-all duration-200"
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-2">50+</div>
-              <div className="text-gray-600">Local Businesses</div>
+
+            {/* Search and Filters */}
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200/50">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                <div className="flex-1 max-w-md">
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Search coupon books..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-4">
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="elementary">Elementary</option>
+                    <option value="middle">Middle School</option>
+                    <option value="high">High School</option>
+                    <option value="community">Community</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">$25K+</div>
-              <div className="text-gray-600">Funds Raised</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-orange-500 mb-2">15</div>
-              <div className="text-gray-600">Schools Partnered</div>
+
+            {/* Available Coupon Books */}
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Available Coupon Books</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredBooks.map((book) => (
+                  <div key={book.id} className="bg-white rounded-2xl shadow-lg border border-gray-200/50 overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getCategoryColor(book.category)}`}>
+                          {book.category.charAt(0).toUpperCase() + book.category.slice(1)}
+                        </span>
+                        {book.featured && (
+                          <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
+                            Featured
+                          </span>
+                        )}
+                      </div>
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{book.title}</h3>
+                      <p className="text-gray-600 text-sm mb-4">{book.description}</p>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-sm text-gray-500">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          {book.school}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-500">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                          </svg>
+                          {book.totalOffers} offers
+                        </div>
+                        <div className="flex items-center text-sm text-gray-500">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          Valid {formatDate(book.validFrom)} - {formatDate(book.validTo)}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-bold text-blue-600">${book.price.toFixed(2)}</div>
+                        {isAuthenticated ? (
+                          <button
+                            onClick={() => handlePurchaseBook(book)}
+                            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                          >
+                            Buy Now
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setShowAuth('signup')}
+                            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                          >
+                            Sign Up to Buy
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* Platform Features */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Platform Features</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        {/* My Books Tab */}
+        {activeTab === 'my-books' && isAuthenticated && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">My Coupon Books</h2>
+            </div>
+            
+            {couponBooks.filter(book => book.purchased).length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Digital Coupon Books</h3>
-                <p className="text-gray-600">
-                  Create and manage digital coupon books with instant redemption tracking, 
-                  real-time analytics, and seamless customer experience.
-                </p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No books purchased yet</h3>
+                <p className="text-gray-600 mb-4">Start by discovering and purchasing coupon books</p>
+                <button
+                  onClick={() => setActiveTab('discover')}
+                  className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium"
+                >
+                  Discover Deals
+                </button>
               </div>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Student Rewards System</h3>
-                <p className="text-gray-600">
-                  Students earn points for sales and coupon redemptions, unlocking school rewards, 
-                  recognition, and building valuable business skills.
-                </p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {couponBooks.filter(book => book.purchased).map((book) => (
+                  <div key={book.id} className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getCategoryColor(book.category)}`}>
+                        {book.category.charAt(0).toUpperCase() + book.category.slice(1)}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        Purchased {formatDate(book.purchaseDate!)}
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{book.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4">{book.description}</p>
+                    
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center text-sm text-gray-500">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                        </svg>
+                        {book.totalOffers} offers
+                      </div>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Valid until {formatDate(book.validTo)}
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={() => setActiveTab('my-coupons')}
+                      className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium"
+                    >
+                      View Coupons
+                    </button>
+                  </div>
+                ))}
               </div>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h3a2 2 0 012 2v14a2 2 0 01-2 2h-3a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Advanced Analytics</h3>
-                <p className="text-gray-600">
-                  Comprehensive reporting and insights to track performance, monitor sales trends, 
-                  and optimize your fundraising strategy for maximum success.
-                </p>
-              </div>
-            </div>
+            )}
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* How It Works */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">How It Works</h2>
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">1</span>
+        {/* My Coupons Tab */}
+        {activeTab === 'my-coupons' && isAuthenticated && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">My Coupons</h2>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setShowNotifications(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-xl hover:from-emerald-700 hover:to-teal-800 transition-all duration-200 text-sm font-medium shadow-lg"
+                >
+                  Notification Settings
+                </button>
+                {locationPermission === 'granted' && (
+                  <button
+                    onClick={isTracking ? stopLocationTracking : startLocationTracking}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg ${
+                      isTracking 
+                        ? 'bg-gradient-to-r from-red-600 to-pink-700 text-white hover:from-red-700 hover:to-pink-800' 
+                        : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800'
+                    }`}
+                  >
+                    {isTracking ? 'Stop Tracking' : 'Start Location Tracking'}
+                  </button>
+                )}
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Schools Sign Up</h3>
-              <p className="text-gray-600">Register your school and set fundraising goals</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">2</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Students Join</h3>
-              <p className="text-gray-600">Students create accounts and start earning points</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">3</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Sell Coupons</h3>
-              <p className="text-gray-600">Students sell digital coupons to friends and family</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">4</span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Earn Rewards</h3>
-              <p className="text-gray-600">Schools receive funding, students earn rewards</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose YourCity Deals */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Why Choose YourCity Deals?</h2>
-          <div className="grid md:grid-cols-2 gap-12">
-            <div>
-              <div className="flex items-center mb-6">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-4">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">For Schools</h3>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Increased fundraising efficiency and reach</span>
-                </li>
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Real-time tracking and reporting</span>
-                </li>
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Reduced administrative overhead</span>
-                </li>
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Better student engagement and motivation</span>
-                </li>
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Professional digital presence</span>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <div className="flex items-center mb-6">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-4">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">For Students</h3>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Earn points and recognition for school</span>
-                </li>
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Build valuable business and sales skills</span>
-                </li>
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Easy-to-use digital tools</span>
-                </li>
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Track progress and achievements</span>
-                </li>
-                <li className="flex items-start">
-                  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-600">Professional referral system</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Install as App */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Install as App</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              YourCity Deals works as a Progressive Web App! Install it on your phone or desktop for quick access and offline functionality. Follow the step-by-step instructions below.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <div className="text-center mb-4">
-                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h3 className="font-semibold text-gray-900">iOS (iPhone/iPad)</h3>
-              </div>
-              <ol className="space-y-2 text-sm text-gray-600">
-                <li>1. Open Safari browser (not Chrome)</li>
-                <li>2. Tap the Share button (square with arrow up) at bottom</li>
-                <li>3. Scroll down and tap 'Add to Home Screen'</li>
-                <li>4. Tap 'Add' to confirm</li>
-              </ol>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <div className="text-center mb-4">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            {userCoupons.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                   </svg>
                 </div>
-                <h3 className="font-semibold text-gray-900">Android</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No coupons yet</h3>
+                <p className="text-gray-600 mb-4">Purchase a coupon book to get started</p>
+                <button
+                  onClick={() => setActiveTab('discover')}
+                  className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium"
+                >
+                  Browse Books
+                </button>
               </div>
-              <ol className="space-y-2 text-sm text-gray-600">
-                <li>1. Open Chrome browser</li>
-                <li>2. Tap the three dots menu (:) at top right</li>
-                <li>3. Tap 'Add to Home screen'</li>
-                <li>4. Tap 'Add' to confirm</li>
-              </ol>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {userCoupons.map((coupon) => {
+                  const daysUntilExpiry = getDaysUntilExpiry(coupon.validTo);
+                  
+                  return (
+                    <div key={coupon.id} className="bg-white rounded-2xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border bg-blue-50 text-blue-700 border-blue-200`}>
+                          {coupon.category}
+                        </span>
+                        <span className={`text-xs font-medium ${getExpiryColor(daysUntilExpiry)}`}>
+                          {daysUntilExpiry} days left
+                        </span>
+                      </div>
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{coupon.title}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{coupon.business}</p>
+                      <p className="text-gray-600 text-sm mb-4">{coupon.description}</p>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-sm text-gray-500">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          {coupon.businessAddress}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-500">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 5.477 5.754 5 7.5 5s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                          {coupon.bookTitle}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="text-xl font-bold text-blue-600">{coupon.discount}</div>
+                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${
+                          coupon.redeemed ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 text-gray-700 border-gray-200'
+                        }`}>
+                          {coupon.redeemed ? 'Redeemed' : 'Available'}
+                        </span>
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => setShowSharing(coupon)}
+                          disabled={coupon.shared || coupon.redeemed}
+                          className="flex-1 px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-xl hover:from-emerald-700 hover:to-teal-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium shadow-lg"
+                        >
+                          Share
+                        </button>
+                        <Link
+                          href={`https://maps.google.com/?q=${coupon.businessAddress}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all duration-200 text-sm font-medium shadow-lg"
+                        >
+                          Directions
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Nearby Offers Tab */}
+        {activeTab === 'nearby' && isAuthenticated && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">Nearby Offers</h2>
+              {locationPermission !== 'granted' && (
+                <button
+                  onClick={requestLocationPermission}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 text-sm font-medium shadow-lg"
+                >
+                  Enable Location
+                </button>
+              )}
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <div className="text-center mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h3 className="font-semibold text-gray-900">Desktop (Chrome/Edge)</h3>
-              </div>
-              <ol className="space-y-2 text-sm text-gray-600">
-                <li>1. Look for the install icon (+) in address bar</li>
-                <li>2. Click the install icon when it appears</li>
-                <li>3. Click 'Install' in the popup</li>
-                <li>4. App will install and appear on desktop</li>
-              </ol>
-            </div>
+            <NearbyOffers
+              userLocation={userLocation}
+              offers={userCoupons.map(coupon => ({
+                ...coupon,
+                distance: userLocation ? calculateDistance(
+                  userLocation.lat,
+                  userLocation.lng,
+                  coupon.businessCoordinates.lat,
+                  coupon.businessCoordinates.lng
+                ) : 0
+              }))}
+              onLocationRequest={requestLocationPermission}
+            />
           </div>
-          
-          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-start">
-              <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-blue-800 text-sm">
-                <strong>Pro Tip:</strong> After installation, the app will work just like a native app with its own icon, full-screen experience, and offline functionality!
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Ready to Get Started */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Get Started?</h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join the digital fundraising revolution and see how YourCity Deals can transform your school's fundraising efforts.
-          </p>
-          <div className="flex justify-center space-x-4">
-            <Link 
-              href="/admin-login"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Start Admin Console
-            </Link>
-            <Link 
-              href="/student"
-              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold border border-blue-200 transition-colors"
-            >
-              Access Student Portal
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h3 className="text-2xl font-bold mb-4">YourCity Deals</h3>
-          <p className="text-gray-400 mb-6">
-            Digital coupon book platform for schools and communities
-          </p>
-          <div className="flex justify-center space-x-6">
-            <Link href="/admin-login" className="text-gray-400 hover:text-white">
-              Admin Portal
-            </Link>
-            <Link href="/student" className="text-gray-400 hover:text-white">
-              Student Portal
-            </Link>
-            <Link href="/merchant" className="text-gray-400 hover:text-white">
-              Merchant Console
-            </Link>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-800">
-            <p className="text-gray-400">
-              © 2025 YourCity Deals. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+        )}
+      </div>
     </div>
   );
 }
