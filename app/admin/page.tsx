@@ -42,32 +42,44 @@ export default function AdminConsole() {
   // Redirect if not admin
   if (!isAuthenticated || currentRole !== 'admin') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Admin Access Required</h1>
-          <p className="text-gray-600 mb-6">You need admin privileges to access this console. Please switch to the admin role to continue.</p>
-          {availableRoles.includes('admin') ? (
-            <button
-              onClick={() => switchRole('admin')}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Switch to Admin Role
-            </button>
-          ) : (
-            <p className="text-red-600 text-sm">You don't have admin privileges.</p>
-          )}
-          <div className="mt-6">
-            <p className="text-sm text-gray-500 mb-2">Available roles:</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {availableRoles.map(role => (
-                <button
-                  key={role}
-                  onClick={() => switchRole(role)}
-                  className="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-full transition-colors"
-                >
-                  {role}
-                </button>
-              ))}
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200/30">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Admin Access Required</h1>
+            <p className="text-gray-600 mb-6">You need admin privileges to access this console. Please switch to the admin role to continue.</p>
+            {availableRoles.includes('admin') ? (
+              <button
+                onClick={() => switchRole('admin')}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 mb-4"
+              >
+                Switch to Admin Role
+              </button>
+            ) : (
+              <p className="text-red-600 text-sm mb-4">You don't have admin privileges.</p>
+            )}
+            <div className="mb-6">
+              <p className="text-sm text-gray-500 mb-2">Available roles:</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {availableRoles.map(role => (
+                  <button
+                    key={role}
+                    onClick={() => switchRole(role)}
+                    className="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-full transition-colors"
+                  >
+                    {role}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="border-t border-gray-200 pt-4">
+              <a href="/" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                ← Back to Marketplace
+              </a>
             </div>
           </div>
         </div>

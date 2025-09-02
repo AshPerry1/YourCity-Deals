@@ -44,32 +44,44 @@ export default function MerchantConsole() {
   // Redirect if not merchant manager
   if (!isAuthenticated || currentRole !== 'merchant_manager') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Merchant Access Required</h1>
-          <p className="text-gray-600 mb-6">You need merchant manager privileges to access this console. Please switch to the merchant manager role to continue.</p>
-          {availableRoles.includes('merchant_manager') ? (
-            <button
-              onClick={() => switchRole('merchant_manager')}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Switch to Merchant Role
-            </button>
-          ) : (
-            <p className="text-red-600 text-sm">You don't have merchant manager privileges.</p>
-          )}
-          <div className="mt-6">
-            <p className="text-sm text-gray-500 mb-2">Available roles:</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {availableRoles.map(role => (
-                <button
-                  key={role}
-                  onClick={() => switchRole(role)}
-                  className="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-full transition-colors"
-                >
-                  {role}
-                </button>
-              ))}
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200/30">
+            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Merchant Access Required</h1>
+            <p className="text-gray-600 mb-6">You need merchant manager privileges to access this console. Please switch to the merchant manager role to continue.</p>
+            {availableRoles.includes('merchant_manager') ? (
+              <button
+                onClick={() => switchRole('merchant_manager')}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 mb-4"
+              >
+                Switch to Merchant Role
+              </button>
+            ) : (
+              <p className="text-red-600 text-sm mb-4">You don't have merchant manager privileges.</p>
+            )}
+            <div className="mb-6">
+              <p className="text-sm text-gray-500 mb-2">Available roles:</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {availableRoles.map(role => (
+                  <button
+                    key={role}
+                    onClick={() => switchRole(role)}
+                    className="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-full transition-colors"
+                  >
+                    {role}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="border-t border-gray-200 pt-4">
+              <a href="/" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                ← Back to Marketplace
+              </a>
             </div>
           </div>
         </div>
