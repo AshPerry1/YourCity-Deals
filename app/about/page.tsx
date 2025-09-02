@@ -363,49 +363,16 @@ export default function MarketingLanding() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Get Started?</h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Join the digital fundraising revolution and see how YourCity Deals can transform your organization's fundraising efforts.</p>
-          <div className="flex justify-center space-x-4">
-            <Link href="/admin" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
-              Start Admin Console
-            </Link>
-            <Link href="/" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold border border-blue-200 transition-colors">
-              Browse Marketplace
-            </Link>
-          </div>
-          
-          {/* Contact Section */}
-          <div className="mt-12 text-center">
-            <h3 className="text-xl font-semibold text-gray-900 mb-4">Get in Touch</h3>
-            <p className="text-gray-600 mb-6">Ready to transform your organization's fundraising? Let's discuss how YourCity Deals can work for you.</p>
-            
-            {/* Founder Contact Card */}
-            <div className="inline-flex items-center space-x-4 mb-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="w-12 h-12 rounded-full overflow-hidden">
-                <img 
-                  src="/AshleyPerry90525.jpg" 
-                  alt="Ash Perry - Founder of YourCity Deals" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="text-left">
-                <h4 className="font-semibold text-gray-900">Ash Perry</h4>
-                <p className="text-sm text-gray-600">Founder & CEO</p>
-              </div>
-            </div>
-            
-            <div className="flex justify-center">
-              <a 
-                href="mailto:adperry18@gmail.com?subject=YourCity%20Deals%20-%20Organization%20Inquiry&body=Hi%20Ash%2C%0A%0AI%20saw%20YourCity%20Deals%20and%20would%20like%20to%20learn%20more%20about%20how%20it%20could%20help%20our%20organization%20with%20fundraising.%0A%0AOrganization%20Name%3A%0AOrganization%20Type%20(school%2Fneighborhood%2Fevent%2Fcity)%3A%0AExpected%20Fundraising%20Goal%3A%0A%0AI%20look%20forward%20to%20hearing%20from%20you%21%0A%0ABest%20regards%2C%0A%5BYour%20Name%5D" 
-                className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                </svg>
-                Contact Us
-              </a>
-            </div>
-            <p className="text-sm text-gray-500 mt-3">
-              <a href="mailto:adperry18@gmail.com?subject=YourCity%20Deals%20-%20Organization%20Inquiry&body=Hi%20Ash%2C%0A%0AI%20saw%20YourCity%20Deals%20and%20would%20like%20to%20learn%20more%20about%20how%20it%20could%20help%20our%20organization%20with%20fundraising.%0A%0AOrganization%20Name%3A%0AOrganization%20Type%20(school%2Fneighborhood%2Fevent%2Fcity)%3A%0AExpected%20Fundraising%20Goal%3A%0A%0AI%20look%20forward%20to%20hearing%20from%20you%21%0A%0ABest%20regards%2C%0A%5BYour%20Name%5D" className="text-blue-600 hover:text-blue-700">adperry18@gmail.com</a>
-            </p>
+          <div className="flex justify-center">
+            <a 
+              href="mailto:adperry18@gmail.com?subject=YourCity%20Deals%20-%20Organization%20Inquiry&body=Hi%20Ash%2C%0A%0AI%20saw%20YourCity%20Deals%20and%20would%20like%20to%20learn%20more%20about%20how%20it%20could%20help%20our%20organization%20with%20fundraising.%0A%0AOrganization%20Name%3A%0AOrganization%20Type%20(school%2Fneighborhood%2Fevent%2Fcity)%3A%0AExpected%20Fundraising%20Goal%3A%0A%0AI%20look%20forward%20to%20hearing%20from%20you%21%0A%0ABest%20regards%2C%0A%5BYour%20Name%5D" 
+              className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              Contact Us
+            </a>
           </div>
         </div>
       </section>
