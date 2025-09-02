@@ -592,23 +592,6 @@ export default function YourCityDealsApp() {
             <div className="text-center bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl p-12 text-white relative overflow-hidden shadow-2xl">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
               
-              {/* Visual Elements */}
-              <div className="absolute top-8 left-8 w-16 h-16 bg-white/10 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-              <div className="absolute top-12 right-12 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <div className="absolute bottom-8 left-12 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              
               <div className="relative z-10">
                 <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
                   Discover Amazing Deals
@@ -721,7 +704,7 @@ export default function YourCityDealsApp() {
                             {book.school}
                           </div>
                           <div className="flex items-center text-sm text-gray-500">
-                            <span className="mr-3">🎫</span>
+                            <span className="mr-3">Offers</span>
                             {book.totalOffers} amazing offers
                           </div>
                           <div className="flex items-center text-sm text-gray-500">
@@ -744,7 +727,7 @@ export default function YourCityDealsApp() {
                                 onClick={() => setShowGiftModal(book)}
                                 className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
                               >
-                                🎁 Gift
+                                Gift
                               </button>
                               <button
                                 onClick={() => handlePurchaseBook(book)}
@@ -759,7 +742,7 @@ export default function YourCityDealsApp() {
                                 onClick={() => handlePreviewBook(book)}
                                 className="px-4 py-2 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-all duration-200 font-medium text-sm border border-gray-200 shadow-sm hover:shadow-md transform hover:scale-105"
                               >
-                                👁️ Preview
+                                Preview
                               </button>
                               <button
                                 onClick={() => setShowAuth('signup')}
