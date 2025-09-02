@@ -13,6 +13,7 @@ import RoleSwitcher from './components/RoleSwitcher';
 import GiftModal from './components/GiftModal';
 import ActivationModal from './components/ActivationModal';
 import ShareModal from './components/ShareModal';
+import PaymentModal from './components/PaymentModal';
 
 interface User {
   id: string;
@@ -1043,6 +1044,16 @@ export default function YourCityDealsApp() {
             setShowSharing(null);
             // In real app, this would transfer the coupon and create claim link
           }}
+        />
+      )}
+
+      {/* Payment Modal */}
+      {showPayment && (
+        <PaymentModal
+          book={showPayment}
+          onClose={() => setShowPayment(null)}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
         />
       )}
     </div>
