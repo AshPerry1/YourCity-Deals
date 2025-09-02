@@ -486,7 +486,7 @@ export default function YourCityDealsApp() {
               
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Portal Links */}
               <div className="hidden md:flex items-center space-x-4 mr-4">
                 <Link href="/about" className="text-gray-600 hover:text-gray-800 text-sm font-medium transition-colors">
@@ -500,13 +500,13 @@ export default function YourCityDealsApp() {
               {isAuthenticated ? (
                 <>
                   <RoleSwitcher />
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 sm:space-x-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-white">
                         {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
                       </span>
                     </div>
-                    <span className="text-sm text-gray-700 font-medium">
+                    <span className="hidden sm:inline text-sm text-gray-700 font-medium">
                       {user?.firstName} {user?.lastName}
                     </span>
                   </div>
@@ -527,7 +527,7 @@ export default function YourCityDealsApp() {
                   </button>
                   <button
                     onClick={() => setShowAuth('signup')}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                    className="px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
                     Sign Up
                   </button>
@@ -541,7 +541,7 @@ export default function YourCityDealsApp() {
       {/* Navigation Tabs */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
+          <nav className="flex space-x-4 sm:space-x-8 overflow-x-auto">
             {isAuthenticated && (
               <>
                 <button
@@ -616,7 +616,7 @@ export default function YourCityDealsApp() {
             </div>
 
             {/* Search and Filters */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200/30">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-4 sm:p-8 shadow-xl border border-gray-200/30">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
                 <div className="flex-1 max-w-md">
                   <div className="relative group">
@@ -630,17 +630,17 @@ export default function YourCityDealsApp() {
                       placeholder="Search coupon books..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-4 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm shadow-sm hover:shadow-md focus:shadow-lg"
+                      className="block w-full pl-12 pr-4 py-3 sm:py-4 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm shadow-sm hover:shadow-md focus:shadow-lg"
                     />
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 sm:space-x-4">
                   <div className="relative group">
                     <select
                       value={categoryFilter}
                       onChange={(e) => setCategoryFilter(e.target.value)}
-                      className="px-4 py-4 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm shadow-sm hover:shadow-md focus:shadow-lg appearance-none pr-10"
+                      className="px-3 sm:px-4 py-3 sm:py-4 border border-gray-300/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm shadow-sm hover:shadow-md focus:shadow-lg appearance-none pr-10"
                     >
                       <option value="all">All Categories</option>
                       <option value="elementary">Elementary School</option>
@@ -665,7 +665,7 @@ export default function YourCityDealsApp() {
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-8">Available Coupon Books</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
                 {filteredBooks.map((book) => (
                   <div key={book.id} className="group">
                     <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/30 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
@@ -722,7 +722,7 @@ export default function YourCityDealsApp() {
                             ${book.price.toFixed(2)}
                           </div>
                           {isAuthenticated ? (
-                            <div className="flex space-x-3">
+                            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                               <button
                                 onClick={() => setShowGiftModal(book)}
                                 className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
@@ -737,7 +737,7 @@ export default function YourCityDealsApp() {
                               </button>
                             </div>
                           ) : (
-                            <div className="flex space-x-3">
+                            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                               <button
                                 onClick={() => handlePreviewBook(book)}
                                 className="px-4 py-2 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-all duration-200 font-medium text-sm border border-gray-200 shadow-sm hover:shadow-md transform hover:scale-105"
@@ -761,28 +761,28 @@ export default function YourCityDealsApp() {
             </div>
             
             {/* PWA Installation Section */}
-            <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 border border-blue-200/50">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-4 sm:p-8 border border-blue-200/50">
+              <div className="text-center mb-6 sm:mb-8">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Install YourCity Deals App</h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">Get quick access to your coupons and deals! Install YourCity Deals on your phone or desktop for the best experience.</p>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Install YourCity Deals App</h2>
+                <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">Get quick access to your coupons and deals! Install YourCity Deals on your phone or desktop for the best experience.</p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="bg-white p-6 rounded-xl shadow-lg">
-                  <div className="text-center mb-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
+                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+                  <div className="text-center mb-3 sm:mb-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                       </svg>
                     </div>
-                    <h3 className="font-semibold text-gray-900">iOS (iPhone/iPad)</h3>
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">iOS (iPhone/iPad)</h3>
                   </div>
-                  <ol className="space-y-2 text-sm text-gray-600">
+                  <ol className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                     <li>1. Open Safari browser (not Chrome)</li>
                     <li>2. Tap the Share button (square with arrow up) at bottom</li>
                     <li>3. Scroll down and tap 'Add to Home Screen'</li>
@@ -790,16 +790,16 @@ export default function YourCityDealsApp() {
                   </ol>
                 </div>
                 
-                <div className="bg-white p-6 rounded-xl shadow-lg">
-                  <div className="text-center mb-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+                  <div className="text-center mb-3 sm:mb-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                       </svg>
                     </div>
-                    <h3 className="font-semibold text-gray-900">Android</h3>
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">Android</h3>
                   </div>
-                  <ol className="space-y-2 text-sm text-gray-600">
+                  <ol className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                     <li>1. Open Chrome browser</li>
                     <li>2. Tap the three dots menu (:) at top right</li>
                     <li>3. Tap 'Add to Home screen'</li>
@@ -807,16 +807,16 @@ export default function YourCityDealsApp() {
                   </ol>
                 </div>
                 
-                <div className="bg-white p-6 rounded-xl shadow-lg">
-                  <div className="text-center mb-4">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+                  <div className="text-center mb-3 sm:mb-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                       </svg>
                     </div>
-                    <h3 className="font-semibold text-gray-900">Desktop (Chrome/Edge)</h3>
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">Desktop (Chrome/Edge)</h3>
                   </div>
-                  <ol className="space-y-2 text-sm text-gray-600">
+                  <ol className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-600">
                     <li>1. Look for the install icon (+) in address bar</li>
                     <li>2. Click the install icon when it appears</li>
                     <li>3. Click 'Install' in the popup</li>
