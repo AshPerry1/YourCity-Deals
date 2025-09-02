@@ -15,20 +15,20 @@ export default function MarketingLanding() {
               </h1>
             </div>
             <nav className="flex space-x-6">
+              <Link href="/" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">
+                Marketplace
+              </Link>
               <Link href="/admin" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
-                Admin
+                Admin Console
               </Link>
               <Link href="/student" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
-                Seller
+                Seller Portal
               </Link>
               <Link href="/org" className="text-gray-700 hover:text-orange-600 font-medium transition-colors">
-                Organization
+                Organization Hub
               </Link>
               <Link href="/merchant" className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
-                Merchant
-              </Link>
-              <Link href="/" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">
-                Buy Coupons
+                Merchant Console
               </Link>
             </nav>
           </div>
@@ -361,11 +361,11 @@ export default function MarketingLanding() {
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Get Started?</h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Join the digital fundraising revolution and see how YourCity Deals can transform your organization's fundraising efforts.</p>
           <div className="flex justify-center space-x-4">
-            <Link href="/admin-login" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            <Link href="/admin" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
               Start Admin Console
             </Link>
             <Link href="/" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold border border-blue-200 transition-colors">
-              Buy Coupons Now
+              Browse Marketplace
             </Link>
           </div>
         </div>
