@@ -20,6 +20,9 @@ export interface Organization {
   name: string;
   type: 'school' | 'neighborhood' | 'event' | 'city';
   description: string;
+  contactEmail: string;
+  contactPhone: string;
+  address: string;
   logo?: string;
   zipCodes?: string[];
   createdAt: Date;
@@ -29,9 +32,13 @@ export interface Book {
   id: string;
   name: string;
   description: string;
+  organizationId?: string;
   orgId?: string;
   type: 'school' | 'neighborhood' | 'event' | 'city';
   price: number;
+  totalOffers: number;
+  totalSales?: number;
+  validUntil: string;
   discoverable: boolean;
   status: 'draft' | 'published' | 'paused' | 'removed';
   publishedAt?: Date;
@@ -42,6 +49,11 @@ export interface Merchant {
   id: string;
   name: string;
   description: string;
+  category: string;
+  address: string;
+  organizationId?: string;
+  status: 'active' | 'inactive' | 'pending';
+  totalOffers?: number;
   logo?: string;
   locations: Location[];
   createdAt: Date;
