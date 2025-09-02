@@ -747,7 +747,7 @@ export default function YourCityDealsApp() {
                                 onClick={() => setShowAuth('signup')}
                                 className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
                               >
-                                Sign Up to Buy
+                                Buy
                               </button>
                             </div>
                           )}
