@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRole } from '../lib/roleContext';
-import { mockDataService } from '../lib/mockDataService';
-import { Book, Merchant, Organization, BookOffer, Offer } from '../lib/types';
+import { useRole } from '../../lib/roleContext';
+import { mockDataService } from '../../lib/mockDataService';
+import { Book, Merchant, Organization, BookOffer, Offer } from '../../lib/types';
 
 export default function AdminConsole() {
   const { currentRole, isAuthenticated } = useRole();

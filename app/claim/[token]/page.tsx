@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { mockDataService } from '../../lib/mockDataService';
+import { mockDataService } from '../../../lib/mockDataService';
 
 export default function ClaimCoupon() {
   const params = useParams();

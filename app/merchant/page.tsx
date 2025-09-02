@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRole } from '../lib/roleContext';
-import { mockDataService } from '../lib/mockDataService';
-import { Merchant, Offer, BookOffer, Redemption } from '../lib/types';
+import { useRole } from '../../lib/roleContext';
+import { mockDataService } from '../../lib/mockDataService';
+import { Merchant, Offer, BookOffer, Redemption } from '../../lib/types';
 
 export default function MerchantConsole() {
   const { currentRole, isAuthenticated } = useRole();

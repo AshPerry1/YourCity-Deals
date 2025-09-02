@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRole } from './roleContext';
+import { useRole } from '../../lib/roleContext';
 
 export default function RoleSwitcher() {
   const { currentRole, availableRoles, switchRole } = useRole();
