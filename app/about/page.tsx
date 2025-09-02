@@ -376,6 +376,22 @@ export default function MarketingLanding() {
           <div className="mt-12 text-center">
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Get in Touch</h3>
             <p className="text-gray-600 mb-6">Ready to transform your organization's fundraising? Let's discuss how YourCity Deals can work for you.</p>
+            
+            {/* Founder Contact Card */}
+            <div className="inline-flex items-center space-x-4 mb-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="w-12 h-12 rounded-full overflow-hidden">
+                <img 
+                  src="/AshleyPerry90525.jpg" 
+                  alt="Ash Perry - Founder of YourCity Deals" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="text-left">
+                <h4 className="font-semibold text-gray-900">Ash Perry</h4>
+                <p className="text-sm text-gray-600">Founder & CEO</p>
+              </div>
+            </div>
+            
             <div className="flex justify-center">
               <a 
                 href="mailto:adperry18@gmail.com" 

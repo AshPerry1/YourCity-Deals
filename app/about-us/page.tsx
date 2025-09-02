@@ -86,8 +86,12 @@ export default function AboutUs() {
               </div>
               
               <div className="mt-8 flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xl font-bold">AP</span>
+                <div className="w-16 h-16 rounded-full overflow-hidden">
+                  <img 
+                    src="/AshleyPerry90525.jpg" 
+                    alt="Ash Perry - Founder of YourCity Deals" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900">Ash Perry</h3>
