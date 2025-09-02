@@ -593,8 +593,8 @@ export default function YourCityDealsApp() {
                   Discover Amazing Deals
                 </h1>
                 <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-10 leading-relaxed">
-                  Support local schools while saving money on dining, services, and entertainment. 
-                  Every purchase helps fund education and community programs.
+                  Support local organizations while saving money on dining, services, and entertainment. 
+                  Every purchase helps fund community programs and local initiatives.
                 </p>
                 {!isAuthenticated && (
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1127,7 +1127,7 @@ export default function YourCityDealsApp() {
                 
                 <div className="bg-blue-50 rounded-xl p-4">
                   <h3 className="font-medium text-blue-900 mb-2">Ready to Purchase?</h3>
-                  <p className="text-sm text-blue-700 mb-4">Get access to all {showPreviewModal.totalOffers} amazing offers and support {showPreviewModal.school}!</p>
+                  <p className="text-sm text-blue-700 mb-4">Get access to all {showPreviewModal.totalOffers} amazing offers and support local community initiatives!</p>
                   <div className="flex space-x-3">
                     <button
                       onClick={() => setShowPreviewModal(null)}
