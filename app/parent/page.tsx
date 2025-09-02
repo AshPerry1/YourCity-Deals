@@ -127,20 +127,20 @@ export default function ParentTeacherDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Header */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h1 className="text-2xl font-bold text-gray-900">Parent/Teacher Dashboard</h1>
-              <p className="text-gray-600 mt-2">Monitor student progress and class performance</p>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Parent/Teacher Dashboard</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-2">Monitor student progress and class performance</p>
             </div>
 
             {/* Tab Navigation */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="border-b border-gray-200">
-                <nav className="flex space-x-8 px-6">
+                <nav className="flex space-x-4 sm:space-x-6 lg:space-x-8 px-4 sm:px-6 overflow-x-auto">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                      className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                         activeTab === tab.id
                           ? 'border-blue-500 text-blue-600'
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -153,11 +153,11 @@ export default function ParentTeacherDashboard() {
                 </nav>
               </div>
 
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {activeTab === 'overview' && (
                   <div className="space-y-6">
                     {/* Class Stats Overview */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                       <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
                         <div className="flex items-center justify-between">
                           <div>

@@ -114,18 +114,18 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Create Your Account</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Create Your Account</h2>
           <p className="mt-2 text-sm text-gray-600">
             Join YourCity Deals to access exclusive local offers
           </p>
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-white rounded-lg p-4">
+        <div className="bg-white rounded-lg p-3 sm:p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-700">Step {step} of 3</span>
             <span className="text-sm text-gray-500">{Math.round((step / 3) * 100)}%</span>
@@ -139,7 +139,7 @@ export default function SignupPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg p-4 sm:p-6 space-y-4 sm:space-y-6">
           {step === 1 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900">Account Information</h3>

@@ -260,24 +260,24 @@ function BookPreviewContent() {
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Link
                 href="/"
                 className="text-purple-600 hover:text-purple-700"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Book Preview</h1>
-                <p className="text-gray-600">{bookDetails.title}</p>
+                <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Book Preview</h1>
+                <p className="text-sm sm:text-base text-gray-600">{bookDetails.title}</p>
               </div>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex space-x-2 sm:space-x-3">
               <button
                 onClick={handlePurchase}
-                className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+                className="bg-purple-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base"
               >
                 Buy Now - {formatCurrency(bookDetails.price)}
               </button>
@@ -307,20 +307,20 @@ function BookPreviewContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Book Overview */}
         <div className="bg-white rounded-xl shadow-sm border mb-8">
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-1">
-                <div className="w-full h-64 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-24 h-24 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-4 sm:p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="lg:col-span-1">
+                <div className="w-full h-48 sm:h-64 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-16 h-16 sm:w-24 sm:h-24 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                 </div>
               </div>
-              <div className="md:col-span-2">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{bookDetails.title}</h2>
-                <p className="text-gray-600 mb-6">{bookDetails.description}</p>
+              <div className="lg:col-span-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{bookDetails.title}</h2>
+                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{bookDetails.description}</p>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-gray-900">{bookDetails.offersCount}</p>
                     <p className="text-sm text-gray-600">Total Offers</p>

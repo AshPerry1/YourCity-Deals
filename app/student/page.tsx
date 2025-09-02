@@ -107,11 +107,11 @@ export default function SellerPortal() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Seller Portal</h1>
-              <span className="ml-4 text-sm text-gray-500">- Earn by sharing deals</span>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Seller Portal</h1>
+              <span className="ml-2 sm:ml-4 text-xs sm:text-sm text-gray-500">- Earn by sharing deals</span>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">Ambassador Dashboard</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <span className="hidden sm:inline text-sm text-gray-500">Ambassador Dashboard</span>
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@ export default function SellerPortal() {
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
+          <nav className="flex space-x-4 sm:space-x-6 lg:space-x-8 overflow-x-auto">
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
@@ -189,7 +189,7 @@ function DashboardTab({ totalClicks, totalAdds, totalPurchases, totalEarnings, r
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-900">Your Performance</h2>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-sm font-medium text-gray-500">Total Clicks</h3>
           <p className="text-3xl font-bold text-gray-900">{totalClicks}</p>

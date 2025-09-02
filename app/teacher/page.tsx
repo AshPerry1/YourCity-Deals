@@ -63,13 +63,13 @@ export default function TeacherDashboard() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             {/* Header */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h1 className="text-2xl font-bold text-gray-900">Teacher Dashboard</h1>
-              <p className="text-gray-600 mt-2">Manage your classroom fundraising and track student progress</p>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Teacher Dashboard</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-2">Manage your classroom fundraising and track student progress</p>
             </div>
 
             {/* Personal Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-lg p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div>
