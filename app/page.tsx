@@ -489,16 +489,6 @@ export default function YourCityDealsApp() {
       <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-8">
-            <button
-              onClick={() => setActiveTab('discover')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
-                activeTab === 'discover'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Discover Deals
-            </button>
             {isAuthenticated && (
               <>
                 <button
@@ -541,6 +531,36 @@ export default function YourCityDealsApp() {
         {/* Discover Tab */}
         {activeTab === 'discover' && (
           <div className="space-y-8">
+            {/* Hero Section */}
+            <div className="text-center bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-12 text-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="relative z-10">
+                <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                  Discover Amazing Deals
+                </h1>
+                <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
+                  Support local schools while saving money on dining, services, and entertainment. 
+                  Every purchase helps fund education and community programs.
+                </p>
+                {!isAuthenticated && (
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button
+                      onClick={() => setShowAuth('signup')}
+                      className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                      Get Started
+                    </button>
+                    <button
+                      onClick={() => setShowAuth('login')}
+                      className="px-8 py-4 bg-transparent text-white font-semibold rounded-xl border-2 border-white/30 hover:bg-white/10 transition-all duration-200"
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Search and Filters */}
             <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200/50">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
