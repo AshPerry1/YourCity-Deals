@@ -9,6 +9,7 @@ import NotificationPreferences from './components/NotificationPreferences';
 import NearbyOffers from './components/NearbyOffers';
 import CouponSharing from './components/coupons/CouponSharing';
 import { useLocationNotifications } from './hooks/useLocationNotifications';
+import RoleSwitcher from './components/RoleSwitcher';
 
 interface User {
   id: string;
@@ -447,6 +448,7 @@ export default function YourCityDealsApp() {
               
               {isAuthenticated ? (
                 <>
+                  <RoleSwitcher />
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-white">

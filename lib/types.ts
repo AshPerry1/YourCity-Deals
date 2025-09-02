@@ -1,99 +1,157 @@
-// User Profile with targeting data
-export interface UserProfile {
+export interface User {
   id: string;
-  user_id: string;
   email: string;
-  name?: string;
-  zip_code?: string;
-  school_id?: string;
-  grade?: string;
-  referrer_code?: string;
-  signup_date: string;
-  last_activity: string;
-  preferences?: {
-    categories: string[];
-    max_distance?: number;
-    notification_types: string[];
-  };
+  name: string;
+  phone?: string;
+  zipCode?: string;
+  createdAt: Date;
 }
 
-// Targeting conditions
-export interface TargetingCondition {
-  field: 'zip_code' | 'school_id' | 'grade' | 'referrer_code' | 'signup_date' | 'last_activity';
-  operator: 'equals' | 'in' | 'not_in' | 'contains' | 'starts_with' | 'ends_with' | 'greater_than' | 'less_than' | 'between';
-  value: string | string[] | number | Date;
+export interface UserRole {
+  userId: string;
+  role: 'buyer' | 'seller' | 'merchant_manager' | 'admin' | 'org_admin';
+  orgId?: string;
+  merchantId?: string;
+  createdAt: Date;
 }
 
-export interface TargetingRule {
+export interface Organization {
   id: string;
   name: string;
-  description?: string;
-  conditions: {
-    all?: TargetingCondition[];
-    any?: TargetingCondition[];
-    none?: TargetingCondition[];
-  };
-  active: boolean;
-  created_at: string;
-  updated_at: string;
+  type: 'school' | 'neighborhood' | 'event' | 'city';
+  description: string;
+  logo?: string;
+  zipCodes?: string[];
+  createdAt: Date;
 }
 
-// Coupon Grant
-export interface CouponGrant {
+export interface Book {
   id: string;
-  coupon_id: string;
-  user_id: string;
-  grant_type: 'purchased' | 'gifted' | 'targeted';
-  targeting_rule_id?: string;
-  granted_at: string;
-  expires_at?: string;
-  used: boolean;
-  used_at?: string;
-  redemption_code?: string;
+  name: string;
+  description: string;
+  orgId?: string;
+  type: 'school' | 'neighborhood' | 'event' | 'city';
+  price: number;
+  discoverable: boolean;
+  status: 'draft' | 'published' | 'paused' | 'removed';
+  publishedAt?: Date;
+  createdAt: Date;
 }
 
-// Targeting Rule with Coupon
-export interface CouponTargetingRule extends TargetingRule {
-  coupon_id: string;
-  max_grants?: number;
-  current_grants: number;
-  auto_run: boolean;
-  run_frequency: 'once' | 'daily' | 'weekly' | 'monthly';
-  last_run?: string;
-  next_run?: string;
+export interface Merchant {
+  id: string;
+  name: string;
+  description: string;
+  logo?: string;
+  locations: Location[];
+  createdAt: Date;
 }
 
-// Performance tracking
-export interface CouponPerformance {
-  coupon_id: string;
-  total_grants: number;
-  purchased_grants: number;
-  gifted_grants: number;
-  targeted_grants: number;
-  total_redemptions: number;
-  purchased_redemptions: number;
-  gifted_redemptions: number;
-  targeted_redemptions: number;
-  conversion_rate: number;
-  revenue_generated: number;
+export interface Location {
+  id: string;
+  merchantId: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  phone?: string;
+  createdAt: Date;
 }
 
-// Geolocation data
-export interface LocationData {
-  zip_code: string;
-  latitude?: number;
-  longitude?: number;
-  city?: string;
-  state?: string;
-  radius_miles?: number;
+export interface Offer {
+  id: string;
+  merchantId: string;
+  title: string;
+  description: string;
+  discount: string;
+  terms: string;
+  image?: string;
+  createdAt: Date;
 }
 
-// Referral tracking
-export interface ReferralData {
-  referrer_code: string;
-  referrer_id: string;
-  referred_users: number;
-  successful_referrals: number;
-  total_value_generated: number;
-  created_at: string;
+export interface BookOffer {
+  id: string;
+  bookId: string;
+  offerId: string;
+  state: 'draft' | 'submitted' | 'approved' | 'published' | 'paused' | 'removed';
+  lockedSnapshot: any; // JSON snapshot when approved
+  reviewerId?: string;
+  reviewedAt?: Date;
+  createdAt: Date;
 }
+
+export interface Purchase {
+  id: string;
+  userId: string;
+  bookId: string;
+  stripeSessionId?: string;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  amount: number;
+  createdAt: Date;
+}
+
+export interface WalletCoupon {
+  id: string;
+  userId: string;
+  bookOfferId: string;
+  status: 'unused' | 'activated' | 'redeemed' | 'transferred';
+  activatedAt?: Date;
+  expiresAt?: Date;
+  createdAt: Date;
+}
+
+export interface TransferToken {
+  id: string;
+  walletCouponId: string;
+  fromUserId: string;
+  claimToken: string;
+  status: 'pending' | 'claimed' | 'expired';
+  expiresAt: Date;
+  createdAt: Date;
+}
+
+export interface Referral {
+  id: string;
+  sellerId: string;
+  linkId: string;
+  clicks: number;
+  adds: number;
+  purchases: number;
+  bookId: string;
+  createdAt: Date;
+}
+
+export interface Redemption {
+  id: string;
+  walletCouponId: string;
+  userId: string;
+  merchantId: string;
+  deviceId?: string;
+  verifiedAt: Date;
+  method: 'qr' | 'pin';
+  createdAt: Date;
+}
+
+export interface AuditEvent {
+  id: string;
+  actorId: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  before?: any;
+  after?: any;
+  timestamp: Date;
+}
+
+export interface Segment {
+  id: string;
+  name: string;
+  zipCodes: string[];
+  createdAt: Date;
+}
+
+// State machine types
+export type BookOfferState = 'draft' | 'submitted' | 'approved' | 'published' | 'paused' | 'removed';
+export type WalletCouponStatus = 'unused' | 'activated' | 'redeemed' | 'transferred';
+export type TransferTokenStatus = 'pending' | 'claimed' | 'expired';

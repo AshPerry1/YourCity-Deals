@@ -1,205 +1,403 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import ProtectedRoute from '@/app/components/ProtectedRoute';
-import { UserRole } from '@/lib/auth';
+import React, { useState, useEffect } from 'react';
+import { useRole } from '../lib/roleContext';
+import { mockDataService } from '../lib/mockDataService';
+import { Book, Merchant, Organization, BookOffer, Offer } from '../lib/types';
 
-export default function AdminDashboard() {
-  const [stats, setStats] = useState({
-    totalPromoters: 0,
-    totalBooks: 0,
-    totalSales: 0,
-    activeOrganizers: 0,
-  });
+export default function AdminConsole() {
+  const { currentRole, isAuthenticated } = useRole();
+  const [activeTab, setActiveTab] = useState<'books' | 'merchants' | 'organizations' | 'analytics' | 'blasts'>('books');
+  const [books, setBooks] = useState<Book[]>([]);
+  const [merchants, setMerchants] = useState<Merchant[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [bookOffers, setBookOffers] = useState<BookOffer[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading stats
-    const loadStats = async () => {
-      setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setStats({
-        totalPromoters: 1250,
-        totalBooks: 45,
-        totalSales: 1250000, // $12,500 in cents
-        activeOrganizers: 24, // Mix of schools, events, neighborhoods, etc.
-      });
+    if (currentRole === 'admin') {
+      fetchData();
+    }
+  }, [currentRole]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setBooks(mockDataService.getBooks());
+      setMerchants(mockDataService.getMerchants());
+      setOrganizations(mockDataService.getOrganizations());
+      setBookOffers(mockDataService.getBookOffers());
+      setOffers(mockDataService.getOffers());
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+    } finally {
       setLoading(false);
-    };
-
-    loadStats();
-  }, []);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount / 100);
+    }
   };
+
+  // Redirect if not admin
+  if (!isAuthenticated || currentRole !== 'admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600">You need admin privileges to access this console.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <p className="mt-4 text-gray-600">Loading admin console...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <ProtectedRoute requiredRole={UserRole.ADMIN}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="space-y-6">
-            {/* Header */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600 mt-2">System overview and administrative controls</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-gray-900">Admin Console</h1>
             </div>
-
-            {/* Admin Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100">Total Promoters</p>
-                    <p className="text-3xl font-bold">{stats.totalPromoters.toLocaleString()}</p>
-                  </div>
-                  <div className="text-4xl">👥</div>
-                </div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100">Total Books</p>
-                    <p className="text-3xl font-bold">{stats.totalBooks}</p>
-                  </div>
-                  <div className="text-4xl">📚</div>
-                </div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100">Total Sales</p>
-                    <p className="text-3xl font-bold">{formatCurrency(stats.totalSales)}</p>
-                  </div>
-                  <div className="text-4xl">💰</div>
-                </div>
-              </div>
-              
-              <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-orange-100">Active Organizers</p>
-                    <p className="text-3xl font-bold">{stats.activeOrganizers}</p>
-                  </div>
-                  <div className="text-4xl">🏢</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Link 
-                  href="/admin/approvals"
-                  className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-left"
-                >
-                  <div className="text-blue-600 text-2xl mb-2">⏳</div>
-                  <p className="font-medium text-gray-900">Approvals Queue</p>
-                  <p className="text-sm text-gray-600">Review pending business applications</p>
-                </Link>
-                
-                <Link 
-                  href="/admin/analytics"
-                  className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors text-left"
-                >
-                  <div className="text-purple-600 text-2xl mb-2">📊</div>
-                  <p className="font-medium text-gray-900">System Analytics</p>
-                  <p className="text-sm text-gray-600">View detailed reports and insights</p>
-                </Link>
-                
-                <Link 
-                  href="/admin/students"
-                  className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-left"
-                >
-                  <div className="text-green-600 text-2xl mb-2">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                  </svg>
-                </div>
-                  <p className="font-medium text-gray-900">Manage Students</p>
-                  <p className="text-sm text-gray-600">{stats.totalPromoters.toLocaleString()} active users</p>
-                </Link>
-                
-                <Link 
-                  href="/admin/payouts"
-                  className="p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors text-left"
-                >
-                  <div className="text-orange-600 text-2xl mb-2">💳</div>
-                  <p className="font-medium text-gray-900">Manage Payouts</p>
-                  <p className="text-sm text-gray-600">Process commission payments</p>
-                </Link>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">New student registered</span>
-                  </div>
-                  <span className="text-xs text-gray-500">2 min ago</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">Business approved</span>
-                  </div>
-                  <span className="text-xs text-gray-500">15 min ago</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">New book published</span>
-                  </div>
-                  <span className="text-xs text-gray-500">1 hour ago</span>
-                </div>
-              </div>
-            </div>
-
-            {/* System Health */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">System Health</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-green-800">Database</span>
-                  </div>
-                  <p className="text-xs text-green-600 mt-1">All systems operational</p>
-                </div>
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-green-800">API Services</span>
-                  </div>
-                  <p className="text-xs text-green-600 mt-1">Response time: 45ms</p>
-                </div>
-              </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-500">Admin Dashboard</span>
             </div>
           </div>
         </div>
       </div>
-    </ProtectedRoute>
+
+      {/* Navigation Tabs */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('books')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'books'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Books
+            </button>
+            <button
+              onClick={() => setActiveTab('merchants')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'merchants'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Merchants
+            </button>
+            <button
+              onClick={() => setActiveTab('organizations')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'organizations'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Organizations
+            </button>
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'analytics'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Analytics
+            </button>
+            <button
+              onClick={() => setActiveTab('blasts')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'blasts'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Free Coupons
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {activeTab === 'books' && <BooksTab books={books} bookOffers={bookOffers} />}
+        {activeTab === 'merchants' && <MerchantsTab merchants={merchants} offers={offers} />}
+        {activeTab === 'organizations' && <OrganizationsTab organizations={organizations} />}
+        {activeTab === 'analytics' && <AnalyticsTab />}
+        {activeTab === 'blasts' && <BlastsTab />}
+      </div>
+    </div>
+  );
+}
+
+// Books Tab Component
+function BooksTab({ books, bookOffers }: { books: Book[], bookOffers: BookOffer[] }) {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Coupon Books</h2>
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          Create Book
+        </button>
+      </div>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {books.map((book) => (
+          <div key={book.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">{book.name}</h3>
+              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                book.status === 'published' ? 'bg-green-100 text-green-800' :
+                book.status === 'draft' ? 'bg-gray-100 text-gray-800' :
+                'bg-yellow-100 text-yellow-800'
+              }`}>
+                {book.status}
+              </span>
+            </div>
+            <p className="text-gray-600 text-sm mb-4">{book.description}</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Type:</span>
+                <span className="font-medium">{book.type}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Price:</span>
+                <span className="font-medium">${book.price}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Discoverable:</span>
+                <span className="font-medium">{book.discoverable ? 'Yes' : 'No'}</span>
+              </div>
+            </div>
+            <div className="mt-4 flex space-x-2">
+              <button className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                Edit
+              </button>
+              <button className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+                View Offers
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Merchants Tab Component
+function MerchantsTab({ merchants, offers }: { merchants: Merchant[], offers: Offer[] }) {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Merchants</h2>
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          Invite Merchant
+        </button>
+      </div>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {merchants.map((merchant) => (
+          <div key={merchant.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{merchant.name}</h3>
+            <p className="text-gray-600 text-sm mb-4">{merchant.description}</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Locations:</span>
+                <span className="font-medium">{merchant.locations.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Offers:</span>
+                <span className="font-medium">{offers.filter(o => o.merchantId === merchant.id).length}</span>
+              </div>
+            </div>
+            <div className="mt-4 flex space-x-2">
+              <button className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                View Details
+              </button>
+              <button className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+                Export Data
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Organizations Tab Component
+function OrganizationsTab({ organizations }: { organizations: Organization[] }) {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Organizations</h2>
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          Add Organization
+        </button>
+      </div>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {organizations.map((org) => (
+          <div key={org.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{org.name}</h3>
+            <p className="text-gray-600 text-sm mb-4">{org.description}</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Type:</span>
+                <span className="font-medium capitalize">{org.type}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">ZIP Codes:</span>
+                <span className="font-medium">{org.zipCodes?.length || 0}</span>
+              </div>
+            </div>
+            <div className="mt-4 flex space-x-2">
+              <button className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                Edit
+              </button>
+              <button className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+                View Books
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Analytics Tab Component
+function AnalyticsTab() {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-gray-900">Analytics Dashboard</h2>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-sm font-medium text-gray-500">Total Books Sold</h3>
+          <p className="text-3xl font-bold text-gray-900">1,247</p>
+          <p className="text-sm text-green-600">+12% from last month</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-sm font-medium text-gray-500">Total Revenue</h3>
+          <p className="text-3xl font-bold text-gray-900">$31,175</p>
+          <p className="text-sm text-green-600">+8% from last month</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-sm font-medium text-gray-500">Active Merchants</h3>
+          <p className="text-3xl font-bold text-gray-900">89</p>
+          <p className="text-sm text-blue-600">+3 this week</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-sm font-medium text-gray-500">Coupons Redeemed</h3>
+          <p className="text-3xl font-bold text-gray-900">5,432</p>
+          <p className="text-sm text-green-600">+15% from last month</p>
+        </div>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Reports</h3>
+        <div className="flex space-x-4">
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Export Sales Report
+          </button>
+          <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            Export Redemption Report
+          </button>
+          <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+            Export Merchant Report
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Blasts Tab Component
+function BlastsTab() {
+  const [zipCodes, setZipCodes] = useState('');
+  const [selectedBook, setSelectedBook] = useState('');
+  const [selectedSegment, setSelectedSegment] = useState('');
+
+  const handleBlast = () => {
+    // Mock implementation
+    alert('Free coupons sent successfully!');
+  };
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-gray-900">Send Free Coupons</h2>
+      
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Target ZIP Codes (comma-separated)
+            </label>
+            <input
+              type="text"
+              value={zipCodes}
+              onChange={(e) => setZipCodes(e.target.value)}
+              placeholder="90210, 90211, 90212"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Target Book Buyers
+            </label>
+            <select
+              value={selectedBook}
+              onChange={(e) => setSelectedBook(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select a book</option>
+              <option value="book-1">Lincoln High School Coupon Book 2024</option>
+              <option value="book-2">Downtown Deals 2024</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Target Segment
+            </label>
+            <select
+              value={selectedSegment}
+              onChange={(e) => setSelectedSegment(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select a segment</option>
+              <option value="segment-1">Beverly Hills Residents</option>
+            </select>
+          </div>
+          
+          <button
+            onClick={handleBlast}
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Send Free Coupons
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

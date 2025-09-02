@@ -1,288 +1,514 @@
 'use client';
 
-import React, { useState } from 'react';
-import ProtectedRoute from '@/app/components/ProtectedRoute';
-import { UserRole } from '@/lib/auth';
+import React, { useState, useEffect } from 'react';
+import { useRole } from '../lib/roleContext';
+import { mockDataService } from '../lib/mockDataService';
+import { Merchant, Offer, BookOffer, Redemption } from '../lib/types';
 
-// Merchant Owner Dashboard
-function MerchantOwnerDashboard() {
-  const [activeTab, setActiveTab] = useState('analytics');
-  const [staffMembers, setStaffMembers] = useState([
-    { id: 1, name: 'Sarah Johnson', email: 'sarah@restaurant.com', pin: '1234', role: 'Cashier' },
-    { id: 2, name: 'Mike Chen', email: 'mike@restaurant.com', pin: '5678', role: 'Manager' },
-  ]);
+export default function MerchantConsole() {
+  const { currentRole, isAuthenticated } = useRole();
+  const [activeTab, setActiveTab] = useState<'offers' | 'redemptions' | 'analytics' | 'redeem-station'>('offers');
+  const [merchant, setMerchant] = useState<Merchant | null>(null);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [bookOffers, setBookOffers] = useState<BookOffer[]>([]);
+  const [redemptions, setRedemptions] = useState<Redemption[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const tabs = [
-    { id: 'analytics', name: 'Analytics', icon: '📊' },
-    { id: 'staff', name: 'Staff Management', icon: '👥' },
-    { id: 'redemptions', name: 'Recent Redemptions', icon: '🎫' },
-  ];
+  useEffect(() => {
+    if (currentRole === 'merchant_manager') {
+      fetchData();
+    }
+  }, [currentRole]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Mock merchant data - in real app this would come from user's merchant association
+      const mockMerchant = mockDataService.getMerchants()[0]; // Joe's Pizza
+      setMerchant(mockMerchant);
+      setOffers(mockDataService.getOffersByMerchant(mockMerchant.id));
+      setBookOffers(mockDataService.getBookOffers().filter(bo => 
+        offers.some(o => o.id === bo.offerId && o.merchantId === mockMerchant.id)
+      ));
+      setRedemptions(mockDataService.getRedemptionsByMerchant(mockMerchant.id));
+    } catch (error) {
+      console.error('Error fetching merchant data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Redirect if not merchant manager
+  if (!isAuthenticated || currentRole !== 'merchant_manager') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600">You need merchant manager privileges to access this console.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading merchant console...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Content sections only - header is provided by UniversalPortalLayout */}
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Create New Offer</h3>
-              <p className="text-purple-100 mb-4">Build coupons for your customers</p>
-              <a
-                href="/merchant/offers/new"
-                className="inline-flex items-center px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition-colors"
-              >
-                <span className="mr-2">➕</span>
-                Create Offer
-              </a>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-gray-900">Merchant Console</h1>
+              {merchant && (
+                <span className="ml-4 text-sm text-gray-500">- {merchant.name}</span>
+              )}
             </div>
-                            <div className="text-4xl">
-                  <svg className="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                  </svg>
-                </div>
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Verify Coupons</h3>
-              <p className="text-green-100 mb-4">Scan or manually verify redemptions</p>
-              <a
-                href="/merchant/verify"
-                className="inline-flex items-center px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 transition-colors"
-              >
-                <span className="mr-2">🎫</span>
-                Verify Now
-              </a>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-500">Merchant Dashboard</span>
             </div>
-            <div className="text-4xl">📱</div>
           </div>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="border-b border-gray-200">
-          <nav className="flex space-x-8 px-6">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
-                    ? 'border-purple-500 text-purple-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.name}
-              </button>
-            ))}
+      {/* Navigation Tabs */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('offers')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'offers'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Offers
+            </button>
+            <button
+              onClick={() => setActiveTab('redemptions')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'redemptions'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Redemptions
+            </button>
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'analytics'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Analytics
+            </button>
+            <button
+              onClick={() => setActiveTab('redeem-station')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'redeem-station'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Redeem Station
+            </button>
           </nav>
         </div>
+      </div>
 
-        <div className="p-6">
-          {activeTab === 'analytics' && (
-            <div className="space-y-6">
-              {/* Analytics Overview */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-purple-100">Total Redemptions</p>
-                      <p className="text-3xl font-bold">1,247</p>
-                    </div>
-                    <div className="text-4xl">🎫</div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-green-100">Revenue Generated</p>
-                      <p className="text-3xl font-bold">$12,450</p>
-                    </div>
-                    <div className="text-4xl">💰</div>
-                  </div>
-                </div>
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-blue-100">Active Offers</p>
-                      <p className="text-3xl font-bold">15</p>
-                    </div>
-                    <div className="text-4xl">🏷️</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Activity */}
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-white rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">Coupon redeemed - 50% off meal</span>
-                    </div>
-                    <span className="text-xs text-gray-500">2 min ago</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-white rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">New staff member added</span>
-                    </div>
-                    <span className="text-xs text-gray-500">1 hour ago</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'staff' && (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-900">Staff Management</h3>
-                <button className="btn-primary">Add Staff Member</button>
-              </div>
-
-              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PIN</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {staffMembers.map((staff) => (
-                      <tr key={staff.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{staff.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{staff.email}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{staff.role}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{staff.pin}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                          <button className="text-red-600 hover:text-red-900">Remove</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'redemptions' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Redemptions</h3>
-                <a
-                  href="/merchant/verify"
-                  className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  <span className="mr-2">🎫</span>
-                  Verify New Coupon
-                </a>
-              </div>
-              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coupon</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Staff</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">50% off meal</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">john@email.com</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Sarah Johnson</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-15</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Verified</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </div>
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {activeTab === 'offers' && <OffersTab offers={offers} bookOffers={bookOffers} />}
+        {activeTab === 'redemptions' && <RedemptionsTab redemptions={redemptions} />}
+        {activeTab === 'analytics' && <AnalyticsTab redemptions={redemptions} />}
+        {activeTab === 'redeem-station' && <RedeemStationTab />}
       </div>
     </div>
   );
 }
 
-// Merchant Staff Dashboard (Simplified)
-function MerchantStaffDashboard() {
+// Offers Tab Component
+function OffersTab({ offers, bookOffers }: { offers: Offer[], bookOffers: BookOffer[] }) {
+  const [showCreateOffer, setShowCreateOffer] = useState(false);
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h1 className="text-2xl font-bold text-gray-900">Coupon Verification</h1>
-        <p className="text-gray-600 mt-2">Verify customer coupons quickly and securely</p>
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">My Offers</h2>
+        <button 
+          onClick={() => setShowCreateOffer(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Create Offer
+        </button>
+      </div>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {offers.map((offer) => {
+          const bookOffer = bookOffers.find(bo => bo.offerId === offer.id);
+          return (
+            <div key={offer.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">{offer.title}</h3>
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  bookOffer?.state === 'published' ? 'bg-green-100 text-green-800' :
+                  bookOffer?.state === 'approved' ? 'bg-blue-100 text-blue-800' :
+                  bookOffer?.state === 'submitted' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {bookOffer?.state || 'draft'}
+                </span>
+              </div>
+              <p className="text-gray-600 text-sm mb-4">{offer.description}</p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Discount:</span>
+                  <span className="font-medium">{offer.discount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Status:</span>
+                  <span className="font-medium capitalize">{bookOffer?.state || 'Not submitted'}</span>
+                </div>
+              </div>
+              <div className="mt-4 flex space-x-2">
+                <button className="flex-1 px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                  Edit
+                </button>
+                <button className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
+                  Submit to Books
+                </button>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Quick Verification */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Verify Coupon</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
-            <input
-              type="text"
-              placeholder="Enter 8-digit code"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <button className="btn-primary w-full">Verify Coupon</button>
+      {showCreateOffer && (
+        <CreateOfferModal onClose={() => setShowCreateOffer(false)} />
+      )}
+    </div>
+  );
+}
+
+// Redemptions Tab Component
+function RedemptionsTab({ redemptions }: { redemptions: Redemption[] }) {
+  const [dateRange, setDateRange] = useState('7d');
+
+  const exportCSV = () => {
+    // Mock CSV export
+    const csvContent = "data:text/csv;charset=utf-8," + 
+      "Date,Time,Coupon,Method,Location\n" +
+      redemptions.map(r => 
+        `${r.verifiedAt.toLocaleDateString()},${r.verifiedAt.toLocaleTimeString()},Coupon-${r.walletCouponId},${r.method},Store`
+      ).join('\n');
+    
+    const link = document.createElement('a');
+    link.setAttribute('href', encodeURI(csvContent));
+    link.setAttribute('download', `redemptions-${dateRange}.csv`);
+    link.click();
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Redemptions</h2>
+        <div className="flex items-center space-x-4">
+          <select
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
+          </select>
+          <button
+            onClick={exportCSV}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            Export CSV
+          </button>
         </div>
       </div>
-
-      {/* Recent Verifications */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Verifications</h2>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div>
-              <p className="font-medium text-gray-900">50% off meal</p>
-              <p className="text-sm text-gray-500">Code: ABC12345</p>
-            </div>
-            <span className="text-xs text-gray-500">2 min ago</span>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div>
-              <p className="font-medium text-gray-900">Free dessert</p>
-              <p className="text-sm text-gray-500">Code: XYZ67890</p>
-            </div>
-            <span className="text-xs text-gray-500">15 min ago</span>
-          </div>
+      
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date & Time
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Coupon
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Method
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Location
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {redemptions.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                    No redemptions found for this period
+                  </td>
+                </tr>
+              ) : (
+                redemptions.map((redemption) => (
+                  <tr key={redemption.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {redemption.verifiedAt.toLocaleDateString()} {redemption.verifiedAt.toLocaleTimeString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      Coupon-{redemption.walletCouponId}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">
+                      {redemption.method}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      Store Location
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
 }
 
-// Main Merchant Page with Role Detection
-export default function MerchantPage() {
-  const userRole = UserRole.MERCHANT_OWNER; // Simplified for demo mode
+// Analytics Tab Component
+function AnalyticsTab({ redemptions }: { redemptions: Redemption[] }) {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-gray-900">Analytics</h2>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-sm font-medium text-gray-500">Total Redemptions</h3>
+          <p className="text-3xl font-bold text-gray-900">{redemptions.length}</p>
+          <p className="text-sm text-green-600">+5% from last week</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-sm font-medium text-gray-500">QR Scans</h3>
+          <p className="text-3xl font-bold text-gray-900">{redemptions.filter(r => r.method === 'qr').length}</p>
+          <p className="text-sm text-blue-600">80% of total</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-sm font-medium text-gray-500">PIN Entries</h3>
+          <p className="text-3xl font-bold text-gray-900">{redemptions.filter(r => r.method === 'pin').length}</p>
+          <p className="text-sm text-purple-600">20% of total</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-sm font-medium text-gray-500">Today's Redemptions</h3>
+          <p className="text-3xl font-bold text-gray-900">
+            {redemptions.filter(r => 
+              r.verifiedAt.toDateString() === new Date().toDateString()
+            ).length}
+          </p>
+          <p className="text-sm text-green-600">+2 from yesterday</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Redeem Station Tab Component
+function RedeemStationTab() {
+  const [couponCode, setCouponCode] = useState('');
+  const [verificationResult, setVerificationResult] = useState<{
+    valid: boolean;
+    message: string;
+    status: 'idle' | 'checking' | 'valid' | 'invalid' | 'used' | 'expired';
+  }>({
+    valid: false,
+    message: '',
+    status: 'idle'
+  });
+
+  const verifyCoupon = async () => {
+    if (!couponCode.trim()) return;
+
+    setVerificationResult({ valid: false, message: '', status: 'checking' });
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Mock verification logic
+    const random = Math.random();
+    if (random > 0.7) {
+      setVerificationResult({
+        valid: true,
+        message: '✅ Valid & Redeemed Now',
+        status: 'valid'
+      });
+    } else if (random > 0.5) {
+      setVerificationResult({
+        valid: false,
+        message: '❌ Already Used',
+        status: 'used'
+      });
+    } else {
+      setVerificationResult({
+        valid: false,
+        message: '❌ Expired/Invalid',
+        status: 'expired'
+      });
+    }
+  };
 
   return (
-    <div className="p-6">
-      {userRole === UserRole.MERCHANT_OWNER ? (
-        <MerchantOwnerDashboard />
-      ) : (
-        <MerchantStaffDashboard />
-      )}
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold text-gray-900">Redeem Station</h2>
+      
+      <div className="max-w-md mx-auto">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Scan QR Code or Enter Code</h3>
+            <p className="text-sm text-gray-600">Enter the coupon code manually or scan the QR code</p>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                placeholder="Enter coupon code..."
+                className="w-full px-4 py-3 text-center text-lg font-mono border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyPress={(e) => e.key === 'Enter' && verifyCoupon()}
+              />
+            </div>
+            
+            <button
+              onClick={verifyCoupon}
+              disabled={verificationResult.status === 'checking'}
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {verificationResult.status === 'checking' ? 'Verifying...' : 'Verify Coupon'}
+            </button>
+          </div>
+          
+          {verificationResult.status !== 'idle' && (
+            <div className={`mt-6 p-4 rounded-lg text-center text-lg font-semibold ${
+              verificationResult.status === 'valid' ? 'bg-green-100 text-green-800' :
+              verificationResult.status === 'used' ? 'bg-yellow-100 text-yellow-800' :
+              'bg-red-100 text-red-800'
+            }`}>
+              {verificationResult.message}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Create Offer Modal Component
+function CreateOfferModal({ onClose }: { onClose: () => void }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    discount: '',
+    terms: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Mock implementation
+    alert('Offer created successfully!');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Create New Offer</h3>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={3}
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
+            <input
+              type="text"
+              value={formData.discount}
+              onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
+              placeholder="e.g., 20% Off, Free Appetizer"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Terms</label>
+            <textarea
+              value={formData.terms}
+              onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={2}
+              required
+            />
+          </div>
+          
+          <div className="flex space-x-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Create Offer
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
