@@ -548,9 +548,7 @@ function InvitesTab() {
   const sendEmail = () => {
     if (!generatedInvite) return;
 
-    const emailTemplate = `Subject: Welcome to YourCity Deals!
-
-Hi ${generatedInvite.firstName},
+    const emailTemplate = `Hi ${generatedInvite.firstName},
 
 You've been invited to join YourCity Deals as a seller!
 
@@ -574,9 +572,7 @@ YourCity Deals Team`;
   const copyEmailTemplate = () => {
     if (!generatedInvite) return;
 
-    const emailTemplate = `Subject: Welcome to YourCity Deals!
-
-Hi ${generatedInvite.firstName},
+    const emailTemplate = `Hi ${generatedInvite.firstName},
 
 You've been invited to join YourCity Deals as a seller!
 
