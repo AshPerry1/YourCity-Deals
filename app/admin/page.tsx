@@ -32,7 +32,7 @@ export default function AdminConsole() {
   }, [currentRole]);
 
   const fetchData = async () => {
-    setLoading(true);
+      setLoading(true);
     try {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -102,7 +102,7 @@ export default function AdminConsole() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+            {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -126,10 +126,10 @@ export default function AdminConsole() {
                 </select>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
+                  </div>
+                </div>
+              </div>
+              
       {/* Navigation Tabs */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -195,9 +195,9 @@ export default function AdminConsole() {
               Seller Invites
             </button>
           </nav>
-        </div>
-      </div>
-
+                </div>
+              </div>
+              
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'books' && <BooksTab books={books} bookOffers={bookOffers} />}
@@ -240,11 +240,11 @@ function BooksTab({ books, bookOffers }: { books: Book[], bookOffers: BookOffer[
               <div className="flex justify-between">
                 <span className="text-gray-500">Type:</span>
                 <span className="font-medium">{book.type}</span>
-              </div>
+                  </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Price:</span>
                 <span className="font-medium">${book.price}</span>
-              </div>
+                </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Discoverable:</span>
                 <span className="font-medium">{book.discoverable ? 'Yes' : 'No'}</span>
@@ -298,11 +298,11 @@ function MerchantsTab({ merchants, offers }: { merchants: Merchant[], offers: Of
               <button className="flex-1 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors">
                 Export Data
               </button>
-            </div>
-          </div>
+                  </div>
+                </div>
         ))}
-      </div>
-    </div>
+                  </div>
+                </div>
   );
 }
 
@@ -315,7 +315,7 @@ function OrganizationsTab({ organizations }: { organizations: Organization[] }) 
         <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
           Add Organization
         </button>
-      </div>
+                  </div>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {organizations.map((org) => (
@@ -326,7 +326,7 @@ function OrganizationsTab({ organizations }: { organizations: Organization[] }) 
               <div className="flex justify-between">
                 <span className="text-gray-500">Type:</span>
                 <span className="font-medium capitalize">{org.type}</span>
-              </div>
+                </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">ZIP Codes:</span>
                 <span className="font-medium">{org.zipCodes?.length || 0}</span>
@@ -409,7 +409,7 @@ function BlastsTab() {
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-900">Send Free Coupons</h2>
       
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -461,7 +461,7 @@ function BlastsTab() {
           </button>
         </div>
       </div>
-    </div>
+                  </div>
   );
 }
 
@@ -523,7 +523,7 @@ function InvitesTab() {
     }
 
     const inviteToken = generateInviteToken();
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://yourcitydeals.com';
+    const baseUrl = 'https://yourcitydeals.com';
     const inviteLink = `${baseUrl}/invite/${inviteToken}`;
 
     const newInvite = {
@@ -619,7 +619,7 @@ YourCity Deals Team`;
         >
           Invite Seller
         </button>
-      </div>
+                </div>
 
       {/* Invite Form Modal */}
       {showInviteForm && (
@@ -637,7 +637,7 @@ YourCity Deals Team`;
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter first name"
                 />
-              </div>
+                  </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
@@ -648,7 +648,7 @@ YourCity Deals Team`;
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter last name"
                 />
-              </div>
+                </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
