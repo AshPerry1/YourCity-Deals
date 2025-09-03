@@ -390,6 +390,141 @@ function AnalyticsTab() {
           </button>
         </div>
       </div>
+
+      {/* Seller Details Modal */}
+      {showInviteDetails && selectedInvite && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Seller Details</h3>
+              <button
+                onClick={() => setShowInviteDetails(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Basic Information</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                    <p className="text-sm text-gray-900">{selectedInvite.firstName} {selectedInvite.lastName}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <p className="text-sm text-gray-900">{selectedInvite.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Invite Token</label>
+                    <p className="text-sm text-gray-900 font-mono">{selectedInvite.inviteToken}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Status</label>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      selectedInvite.status === 'accepted' || selectedInvite.status === 'approved'
+                        ? 'bg-green-100 text-green-800' 
+                        : selectedInvite.status === 'rejected'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {selectedInvite.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Seller Profile Info */}
+              {(() => {
+                const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+                const sellers = savedSellers ? JSON.parse(savedSellers) : [];
+                const seller = sellers.find((s: any) => s.inviteId === selectedInvite.id);
+                return seller ? (
+                  <div>
+                    <h4 className="text-md font-semibold text-gray-900 mb-3">Profile Information</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Phone</label>
+                        <p className="text-sm text-gray-900">{seller.phone}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
+                        <p className="text-sm text-gray-900">{seller.zipCode}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Profile Status</label>
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          seller.status === 'active' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {seller.status}
+                        </span>
+                      </div>
+                      {seller.profilePicture && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
+                          <img 
+                            src={seller.profilePicture} 
+                            alt="Profile" 
+                            className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 mt-1"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p className="text-yellow-800 text-sm">
+                      This seller hasn't completed their profile yet. They may still be in the onboarding process.
+                    </p>
+                  </div>
+                );
+              })()}
+
+              {/* Actions */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Actions</h4>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => handleResendInvite(selectedInvite)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Resend Invite
+                  </button>
+                  {selectedInvite.status === 'pending' && (
+                    <>
+                      <button
+                        onClick={() => handleApproveSeller(selectedInvite)}
+                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                      >
+                        Approve Seller
+                      </button>
+                      <button
+                        onClick={() => handleRejectSeller(selectedInvite)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                      >
+                        Reject Seller
+                      </button>
+                    </>
+                  )}
+                  <button
+                    onClick={() => setShowInviteDetails(false)}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -475,6 +610,8 @@ function InvitesTab() {
     email: ''
   });
   const [generatedInvite, setGeneratedInvite] = useState<any>(null);
+  const [selectedInvite, setSelectedInvite] = useState<any>(null);
+  const [showInviteDetails, setShowInviteDetails] = useState(false);
 
   // Mock data for testing
   useEffect(() => {
@@ -615,6 +752,75 @@ The YourCity Deals Team`;
       document.body.removeChild(textArea);
       alert('Email template copied to clipboard!');
     });
+  };
+
+  const handleViewDetails = (invite: any) => {
+    setSelectedInvite(invite);
+    setShowInviteDetails(true);
+  };
+
+  const handleResendInvite = (invite: any) => {
+    const baseUrl = 'https://yourcitydeals.com';
+    const inviteLink = `${baseUrl}/invite/${invite.inviteToken}`;
+    
+    const emailTemplate = `Hi ${invite.firstName},
+
+We're thrilled to invite you to join YourCity Deals as a seller! 🎉
+
+You're about to become part of an amazing community of sellers who are helping their local businesses grow while supporting great causes. We're excited to see what you'll accomplish!
+
+Ready to get started? Click here to set up your account:
+${inviteLink}
+
+This invite expires in 7 days, so don't wait too long!
+
+We're here to support you every step of the way. If you have any questions or need help getting started, just reply to this email - we'd love to hear from you!
+
+Welcome to the team!
+
+Best regards,
+The YourCity Deals Team`;
+
+    const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('Welcome to YourCity Deals!')}&body=${encodeURIComponent(emailTemplate)}`;
+    window.open(mailtoLink, '_blank');
+  };
+
+  const handleApproveSeller = (invite: any) => {
+    // Find the seller in localStorage
+    const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+    const sellers = JSON.parse(savedSellers);
+    const seller = sellers.find((s: any) => s.inviteId === invite.id);
+    
+    if (seller) {
+      const updatedSellers = sellers.map((s: any) => 
+        s.id === seller.id ? { ...s, status: 'active' } : s
+      );
+      localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+      
+      // Update invite status
+      const updatedInvites = invites.map((inv: any) => 
+        inv.id === invite.id ? { ...inv, status: 'approved' } : inv
+      );
+      setInvites(updatedInvites);
+      localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+      
+      alert('Seller approved successfully!');
+    } else {
+      alert('Seller not found. They may not have completed their profile yet.');
+    }
+  };
+
+  const handleRejectSeller = (invite: any) => {
+    if (confirm('Are you sure you want to reject this seller? This action cannot be undone.')) {
+      // Update invite status
+      const updatedInvites = invites.map((inv: any) => 
+        inv.id === invite.id ? { ...inv, status: 'rejected' } : inv
+      );
+      setInvites(updatedInvites);
+      localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+      
+      alert('Seller rejected successfully!');
+    }
   };
 
   return (
@@ -763,7 +969,12 @@ The YourCity Deals Team`;
                     {invite.sentAt}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900">View Details</button>
+                    <button 
+                      onClick={() => handleViewDetails(invite)}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
+                      View Details
+                    </button>
                   </td>
                 </tr>
               ))}
