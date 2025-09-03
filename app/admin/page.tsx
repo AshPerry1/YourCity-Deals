@@ -524,6 +524,27 @@ function InvitesTab() {
       return;
     }
 
+    // Check for duplicate email
+    const existingInvite = invites.find(invite => 
+      invite.email.toLowerCase() === inviteForm.email.toLowerCase()
+    );
+    
+    if (existingInvite) {
+      alert(`A seller with the email "${inviteForm.email}" has already been invited. Please use a different email address or check the invite history.`);
+      return;
+    }
+
+    // Check for duplicate name combination
+    const existingName = invites.find(invite => 
+      invite.firstName.toLowerCase() === inviteForm.firstName.toLowerCase() &&
+      invite.lastName.toLowerCase() === inviteForm.lastName.toLowerCase()
+    );
+    
+    if (existingName) {
+      alert(`A seller with the name "${inviteForm.firstName} ${inviteForm.lastName}" has already been invited. Please verify this is a different person or use a different name.`);
+      return;
+    }
+
     const inviteToken = generateInviteToken();
     const baseUrl = 'https://yourcitydeals.com';
     const inviteLink = `${baseUrl}/invite/${inviteToken}`;
