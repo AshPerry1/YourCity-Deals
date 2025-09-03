@@ -143,7 +143,8 @@ export default function InvitePage() {
       verificationCode,
       expectedCode: '123456',
       invite: invite,
-      phone: phone
+      phone: phone,
+      step: step
     });
 
     if (verificationCode === '123456') {
@@ -162,29 +163,39 @@ export default function InvitePage() {
 
       console.log('Seller data to save:', sellerData);
 
-      const savedSellers = localStorage.getItem('yourcitydeals_sellers');
-      const sellers = savedSellers ? JSON.parse(savedSellers) : [];
-      sellers.push(sellerData);
-      localStorage.setItem('yourcitydeals_sellers', JSON.stringify(sellers));
+      try {
+        const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+        const sellers = savedSellers ? JSON.parse(savedSellers) : [];
+        sellers.push(sellerData);
+        localStorage.setItem('yourcitydeals_sellers', JSON.stringify(sellers));
+        console.log('Seller data saved successfully');
 
-      // Update invite status
-      const savedInvites = localStorage.getItem('yourcitydeals_invites');
-      const invites = JSON.parse(savedInvites);
-      const updatedInvites = invites.map((inv: any) => 
-        inv.id === invite.id ? { ...inv, status: 'accepted', acceptedAt: new Date().toISOString() } : inv
-      );
-      localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+        // Update invite status
+        const savedInvites = localStorage.getItem('yourcitydeals_invites');
+        if (savedInvites) {
+          const invites = JSON.parse(savedInvites);
+          const updatedInvites = invites.map((inv: any) => 
+            inv.id === invite.id ? { ...inv, status: 'accepted', acceptedAt: new Date().toISOString() } : inv
+          );
+          localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+          console.log('Invite status updated successfully');
+        }
 
-      // Pre-fill profile data
-      setProfileData({
-        firstName: invite.firstName,
-        lastName: invite.lastName,
-        zipCode: '',
-        profilePicture: null
-      });
+        // Pre-fill profile data
+        setProfileData({
+          firstName: invite.firstName,
+          lastName: invite.lastName,
+          zipCode: '',
+          profilePicture: null
+        });
 
-      console.log('Setting step to profile');
-      setStep('profile');
+        console.log('Setting step to profile');
+        setStep('profile');
+        console.log('Step set to profile successfully');
+      } catch (error) {
+        console.error('Error during verification:', error);
+        alert('There was an error processing your verification. Please try again.');
+      }
     } else {
       console.log('Invalid code entered:', verificationCode);
       alert('Invalid verification code. Please try again.');
@@ -455,6 +466,17 @@ export default function InvitePage() {
                   </svg>
                   Verify Code
                 </button>
+                
+                {/* Debug button for testing */}
+                <button
+                  onClick={() => {
+                    console.log('Debug: Manually advancing to profile step');
+                    setStep('profile');
+                  }}
+                  className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium text-sm mt-2"
+                >
+                  Debug: Skip to Profile Step
+                </button>
               </div>
             </div>
           )}
@@ -611,28 +633,57 @@ export default function InvitePage() {
           {step === 'success' && (
             <div className="space-y-6">
               <div className="text-center">
-                <div className="mx-auto w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mx-auto w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mb-6">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to YourCity Deals!</h2>
-                <p className="text-gray-600">
-                  Your profile has been completed successfully.
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to YourCity Deals!</h2>
+                <p className="text-gray-600 mb-6">
+                  Congratulations! Your seller profile has been completed successfully. We're excited to have you join our community!
                 </p>
               </div>
               
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h3 className="text-green-900 font-semibold">Application Submitted!</h3>
-                <p className="text-green-700 text-sm mt-1">
-                  Your seller account is now pending review. We'll review your application and notify you via email when it's approved.
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <h3 className="text-green-900 font-semibold text-lg mb-3">Application Submitted Successfully!</h3>
+                <p className="text-green-700 text-sm mb-4">
+                  Your seller account is now pending review. Our team will review your application and get back to you within 24-48 hours.
                 </p>
+                <div className="space-y-2 text-sm text-green-700">
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    You'll receive an email notification when approved
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Once approved, you can start creating and selling deals
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    We'll help you get set up with your first campaign
+                  </div>
+                </div>
               </div>
               
-              <div className="text-center">
-                <a href="/" className="text-green-600 hover:text-green-700 text-sm font-medium">
-                  ← Back to Marketplace
+              <div className="text-center space-y-4">
+                <a 
+                  href="/" 
+                  className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  Back to Marketplace
                 </a>
+                <p className="text-sm text-gray-500">
+                  Questions? Contact us at <a href="mailto:support@yourcitydeals.com" className="text-green-600 hover:text-green-700">support@yourcitydeals.com</a>
+                </p>
               </div>
             </div>
           )}
