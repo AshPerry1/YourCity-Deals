@@ -518,7 +518,7 @@ function InvitesTab() {
     }
 
     const inviteToken = generateInviteToken();
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://yourcitydeals.com';
     const inviteLink = `${baseUrl}/invite/${inviteToken}`;
 
     const newInvite = {
