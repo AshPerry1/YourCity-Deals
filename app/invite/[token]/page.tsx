@@ -30,11 +30,15 @@ export default function InvitePage() {
       const invites = JSON.parse(savedInvites);
       const foundInvite = invites.find((inv: any) => inv.inviteToken === token);
       console.log('Found invite:', foundInvite);
-      setInvite(foundInvite);
+      if (foundInvite) {
+        setInvite(foundInvite);
+        setLoading(false);
+        return;
+      }
     }
     
     // For testing: TEST123 is always valid - but we need to find the actual invite
-    if (token === 'TEST123' && !invite) {
+    if (token === 'TEST123') {
       console.log('TEST123 token detected, looking for TEST123 invite');
       const savedInvites = localStorage.getItem('yourcitydeals_invites');
       if (savedInvites) {
@@ -48,9 +52,9 @@ export default function InvitePage() {
           console.log('No TEST123 invite found, creating fallback');
           setInvite({
             id: 'test-invite',
-            firstName: 'Test',
+            firstName: 'John',
             lastName: 'Seller',
-            email: 'test@example.com',
+            email: 'john@example.com',
             inviteToken: 'TEST123',
             status: 'pending'
           });
@@ -60,9 +64,9 @@ export default function InvitePage() {
         console.log('No invites exist, creating fallback');
         setInvite({
           id: 'test-invite',
-          firstName: 'Test',
+          firstName: 'John',
           lastName: 'Seller',
-          email: 'test@example.com',
+          email: 'john@example.com',
           inviteToken: 'TEST123',
           status: 'pending'
         });
@@ -315,10 +319,15 @@ export default function InvitePage() {
                   {step === 'phone' && (
             <div className="space-y-6">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Phone Verification</h2>
-                <p className="text-gray-600">
-                  We'll send you a verification code to confirm your phone number.
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Let's Verify Your Phone</h2>
+                <p className="text-gray-600 mb-4">
+                  Great! We're excited to have you join our seller community. First, let's verify your phone number so we can keep you updated on your sales and important notifications.
                 </p>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-sm text-green-800">
+                    <strong>Why we need this:</strong> We'll send you verification codes, sales updates, and important notifications about your seller account.
+                  </p>
+                </div>
               </div>
               
               <div className="space-y-4">
@@ -351,13 +360,15 @@ export default function InvitePage() {
                   {step === 'verification' && (
             <div className="space-y-6">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Enter Verification Code</h2>
-                <p className="text-gray-600">
-                  We sent a verification code to {phone}
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Enter Your Verification Code</h2>
+                <p className="text-gray-600 mb-4">
+                  Perfect! We've sent a verification code to your phone. This helps us ensure your account is secure and you're ready to start selling.
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Test code: <strong className="text-green-600">123456</strong>
-                </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Test Mode:</strong> For testing purposes, use code <strong className="text-green-600">123456</strong>
+                  </p>
+                </div>
               </div>
               
               <div className="space-y-4">
@@ -375,7 +386,10 @@ export default function InvitePage() {
                 </div>
                 
                 <button
-                  onClick={handleVerifyCode}
+                  onClick={() => {
+                    console.log('Verify button clicked!');
+                    handleVerifyCode();
+                  }}
                   className="w-full px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg flex items-center justify-center"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
