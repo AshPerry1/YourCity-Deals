@@ -103,16 +103,27 @@ export default function AboutUs() {
           </div>
         </div>
         
-        {/* Decorative Elements - Tech Forward Pattern */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-15">
+        {/* Decorative Elements - Circuit Board Pattern */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-20">
           <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
-              <pattern id="tech-grid" width="12" height="12" patternUnits="userSpaceOnUse">
-                <path d="M12 0L0 0 0 12" fill="none" stroke="currentColor" strokeWidth="0.3"/>
-                <circle cx="6" cy="6" r="0.5" fill="currentColor"/>
+              <pattern id="circuit" width="20" height="20" patternUnits="userSpaceOnUse">
+                {/* Main circuit lines */}
+                <path d="M0 10 Q5 5 10 10 T20 10" fill="none" stroke="currentColor" strokeWidth="0.2"/>
+                <path d="M10 0 Q15 5 10 10 T10 20" fill="none" stroke="currentColor" strokeWidth="0.2"/>
+                <path d="M0 5 Q10 10 20 5" fill="none" stroke="currentColor" strokeWidth="0.15"/>
+                <path d="M5 0 Q10 10 5 20" fill="none" stroke="currentColor" strokeWidth="0.15"/>
+                
+                {/* Connection nodes */}
+                <circle cx="10" cy="10" r="0.8" fill="currentColor"/>
+                <rect x="9.2" y="9.2" width="1.6" height="1.6" fill="currentColor"/>
+                <circle cx="5" cy="5" r="0.4" fill="currentColor"/>
+                <circle cx="15" cy="15" r="0.4" fill="currentColor"/>
+                <rect x="4.6" y="14.6" width="0.8" height="0.8" fill="currentColor"/>
+                <rect x="14.6" y="4.6" width="0.8" height="0.8" fill="currentColor"/>
               </pattern>
             </defs>
-            <rect width="100" height="100" fill="url(#tech-grid)"/>
+            <rect width="100" height="100" fill="url(#circuit)"/>
           </svg>
         </div>
       </section>
