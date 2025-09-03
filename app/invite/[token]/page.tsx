@@ -9,7 +9,7 @@ export default function InvitePage() {
   const [invite, setInvite] = useState<any>(null);
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState<'phone' | 'verification' | 'profile' | 'success'>('phone');
+  const [step, setStep] = useState<'pwa' | 'phone' | 'verification' | 'profile' | 'success'>('pwa');
   const [verificationCode, setVerificationCode] = useState('');
   const [showVerification, setShowVerification] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -300,21 +300,79 @@ export default function InvitePage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-green-600">
-              {step === 'phone' ? 'Step 1 of 3' : step === 'verification' ? 'Step 2 of 3' : 'Step 3 of 3'}
+              {step === 'pwa' ? 'Step 1 of 4' : step === 'phone' ? 'Step 2 of 4' : step === 'verification' ? 'Step 3 of 4' : 'Step 4 of 4'}
             </span>
             <span className="text-sm text-gray-500">
-              {step === 'phone' ? 'Phone Verification' : step === 'verification' ? 'Code Verification' : 'Profile Setup'}
+              {step === 'pwa' ? 'Add to Home Screen' : step === 'phone' ? 'Phone Verification' : step === 'verification' ? 'Code Verification' : 'Profile Setup'}
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div className="bg-green-600 h-2 rounded-full transition-all duration-300" style={{ 
-              width: step === 'phone' ? '33%' : step === 'verification' ? '66%' : '100%' 
+              width: step === 'pwa' ? '25%' : step === 'phone' ? '50%' : step === 'verification' ? '75%' : '100%' 
             }}></div>
           </div>
         </div>
 
         {/* Content */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+
+          {step === 'pwa' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                  <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Add YourCity Deals to Your Home Screen</h2>
+                <p className="text-gray-600 mb-6">
+                  For the best seller experience, add our app to your home screen. This gives you quick access to manage your sales, track earnings, and receive important notifications.
+                </p>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                  <h3 className="font-semibold text-blue-900 mb-3">How to Add to Home Screen:</h3>
+                  <div className="space-y-3 text-left">
+                    <div className="flex items-start">
+                      <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
+                      <p className="text-sm text-blue-800">Tap the <strong>Share</strong> button in your browser</p>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
+                      <p className="text-sm text-blue-800">Select <strong>"Add to Home Screen"</strong></p>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
+                      <p className="text-sm text-blue-800">Tap <strong>"Add"</strong> to confirm</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-green-800">
+                    <strong>Benefits:</strong> Faster access, offline capabilities, and push notifications for sales updates.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => setStep('phone')}
+                  className="flex-1 px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg flex items-center justify-center"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                  Continue Setup
+                </button>
+                <button
+                  onClick={() => setStep('phone')}
+                  className="px-6 py-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Skip for Now
+                </button>
+              </div>
+            </div>
+          )}
 
                   {step === 'phone' && (
             <div className="space-y-6">
