@@ -69,6 +69,15 @@ export default function InvitePage() {
       return;
     }
 
+    // For TEST123, skip duplicate checks for testing purposes
+    if (token === 'TEST123') {
+      // Mock Twilio SMS - always send "123456"
+      console.log(`SMS sent to ${phone}: Your verification code is 123456`);
+      setShowVerification(true);
+      setStep('verification');
+      return;
+    }
+
     // Check for duplicate phone number
     const savedSellers = localStorage.getItem('yourcitydeals_sellers');
     if (savedSellers) {
