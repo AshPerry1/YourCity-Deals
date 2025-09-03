@@ -28,16 +28,36 @@ export default function InvitePage() {
       setInvite(foundInvite);
     }
     
-    // For testing: TEST123 is always valid
+    // For testing: TEST123 is always valid - but we need to find the actual invite
     if (token === 'TEST123' && !invite) {
-      setInvite({
-        id: 'test-invite',
-        firstName: 'Test',
-        lastName: 'Seller',
-        email: 'test@example.com',
-        inviteToken: 'TEST123',
-        status: 'pending'
-      });
+      const savedInvites = localStorage.getItem('yourcitydeals_invites');
+      if (savedInvites) {
+        const invites = JSON.parse(savedInvites);
+        const testInvite = invites.find((inv: any) => inv.inviteToken === 'TEST123');
+        if (testInvite) {
+          setInvite(testInvite);
+        } else {
+          // Fallback if no TEST123 invite exists
+          setInvite({
+            id: 'test-invite',
+            firstName: 'Test',
+            lastName: 'Seller',
+            email: 'test@example.com',
+            inviteToken: 'TEST123',
+            status: 'pending'
+          });
+        }
+      } else {
+        // Fallback if no invites exist
+        setInvite({
+          id: 'test-invite',
+          firstName: 'Test',
+          lastName: 'Seller',
+          email: 'test@example.com',
+          inviteToken: 'TEST123',
+          status: 'pending'
+        });
+      }
     }
     
     setLoading(false);
@@ -60,14 +80,33 @@ export default function InvitePage() {
       }
     }
 
-    // Check for duplicate email
-    const savedInvites = localStorage.getItem('yourcitydeals_invites');
-    if (savedInvites) {
-      const invites = JSON.parse(savedInvites);
-      const existingInvite = invites.find((inv: any) => inv.email === invite.email && inv.status === 'accepted');
-      if (existingInvite) {
-        alert('This email is already registered. Please use a different email or contact support if you need help.');
-        return;
+    // Check if this specific invite has already been used with a different phone
+    if (invite && invite.id) {
+      const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+      if (savedSellers) {
+        const sellers = JSON.parse(savedSellers);
+        const existingInviteUsage = sellers.find((seller: any) => seller.inviteId === invite.id);
+        if (existingInviteUsage) {
+          alert('This invite has already been used. Please contact support if you need a new invite.');
+          return;
+        }
+      }
+    }
+
+    // Check for duplicate email - only if we have a real invite with email
+    if (invite && invite.email && invite.email !== 'test@example.com') {
+      const savedInvites = localStorage.getItem('yourcitydeals_invites');
+      if (savedInvites) {
+        const invites = JSON.parse(savedInvites);
+        const existingInvite = invites.find((inv: any) => 
+          inv.email === invite.email && 
+          inv.status === 'accepted' && 
+          inv.id !== invite.id
+        );
+        if (existingInvite) {
+          alert('This email is already registered. Please use a different email or contact support if you need help.');
+          return;
+        }
       }
     }
 
