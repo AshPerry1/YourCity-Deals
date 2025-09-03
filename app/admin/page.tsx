@@ -707,40 +707,111 @@ The YourCity Deals Team`;
   };
 
   const handleApproveSeller = (invite: any) => {
-    // Find the seller in localStorage
-    const savedSellers = localStorage.getItem('yourcitydeals_sellers');
-    const sellers = JSON.parse(savedSellers);
-    const seller = sellers.find((s: any) => s.inviteId === invite.id);
-    
-    if (seller) {
-      const updatedSellers = sellers.map((s: any) => 
-        s.id === seller.id ? { ...s, status: 'active' } : s
-      );
-      localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+    if (confirm(`Are you sure you want to approve ${invite.firstName} ${invite.lastName}?`)) {
+      // Find the seller in localStorage
+      const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+      const sellers = JSON.parse(savedSellers);
+      const seller = sellers.find((s: any) => s.inviteId === invite.id);
       
-      // Update invite status
-      const updatedInvites = invites.map((inv: any) => 
-        inv.id === invite.id ? { ...inv, status: 'approved' } : inv
-      );
-      setInvites(updatedInvites);
-      localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
-      
-      alert('Seller approved successfully!');
-    } else {
-      alert('Seller not found. They may not have completed their profile yet.');
+      if (seller) {
+        const updatedSellers = sellers.map((s: any) => 
+          s.id === seller.id ? { ...s, status: 'approved' } : s
+        );
+        localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+        
+        // Update invite status
+        const updatedInvites = invites.map((inv: any) => 
+          inv.id === invite.id ? { ...inv, status: 'approved', approvedAt: new Date().toISOString() } : inv
+        );
+        setInvites(updatedInvites);
+        localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+        
+        // Send approval email
+        const approvalLink = `https://yourcitydeals.com/activate/${invite.id}`;
+        const emailTemplate = `Hi ${invite.firstName},
+
+Great news! Your seller application has been approved! 🎉
+
+We're excited to welcome you to the YourCity Deals team. You're now ready to start creating and selling deals to help local businesses grow while supporting great causes.
+
+To get started, please create your account by clicking the link below:
+${approvalLink}
+
+This link will take you to a secure page where you can:
+• Set up your password
+• Access your seller dashboard
+• Start creating your first deals
+
+Your username will be: ${seller.phone || seller.email}
+
+If you have any questions or need help getting started, please don't hesitate to reach out to us.
+
+Welcome to the team!
+
+Best regards,
+The YourCity Deals Team`;
+
+        const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Application Approved!')}&body=${encodeURIComponent(emailTemplate)}`;
+        window.open(mailtoLink, '_blank');
+
+        setShowInviteDetails(false);
+        alert('Seller approved! Approval email has been opened.');
+      } else {
+        alert('Seller not found. They may not have completed their profile yet.');
+      }
     }
   };
 
   const handleRejectSeller = (invite: any) => {
-    if (confirm('Are you sure you want to reject this seller? This action cannot be undone.')) {
+    const reason = prompt('Please provide a reason for rejection (optional):');
+    if (confirm(`Are you sure you want to reject ${invite.firstName} ${invite.lastName}?`)) {
       // Update invite status
       const updatedInvites = invites.map((inv: any) => 
-        inv.id === invite.id ? { ...inv, status: 'rejected' } : inv
+        inv.id === invite.id ? { 
+          ...inv, 
+          status: 'rejected', 
+          rejectedAt: new Date().toISOString(),
+          rejectionReason: reason || 'Application did not meet our requirements'
+        } : inv
       );
       setInvites(updatedInvites);
       localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
-      
-      alert('Seller rejected successfully!');
+
+      // Update seller status
+      const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+      if (savedSellers) {
+        const sellers = JSON.parse(savedSellers);
+        const updatedSellers = sellers.map((seller: any) => 
+          seller.inviteId === invite.id ? { 
+            ...seller, 
+            status: 'rejected',
+            rejectionReason: reason || 'Application did not meet our requirements'
+          } : seller
+        );
+        localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+      }
+
+      // Send rejection email
+      const emailTemplate = `Hi ${invite.firstName},
+
+Thank you for your interest in becoming a seller with YourCity Deals.
+
+After careful review of your application, we regret to inform you that we are unable to approve your seller application at this time.
+
+${reason ? `Reason: ${reason}` : 'We appreciate your interest and encourage you to apply again in the future if your circumstances change.'}
+
+If you have any questions about this decision or would like to discuss it further, please don't hesitate to contact us.
+
+Thank you for your understanding.
+
+Best regards,
+The YourCity Deals Team`;
+
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Application Status Update')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
+
+      setShowInviteDetails(false);
+      alert('Seller rejected! Rejection email has been opened.');
     }
   };
 

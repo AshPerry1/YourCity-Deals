@@ -9,7 +9,7 @@ export default function InvitePage() {
   const [invite, setInvite] = useState<any>(null);
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState<'pwa' | 'phone' | 'verification' | 'profile' | 'success'>('pwa');
+  const [step, setStep] = useState<'pwa' | 'phone' | 'verification' | 'profile' | 'review' | 'success'>('pwa');
   const [verificationCode, setVerificationCode] = useState('');
   const [showVerification, setShowVerification] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -290,7 +290,7 @@ export default function InvitePage() {
     }
 
     console.log('Profile completed:', profileData);
-    setStep('success');
+    setStep('review');
   };
 
   const handleSignOut = () => {
@@ -345,15 +345,15 @@ export default function InvitePage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-green-600">
-              {step === 'pwa' ? 'Step 1 of 4' : step === 'phone' ? 'Step 2 of 4' : step === 'verification' ? 'Step 3 of 4' : 'Step 4 of 4'}
+              {step === 'pwa' ? 'Step 1 of 5' : step === 'phone' ? 'Step 2 of 5' : step === 'verification' ? 'Step 3 of 5' : step === 'profile' ? 'Step 4 of 5' : 'Step 5 of 5'}
             </span>
             <span className="text-sm text-gray-500">
-              {step === 'pwa' ? 'Add to Home Screen' : step === 'phone' ? 'Phone Verification' : step === 'verification' ? 'Code Verification' : 'Profile Setup'}
+              {step === 'pwa' ? 'Add to Home Screen' : step === 'phone' ? 'Phone Verification' : step === 'verification' ? 'Code Verification' : step === 'profile' ? 'Profile Setup' : 'Review & Approval'}
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div className="bg-green-600 h-2 rounded-full transition-all duration-300" style={{ 
-              width: step === 'pwa' ? '25%' : step === 'phone' ? '50%' : step === 'verification' ? '75%' : '100%' 
+              width: step === 'pwa' ? '20%' : step === 'phone' ? '40%' : step === 'verification' ? '60%' : step === 'profile' ? '80%' : '100%' 
             }}></div>
           </div>
         </div>
@@ -660,6 +660,79 @@ export default function InvitePage() {
                   </svg>
                   Complete Profile & Submit Application
                 </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'review' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="mx-auto w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
+                  <svg className="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Application Submitted!</h2>
+                <p className="text-gray-600 mb-6">
+                  Thank you for completing your seller profile! Your application is now under review by our team.
+                </p>
+              </div>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                <h3 className="text-yellow-900 font-semibold text-lg mb-3">What happens next?</h3>
+                <div className="space-y-3 text-sm text-yellow-800">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-6 h-6 bg-yellow-200 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <span className="text-yellow-800 text-xs font-bold">1</span>
+                    </div>
+                    <p>Our team will review your application within 24-48 hours</p>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-6 h-6 bg-yellow-200 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <span className="text-yellow-800 text-xs font-bold">2</span>
+                    </div>
+                    <p>You'll receive an email notification with the decision</p>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 w-6 h-6 bg-yellow-200 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                      <span className="text-yellow-800 text-xs font-bold">3</span>
+                    </div>
+                    <p>If approved, you'll get access to create your seller account</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-blue-900 font-semibold mb-2">Application Details</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm text-blue-800">
+                  <div>
+                    <strong>Name:</strong> {profileData.firstName} {profileData.lastName}
+                  </div>
+                  <div>
+                    <strong>Phone:</strong> {phone}
+                  </div>
+                  <div>
+                    <strong>ZIP Code:</strong> {profileData.zipCode}
+                  </div>
+                  <div>
+                    <strong>Submitted:</strong> {new Date().toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center space-y-4">
+                <p className="text-sm text-gray-600">
+                  You can close this page now. We'll contact you via email with the next steps.
+                </p>
+                <a 
+                  href="/" 
+                  className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  Back to Marketplace
+                </a>
               </div>
             </div>
           )}
