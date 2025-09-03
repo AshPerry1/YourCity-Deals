@@ -561,7 +561,7 @@ function InvitesTab() {
 
 We're thrilled to invite you to join YourCity Deals as a seller! 🎉
 
-You're about to become part of an amazing community of sellers who are earning great money while helping their local businesses grow. We're excited to see what you'll accomplish!
+You're about to become part of an amazing community of sellers who are helping their local businesses grow while supporting great causes. We're excited to see what you'll accomplish!
 
 Ready to get started? Click here to set up your account:
 ${generatedInvite.inviteLink}
@@ -589,7 +589,7 @@ The YourCity Deals Team`;
 
 We're thrilled to invite you to join YourCity Deals as a seller! 🎉
 
-You're about to become part of an amazing community of sellers who are earning great money while helping their local businesses grow. We're excited to see what you'll accomplish!
+You're about to become part of an amazing community of sellers who are helping their local businesses grow while supporting great causes. We're excited to see what you'll accomplish!
 
 Ready to get started? Click here to set up your account:
 ${generatedInvite.inviteLink}
