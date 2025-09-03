@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 export default function AboutUs() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeFAQ, setActiveFAQ] = useState<number | null>(null);
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -331,85 +332,205 @@ export default function AboutUs() {
             </p>
           </div>
           
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* FAQ Item 1 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">What exactly is YourCity Deals?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                YourCity Deals is a digital coupon book platform that connects local organizations (schools, nonprofits, community groups) with local businesses. Organizations create digital coupon books, community members purchase them, and everyone benefits - organizations raise funds, businesses get customers, and community members save money.
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 1 ? null : 1)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">What exactly is YourCity Deals?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 1 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 1 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    YourCity Deals is a digital coupon book platform that connects local organizations (schools, nonprofits, community groups) with local businesses. Organizations create digital coupon books, community members purchase them, and everyone benefits - organizations raise funds, businesses get customers, and community members save money.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* FAQ Item 2 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">How does the fundraising process work?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Organizations create digital coupon books with offers from local businesses. Community members purchase these books for a set price (typically $25-50). The organization keeps a portion of the proceeds for their fundraising goals, while the rest goes to platform costs and business partnerships. Each book contains multiple offers that can be redeemed at participating businesses.
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 2 ? null : 2)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">How does the fundraising process work?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 2 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 2 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    Organizations create digital coupon books with offers from local businesses. Community members purchase these books for a set price (typically $25-50). The organization keeps a portion of the proceeds for their fundraising goals, while the rest goes to platform costs and business partnerships. Each book contains multiple offers that can be redeemed at participating businesses.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* FAQ Item 3 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">When will the platform be available?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                We're currently in development and plan to launch in Summer 2026. We're building the MVP (Minimum Viable Product) to ensure we deliver the best possible experience for organizations, businesses, and community members. You can stay updated by following our progress or reaching out to discuss early partnership opportunities.
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 3 ? null : 3)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">When will the platform be available?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 3 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 3 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    We're currently in development and plan to launch in Summer 2026. We're building the MVP (Minimum Viable Product) to ensure we deliver the best possible experience for organizations, businesses, and community members. You can stay updated by following our progress or reaching out to discuss early partnership opportunities.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* FAQ Item 4 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">How do I redeem the coupons?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Once you purchase a coupon book, you'll receive unique redemption codes for each offer. Simply present the code to the participating business when making your purchase. The business will verify the code through our platform, and you'll receive your discount or special offer immediately.
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 4 ? null : 4)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">How do I redeem the coupons?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 4 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 4 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    Once you purchase a coupon book, you'll receive unique redemption codes for each offer. Simply present the code to the participating business when making your purchase. The business will verify the code through our platform, and you'll receive your discount or special offer immediately.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* FAQ Item 5 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">What types of organizations can use YourCity Deals?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Any organization that needs to raise funds can use our platform! This includes schools (PTAs, sports teams, clubs), nonprofits, community groups, churches, youth organizations, and more. We're designed to be flexible and scalable to meet the needs of organizations of all sizes.
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 5 ? null : 5)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">What types of organizations can use YourCity Deals?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 5 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 5 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    Any organization that needs to raise funds can use our platform! This includes schools (PTAs, sports teams, clubs), nonprofits, community groups, churches, youth organizations, and more. We're designed to be flexible and scalable to meet the needs of organizations of all sizes.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* FAQ Item 6 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">How do businesses benefit from participating?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Businesses get exposure to new customers in their community, increased foot traffic, and the opportunity to build relationships with local organizations. They can set their own offers and terms, and our platform handles all the technical aspects of coupon verification and redemption.
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 6 ? null : 6)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">How do businesses benefit from participating?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 6 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 6 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    Businesses get exposure to new customers in their community, increased foot traffic, and the opportunity to build relationships with local organizations. They can set their own offers and terms, and our platform handles all the technical aspects of coupon verification and redemption.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* FAQ Item 7 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Is my payment information secure?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Absolutely! We use industry-standard encryption and security measures to protect all payment information. We partner with trusted payment processors to ensure your financial data is always secure and protected.
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 7 ? null : 7)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">Is my payment information secure?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 7 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 7 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    Absolutely! We use industry-standard encryption and security measures to protect all payment information. We partner with trusted payment processors to ensure your financial data is always secure and protected.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* FAQ Item 8 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Can I get a refund if I'm not satisfied?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                We want you to be completely satisfied with your purchase. If you're not happy with your coupon book for any reason, we offer a 30-day money-back guarantee. Simply contact our support team, and we'll process your refund.
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 8 ? null : 8)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">Can I get a refund if I'm not satisfied?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 8 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 8 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    We want you to be completely satisfied with your purchase. If you're not happy with your coupon book for any reason, we offer a 30-day money-back guarantee. Simply contact our support team, and we'll process your refund.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* FAQ Item 9 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">How do I know the offers are legitimate?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                All businesses on our platform are verified and vetted. We work directly with business owners to ensure all offers are legitimate and accurately represent their services. Our platform also includes a rating and review system so you can see feedback from other community members.
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 9 ? null : 9)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">How do I know the offers are legitimate?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 9 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 9 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    All businesses on our platform are verified and vetted. We work directly with business owners to ensure all offers are legitimate and accurately represent their services. Our platform also includes a rating and review system so you can see feedback from other community members.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* FAQ Item 10 */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">How can I get involved as a business or organization?</h3>
-              <p className="text-gray-600 leading-relaxed">
-                We'd love to have you on board! Organizations can start by reaching out to discuss their fundraising needs and timeline. Businesses can contact us to learn about partnership opportunities and how to create compelling offers for the community. Just send us an email, and we'll guide you through the process!
-              </p>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <button 
+                className="w-full px-6 py-4 text-left bg-white hover:bg-gray-50 transition-colors flex justify-between items-center"
+                onClick={() => setActiveFAQ(activeFAQ === 10 ? null : 10)}
+              >
+                <h3 className="text-lg font-semibold text-gray-900">How can I get involved as a business or organization?</h3>
+                <svg className={`w-5 h-5 text-gray-500 transition-transform ${activeFAQ === 10 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {activeFAQ === 10 && (
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <p className="text-gray-600 leading-relaxed">
+                    We'd love to have you on board! Organizations can start by reaching out to discuss their fundraising needs and timeline. Businesses can contact us to learn about partnership opportunities and how to create compelling offers for the community. Just send us an email, and we'll guide you through the process!
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
