@@ -11,7 +11,7 @@ interface SellerData {
   phone: string;
   zipCode: string;
   profilePicture: string | null;
-  status: 'pending_review' | 'ready_for_review' | 'approved' | 'rejected' | 'active';
+  status: 'pending_review' | 'ready_for_review' | 'edit_requested' | 'approved' | 'rejected' | 'active';
   createdAt: string;
   inviteId: string;
 }
@@ -91,6 +91,8 @@ export default function SellerDashboard() {
         return 'bg-yellow-100 text-yellow-800';
       case 'ready_for_review':
         return 'bg-blue-100 text-blue-800';
+      case 'edit_requested':
+        return 'bg-orange-100 text-orange-800';
       case 'approved':
         return 'bg-green-100 text-green-800';
       case 'rejected':
@@ -108,6 +110,8 @@ export default function SellerDashboard() {
         return 'Pending Review';
       case 'ready_for_review':
         return 'Ready for Review';
+      case 'edit_requested':
+        return 'Edit Requested';
       case 'approved':
         return 'Approved';
       case 'rejected':
@@ -217,6 +221,41 @@ export default function SellerDashboard() {
                     </svg>
                     Email notification will be sent upon completion
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {sellerData.status === 'edit_requested' && (
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-8">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-medium text-orange-800">Profile Update Requested</h3>
+                <p className="text-orange-700 mt-2">
+                  We've reviewed your application and would like you to make some changes before we can approve it.
+                </p>
+                <div className="mt-4 p-4 bg-orange-100 rounded-lg">
+                  <h4 className="text-orange-900 font-semibold mb-2">Requested Changes:</h4>
+                  <p className="text-orange-800 text-sm">
+                    {sellerData.editRequest || 'Please review your profile information and make any necessary updates.'}
+                  </p>
+                </div>
+                <div className="mt-4">
+                  <a 
+                    href="/invite/TEST123" 
+                    className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Update Profile
+                  </a>
                 </div>
               </div>
             </div>

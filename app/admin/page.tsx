@@ -762,7 +762,99 @@ The YourCity Deals Team`;
     }
   };
 
-  const handleRejectSeller = (invite: any) => {
+  const handleRequestEdits = (invite: any) => {
+    const editRequest = prompt('Please specify what changes are needed:');
+    if (editRequest && confirm(`Send edit request to ${invite.firstName} ${invite.lastName}?`)) {
+      // Update invite status
+      const updatedInvites = invites.map((inv: any) => 
+        inv.id === invite.id ? { 
+          ...inv, 
+          status: 'edit_requested', 
+          editRequestedAt: new Date().toISOString(),
+          editRequest: editRequest
+        } : inv
+      );
+      setInvites(updatedInvites);
+      localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+
+      // Update seller status
+      const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+      if (savedSellers) {
+        const sellers = JSON.parse(savedSellers);
+        const updatedSellers = sellers.map((seller: any) => 
+          seller.inviteId === invite.id ? { 
+            ...seller, 
+            status: 'edit_requested',
+            editRequest: editRequest
+          } : seller
+        );
+        localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+      }
+
+      // Send edit request email
+      const emailTemplate = `Hi ${invite.firstName},
+
+Thank you for your seller application with YourCity Deals.
+
+We've reviewed your profile and would like to request some changes before we can approve your application:
+
+${editRequest}
+
+Please log back into your application and make the requested changes. Once you've updated your profile, we'll review it again.
+
+You can access your application here: https://yourcitydeals.com/invite/TEST123
+
+If you have any questions about the requested changes, please don't hesitate to contact us.
+
+Thank you for your understanding.
+
+Best regards,
+The YourCity Deals Team`;
+
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Profile Update Requested')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
+
+      setShowInviteDetails(false);
+      alert('Edit request sent! Email has been opened.');
+    }
+  };
+
+  const handleManualEdit = (invite: any) => {
+    const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+    const sellers = JSON.parse(savedSellers);
+    const seller = sellers.find((s: any) => s.inviteId === invite.id);
+    
+    if (seller) {
+      const newFirstName = prompt('First Name:', seller.firstName);
+      const newLastName = prompt('Last Name:', seller.lastName);
+      const newEmail = prompt('Email:', seller.email);
+      const newPhone = prompt('Phone:', seller.phone);
+      const newZipCode = prompt('ZIP Code:', seller.zipCode);
+      
+      if (newFirstName && newLastName && newEmail && newPhone && newZipCode) {
+        const updatedSeller = {
+          ...seller,
+          firstName: newFirstName,
+          lastName: newLastName,
+          email: newEmail,
+          phone: newPhone,
+          zipCode: newZipCode,
+          manuallyEdited: true,
+          editedAt: new Date().toISOString()
+        };
+        
+        const updatedSellers = sellers.map((s: any) => 
+          s.id === seller.id ? updatedSeller : s
+        );
+        localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+        
+        alert('Seller information updated successfully!');
+        setShowInviteDetails(false);
+      }
+    } else {
+      alert('Seller not found. They may not have completed their profile yet.');
+    }
+  };
     const reason = prompt('Please provide a reason for rejection (optional):');
     if (confirm(`Are you sure you want to reject ${invite.firstName} ${invite.lastName}?`)) {
       // Update invite status
@@ -1069,9 +1161,12 @@ The YourCity Deals Team`;
                         ? 'bg-red-100 text-red-800'
                         : invite.status === 'ready_for_review'
                         ? 'bg-blue-100 text-blue-800'
+                        : invite.status === 'edit_requested'
+                        ? 'bg-orange-100 text-orange-800'
                         : 'bg-yellow-100 text-yellow-800'
                     }`}>
-                      {invite.status === 'ready_for_review' ? 'Ready for Review' : invite.status}
+                      {invite.status === 'ready_for_review' ? 'Ready for Review' : 
+                       invite.status === 'edit_requested' ? 'Edit Requested' : invite.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -1195,15 +1290,27 @@ The YourCity Deals Team`;
               {/* Actions */}
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-3">Actions</h4>
-                <div className="flex space-x-3">
+                <div className="flex flex-wrap gap-3">
                   <button
                     onClick={() => handleResendInvite(selectedInvite)}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
                     Resend Invite
                   </button>
-                  {selectedInvite.status === 'pending' && (
+                  {selectedInvite.status === 'ready_for_review' && (
                     <>
+                      <button
+                        onClick={() => handleRequestEdits(selectedInvite)}
+                        className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+                      >
+                        Request Edits
+                      </button>
+                      <button
+                        onClick={() => handleManualEdit(selectedInvite)}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                      >
+                        Edit Manually
+                      </button>
                       <button
                         onClick={() => handleApproveSeller(selectedInvite)}
                         className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
