@@ -7,7 +7,7 @@ import { Book, Merchant, Organization, BookOffer, Offer } from '../../lib/types'
 
 export default function AdminConsole() {
   const { currentRole, isAuthenticated, availableRoles, switchRole } = useRole();
-  const [activeTab, setActiveTab] = useState<'books' | 'merchants' | 'organizations' | 'analytics' | 'blasts'>('books');
+  const [activeTab, setActiveTab] = useState<'books' | 'merchants' | 'organizations' | 'analytics' | 'blasts' | 'invites'>('books');
   const [books, setBooks] = useState<Book[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -182,6 +182,16 @@ export default function AdminConsole() {
             >
               Free Coupons
             </button>
+            <button
+              onClick={() => setActiveTab('invites')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'invites'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Seller Invites
+            </button>
           </nav>
         </div>
       </div>
@@ -193,6 +203,7 @@ export default function AdminConsole() {
         {activeTab === 'organizations' && <OrganizationsTab organizations={organizations} />}
         {activeTab === 'analytics' && <AnalyticsTab />}
         {activeTab === 'blasts' && <BlastsTab />}
+        {activeTab === 'invites' && <InvitesTab />}
       </div>
     </div>
   );
@@ -446,6 +457,271 @@ function BlastsTab() {
           >
             Send Free Coupons
           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Invites Tab Component
+function InvitesTab() {
+  const [invites, setInvites] = useState<any[]>([]);
+  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [inviteForm, setInviteForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: ''
+  });
+  const [generatedInvite, setGeneratedInvite] = useState<any>(null);
+
+  // Mock data for testing
+  useEffect(() => {
+    setInvites([
+      {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Smith',
+        email: 'john@example.com',
+        inviteToken: 'ABC123XYZ',
+        status: 'pending',
+        sentAt: '2024-01-15',
+        acceptedAt: null
+      },
+      {
+        id: '2',
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@example.com',
+        inviteToken: 'DEF456UVW',
+        status: 'accepted',
+        sentAt: '2024-01-10',
+        acceptedAt: '2024-01-12'
+      }
+    ]);
+  }, []);
+
+  const generateInviteToken = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  const handleCreateInvite = () => {
+    if (!inviteForm.firstName || !inviteForm.lastName || !inviteForm.email) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const inviteToken = generateInviteToken();
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const inviteLink = `${baseUrl}/invite/${inviteToken}`;
+
+    const newInvite = {
+      id: Date.now().toString(),
+      firstName: inviteForm.firstName,
+      lastName: inviteForm.lastName,
+      email: inviteForm.email,
+      inviteToken: inviteToken,
+      status: 'pending',
+      sentAt: new Date().toISOString().split('T')[0],
+      acceptedAt: null
+    };
+
+    setInvites([newInvite, ...invites]);
+    setGeneratedInvite({
+      ...newInvite,
+      inviteLink: inviteLink
+    });
+    setShowInviteForm(false);
+    setInviteForm({ firstName: '', lastName: '', email: '' });
+
+    // Log to console for testing
+    console.log('Invite created:', newInvite);
+    console.log('Invite link:', inviteLink);
+  };
+
+  const copyEmailTemplate = () => {
+    if (!generatedInvite) return;
+
+    const emailTemplate = `Subject: Welcome to YourCity Deals!
+
+Hi ${generatedInvite.firstName},
+
+You've been invited to join YourCity Deals as a seller!
+
+Join our platform and start earning by sharing great deals with your community.
+
+Click here to set up your account:
+${generatedInvite.inviteLink}
+
+This invite expires in 7 days.
+
+Best regards,
+YourCity Deals Team`;
+
+    navigator.clipboard.writeText(emailTemplate).then(() => {
+      alert('Email template copied to clipboard!');
+    }).catch(() => {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = emailTemplate;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Email template copied to clipboard!');
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Seller Invites</h2>
+        <button 
+          onClick={() => setShowInviteForm(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Invite Seller
+        </button>
+      </div>
+
+      {/* Invite Form Modal */}
+      {showInviteForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Invite New Seller</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input
+                  type="text"
+                  value={inviteForm.firstName}
+                  onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter first name"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  value={inviteForm.lastName}
+                  onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter last name"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={inviteForm.email}
+                  onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter email address"
+                />
+              </div>
+            </div>
+            
+            <div className="flex space-x-3 mt-6">
+              <button
+                onClick={handleCreateInvite}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Generate Invite
+              </button>
+              <button
+                onClick={() => setShowInviteForm(false)}
+                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Generated Invite Display */}
+      {generatedInvite && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <h3 className="text-lg font-semibold text-green-900 mb-2">Invite Generated Successfully!</h3>
+          <div className="space-y-2 text-sm">
+            <div><strong>Name:</strong> {generatedInvite.firstName} {generatedInvite.lastName}</div>
+            <div><strong>Email:</strong> {generatedInvite.email}</div>
+            <div><strong>Invite Link:</strong> {generatedInvite.inviteLink}</div>
+            <div><strong>Status:</strong> <span className="text-yellow-600">Pending</span></div>
+          </div>
+          <div className="mt-4 flex space-x-3">
+            <button
+              onClick={copyEmailTemplate}
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              Copy Email Template
+            </button>
+            <button
+              onClick={() => setGeneratedInvite(null)}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Invites List */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Invite History</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invite Token</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {invites.map((invite) => (
+                <tr key={invite.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {invite.firstName} {invite.lastName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {invite.email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                    {invite.inviteToken}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      invite.status === 'accepted' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {invite.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {invite.sentAt}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button className="text-blue-600 hover:text-blue-900">View Details</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
