@@ -20,24 +20,32 @@ export default function InvitePage() {
   });
 
   useEffect(() => {
+    console.log('Loading invite for token:', token);
+    
     // Load invite from localStorage
     const savedInvites = localStorage.getItem('yourcitydeals_invites');
+    console.log('Saved invites:', savedInvites);
+    
     if (savedInvites) {
       const invites = JSON.parse(savedInvites);
       const foundInvite = invites.find((inv: any) => inv.inviteToken === token);
+      console.log('Found invite:', foundInvite);
       setInvite(foundInvite);
     }
     
     // For testing: TEST123 is always valid - but we need to find the actual invite
     if (token === 'TEST123' && !invite) {
+      console.log('TEST123 token detected, looking for TEST123 invite');
       const savedInvites = localStorage.getItem('yourcitydeals_invites');
       if (savedInvites) {
         const invites = JSON.parse(savedInvites);
         const testInvite = invites.find((inv: any) => inv.inviteToken === 'TEST123');
+        console.log('Found TEST123 invite:', testInvite);
         if (testInvite) {
           setInvite(testInvite);
         } else {
           // Fallback if no TEST123 invite exists
+          console.log('No TEST123 invite found, creating fallback');
           setInvite({
             id: 'test-invite',
             firstName: 'Test',
@@ -49,6 +57,7 @@ export default function InvitePage() {
         }
       } else {
         // Fallback if no invites exist
+        console.log('No invites exist, creating fallback');
         setInvite({
           id: 'test-invite',
           firstName: 'Test',
@@ -126,7 +135,16 @@ export default function InvitePage() {
   };
 
   const handleVerifyCode = () => {
+    console.log('Verification attempt:', {
+      verificationCode,
+      expectedCode: '123456',
+      invite: invite,
+      phone: phone
+    });
+
     if (verificationCode === '123456') {
+      console.log('Code verified successfully, proceeding to profile setup');
+      
       // Save seller data to localStorage
       const sellerData = {
         id: Date.now().toString(),
@@ -137,6 +155,8 @@ export default function InvitePage() {
         status: 'pending_review',
         createdAt: new Date().toISOString()
       };
+
+      console.log('Seller data to save:', sellerData);
 
       const savedSellers = localStorage.getItem('yourcitydeals_sellers');
       const sellers = savedSellers ? JSON.parse(savedSellers) : [];
@@ -159,8 +179,10 @@ export default function InvitePage() {
         profilePicture: null
       });
 
+      console.log('Setting step to profile');
       setStep('profile');
     } else {
+      console.log('Invalid code entered:', verificationCode);
       alert('Invalid verification code. Please try again.');
     }
   };
