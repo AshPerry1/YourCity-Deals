@@ -588,6 +588,32 @@ function InvitesTab() {
     console.log('Invite link:', inviteLink);
   };
 
+  const sendEmail = () => {
+    if (!generatedInvite) return;
+
+    const emailTemplate = `Subject: Welcome to YourCity Deals!
+
+Hi ${generatedInvite.firstName},
+
+You've been invited to join YourCity Deals as a seller!
+
+Join our platform and start earning by sharing great deals with your community.
+
+Click here to set up your account:
+${generatedInvite.inviteLink}
+
+This invite expires in 7 days.
+
+Best regards,
+YourCity Deals Team`;
+
+    // Create mailto link with pre-filled content
+    const mailtoLink = `mailto:${generatedInvite.email}?subject=${encodeURIComponent('Welcome to YourCity Deals!')}&body=${encodeURIComponent(emailTemplate)}`;
+    
+    // Open email client
+    window.open(mailtoLink, '_blank');
+  };
+
   const copyEmailTemplate = () => {
     if (!generatedInvite) return;
 
@@ -703,6 +729,12 @@ YourCity Deals Team`;
             <div><strong>Status:</strong> <span className="text-yellow-600">Pending</span></div>
           </div>
           <div className="mt-4 flex space-x-3">
+            <button
+              onClick={sendEmail}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              📧 Send Email
+            </button>
             <button
               onClick={copyEmailTemplate}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
