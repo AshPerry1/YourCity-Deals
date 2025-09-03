@@ -819,9 +819,151 @@ The YourCity Deals Team`;
     }
   };
 
-  const handleManualEdit = (invite: any) => {
+  const handleAssignToOrganization = (invite: any) => {
+    const organizationOptions = organizationalHubs.map(org => `${org.id}: ${org.name}`).join('\n');
+    const selectedOrg = prompt(`Select an organization (enter the ID):\n\n${organizationOptions}`);
+    
+    if (selectedOrg) {
+      const orgId = selectedOrg.split(':')[0].trim();
+      const organization = organizationalHubs.find(org => org.id === orgId);
+      
+      if (organization) {
+        // Update invite
+        const updatedInvites = invites.map((inv: any) => 
+          inv.id === invite.id ? { ...inv, organizationHub: organization.name, organizationHubId: orgId } : inv
+        );
+        setInvites(updatedInvites);
+        localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+
+        // Update seller if exists
+        const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+        if (savedSellers) {
+          const sellers = JSON.parse(savedSellers);
+          const updatedSellers = sellers.map((seller: any) => 
+            seller.inviteId === invite.id ? { 
+              ...seller, 
+              organizationHub: organization.name, 
+              organizationHubId: orgId 
+            } : seller
+          );
+          localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+        }
+
+        alert(`Successfully assigned ${invite.firstName} ${invite.lastName} to ${organization.name}`);
+        setShowInviteDetails(false);
+      } else {
+        alert('Invalid organization ID selected.');
+      }
+    }
+  };
+
+  const handleAssignToBook = (invite: any) => {
+    const bookOptions = couponBooks.map(book => `${book.id}: ${book.name}`).join('\n');
+    const selectedBook = prompt(`Select a coupon book (enter the ID):\n\n${bookOptions}`);
+    
+    if (selectedBook) {
+      const bookId = selectedBook.split(':')[0].trim();
+      const book = couponBooks.find(b => b.id === bookId);
+      
+      if (book) {
+        // Update invite
+        const updatedInvites = invites.map((inv: any) => 
+          inv.id === invite.id ? { ...inv, couponBook: book.name, couponBookId: bookId } : inv
+        );
+        setInvites(updatedInvites);
+        localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+
+        // Update seller if exists
+        const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+        if (savedSellers) {
+          const sellers = JSON.parse(savedSellers);
+          const updatedSellers = sellers.map((seller: any) => 
+            seller.inviteId === invite.id ? { 
+              ...seller, 
+              couponBook: book.name, 
+              couponBookId: bookId 
+            } : seller
+          );
+          localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+        }
+
+        alert(`Successfully assigned ${invite.firstName} ${invite.lastName} to ${book.name}`);
+        setShowInviteDetails(false);
+      } else {
+        alert('Invalid book ID selected.');
+      }
+    }
+  };
+
+  const handleRemoveAssignment = (invite: any, type: 'organization' | 'book') => {
+    const confirmMessage = type === 'organization' 
+      ? `Remove ${invite.firstName} ${invite.lastName} from ${invite.organizationHub}?`
+      : `Remove ${invite.firstName} ${invite.lastName} from ${invite.couponBook}?`;
+    
+    if (confirm(confirmMessage)) {
+      // Update invite
+      const updatedInvites = invites.map((inv: any) => 
+        inv.id === invite.id ? { 
+          ...inv, 
+          [type === 'organization' ? 'organizationHub' : 'couponBook']: null,
+          [type === 'organization' ? 'organizationHubId' : 'couponBookId']: null
+        } : inv
+      );
+      setInvites(updatedInvites);
+      localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+
+      // Update seller if exists
+      const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+      if (savedSellers) {
+        const sellers = JSON.parse(savedSellers);
+        const updatedSellers = sellers.map((seller: any) => 
+          seller.inviteId === invite.id ? { 
+            ...seller, 
+            [type === 'organization' ? 'organizationHub' : 'couponBook']: null,
+            [type === 'organization' ? 'organizationHubId' : 'couponBookId']: null
+          } : seller
+        );
+        localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+      }
+
+        const handleManualEdit = (invite: any) => {
     const savedSellers = localStorage.getItem('yourcitydeals_sellers');
     const sellers = JSON.parse(savedSellers);
+    const seller = sellers.find((s: any) => s.inviteId === invite.id);
+    
+    if (seller) {
+      const newFirstName = prompt('First Name:', seller.firstName);
+      const newLastName = prompt('Last Name:', seller.lastName);
+      const newEmail = prompt('Email:', seller.email);
+      const newPhone = prompt('Phone:', seller.phone);
+      const newZipCode = prompt('ZIP Code:', seller.zipCode);
+      
+      if (newFirstName && newLastName && newEmail && newPhone && newZipCode) {
+        const updatedSeller = {
+          ...seller,
+          firstName: newFirstName,
+          lastName: newLastName,
+          email: newEmail,
+          phone: newPhone,
+          zipCode: newZipCode,
+          manuallyEdited: true,
+          editedAt: new Date().toISOString()
+        };
+        
+        const updatedSellers = sellers.map((s: any) => 
+          s.id === seller.id ? updatedSeller : s
+        );
+        localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+        
+        alert('Seller information updated successfully!');
+        setShowInviteDetails(false);
+      }
+    } else {
+      alert('Seller not found. They may not have completed their profile yet.');
+    }
+  };
+
+  const handleRejectSeller = (invite: any) => {
     const seller = sellers.find((s: any) => s.inviteId === invite.id);
     
     if (seller) {
@@ -1137,6 +1279,8 @@ The YourCity Deals Team`;
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invite Token</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coupon Book</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -1168,6 +1312,12 @@ The YourCity Deals Team`;
                       {invite.status === 'ready_for_review' ? 'Ready for Review' : 
                        invite.status === 'edit_requested' ? 'Edit Requested' : invite.status}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {invite.organizationHub || '-'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {invite.couponBook || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {invite.sentAt}
@@ -1286,6 +1436,59 @@ The YourCity Deals Team`;
                   </div>
                 );
               })()}
+
+              {/* Current Assignments */}
+              <div className="mb-6">
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Current Assignments</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <span className="font-medium text-gray-700">Organization Hub:</span>
+                      <p className="text-gray-900">{selectedInvite.organizationHub || 'Not assigned'}</p>
+                    </div>
+                    <div className="flex space-x-2">
+                      {selectedInvite.organizationHub ? (
+                        <button
+                          onClick={() => handleRemoveAssignment(selectedInvite, 'organization')}
+                          className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleAssignToOrganization(selectedInvite)}
+                          className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                        >
+                          Assign
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <span className="font-medium text-gray-700">Coupon Book:</span>
+                      <p className="text-gray-900">{selectedInvite.couponBook || 'Not assigned'}</p>
+                    </div>
+                    <div className="flex space-x-2">
+                      {selectedInvite.couponBook ? (
+                        <button
+                          onClick={() => handleRemoveAssignment(selectedInvite, 'book')}
+                          className="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleAssignToBook(selectedInvite)}
+                          className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
+                        >
+                          Assign
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               {/* Actions */}
               <div>
