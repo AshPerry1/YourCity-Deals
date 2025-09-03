@@ -15,6 +15,16 @@ export default function AdminConsole() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Debug logging
+  useEffect(() => {
+    console.log('Admin Console Debug:', {
+      isAuthenticated,
+      currentRole,
+      availableRoles,
+      loading
+    });
+  }, [isAuthenticated, currentRole, availableRoles, loading]);
+
   useEffect(() => {
     if (currentRole === 'admin') {
       fetchData();
