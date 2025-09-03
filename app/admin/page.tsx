@@ -77,7 +77,7 @@ export default function AdminConsole() {
                 switchRole('admin');
                 setTimeout(() => window.location.reload(), 100);
               }}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
               Switch to Admin Role
             </button>
