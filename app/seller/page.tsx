@@ -11,7 +11,7 @@ interface SellerData {
   phone: string;
   zipCode: string;
   profilePicture: string | null;
-  status: 'pending_review' | 'approved' | 'rejected' | 'active';
+  status: 'pending_review' | 'ready_for_review' | 'approved' | 'rejected' | 'active';
   createdAt: string;
   inviteId: string;
 }
@@ -89,6 +89,8 @@ export default function SellerDashboard() {
     switch (status) {
       case 'pending_review':
         return 'bg-yellow-100 text-yellow-800';
+      case 'ready_for_review':
+        return 'bg-blue-100 text-blue-800';
       case 'approved':
         return 'bg-green-100 text-green-800';
       case 'rejected':
@@ -104,6 +106,8 @@ export default function SellerDashboard() {
     switch (status) {
       case 'pending_review':
         return 'Pending Review';
+      case 'ready_for_review':
+        return 'Ready for Review';
       case 'approved':
         return 'Approved';
       case 'rejected':
@@ -180,6 +184,45 @@ export default function SellerDashboard() {
         </div>
 
         {/* Status-specific content */}
+        {sellerData.status === 'ready_for_review' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-medium text-blue-800">Profile Complete - Ready for Review!</h3>
+                <p className="text-blue-700 mt-2">
+                  Excellent! Your seller profile has been completed successfully and is now ready for our team to review. 
+                  This typically takes 24-48 hours, and you'll receive an email notification once your application has been processed.
+                </p>
+                <div className="mt-4 space-y-2 text-sm text-blue-700">
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Profile submitted on {new Date(sellerData.createdAt).toLocaleDateString()}
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Currently in review queue
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Email notification will be sent upon completion
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {sellerData.status === 'pending_review' && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
             <div className="flex items-start">

@@ -9,7 +9,7 @@ export default function InvitePage() {
   const [invite, setInvite] = useState<any>(null);
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState<'pwa' | 'phone' | 'verification' | 'profile' | 'review' | 'success'>('pwa');
+  const [step, setStep] = useState<'pwa' | 'phone' | 'verification' | 'profile' | 'ready_for_review' | 'success'>('pwa');
   const [verificationCode, setVerificationCode] = useState('');
   const [showVerification, setShowVerification] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -170,7 +170,7 @@ export default function InvitePage() {
         phone: phone,
         firstName: invite.firstName,
         lastName: invite.lastName,
-        status: 'pending_review',
+        status: 'ready_for_review',
         createdAt: new Date().toISOString()
       };
 
@@ -290,7 +290,7 @@ export default function InvitePage() {
     }
 
     console.log('Profile completed:', profileData);
-    setStep('review');
+    setStep('ready_for_review');
   };
 
   const handleSignOut = () => {
@@ -345,15 +345,15 @@ export default function InvitePage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-green-600">
-              {step === 'pwa' ? 'Step 1 of 5' : step === 'phone' ? 'Step 2 of 5' : step === 'verification' ? 'Step 3 of 5' : step === 'profile' ? 'Step 4 of 5' : 'Step 5 of 5'}
+              {step === 'pwa' ? 'Step 1 of 6' : step === 'phone' ? 'Step 2 of 6' : step === 'verification' ? 'Step 3 of 6' : step === 'profile' ? 'Step 4 of 6' : step === 'ready_for_review' ? 'Step 5 of 6' : 'Step 6 of 6'}
             </span>
             <span className="text-sm text-gray-500">
-              {step === 'pwa' ? 'Add to Home Screen' : step === 'phone' ? 'Phone Verification' : step === 'verification' ? 'Code Verification' : step === 'profile' ? 'Profile Setup' : 'Review & Approval'}
+              {step === 'pwa' ? 'Add to Home Screen' : step === 'phone' ? 'Phone Verification' : step === 'verification' ? 'Code Verification' : step === 'profile' ? 'Profile Setup' : step === 'ready_for_review' ? 'Ready for Review' : 'Complete'}
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div className="bg-green-600 h-2 rounded-full transition-all duration-300" style={{ 
-              width: step === 'pwa' ? '20%' : step === 'phone' ? '40%' : step === 'verification' ? '60%' : step === 'profile' ? '80%' : '100%' 
+              width: step === 'pwa' ? '16.67%' : step === 'phone' ? '33.33%' : step === 'verification' ? '50%' : step === 'profile' ? '66.67%' : step === 'ready_for_review' ? '83.33%' : '100%' 
             }}></div>
           </div>
         </div>
@@ -664,7 +664,7 @@ export default function InvitePage() {
             </div>
           )}
 
-          {step === 'review' && (
+          {step === 'ready_for_review' && (
             <div className="space-y-6">
               <div className="text-center">
                 <div className="mx-auto w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mb-6">

@@ -1065,9 +1065,13 @@ The YourCity Deals Team`;
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       invite.status === 'accepted' 
                         ? 'bg-green-100 text-green-800' 
+                        : invite.status === 'rejected'
+                        ? 'bg-red-100 text-red-800'
+                        : invite.status === 'ready_for_review'
+                        ? 'bg-blue-100 text-blue-800'
                         : 'bg-yellow-100 text-yellow-800'
                     }`}>
-                      {invite.status}
+                      {invite.status === 'ready_for_review' ? 'Ready for Review' : invite.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -1158,9 +1162,13 @@ The YourCity Deals Team`;
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                           seller.status === 'active' 
                             ? 'bg-green-100 text-green-800' 
+                            : seller.status === 'rejected'
+                            ? 'bg-red-100 text-red-800'
+                            : seller.status === 'ready_for_review'
+                            ? 'bg-blue-100 text-blue-800'
                             : 'bg-yellow-100 text-yellow-800'
                         }`}>
-                          {seller.status}
+                          {seller.status === 'ready_for_review' ? 'Ready for Review' : seller.status}
                         </span>
                       </div>
                       {seller.profilePicture && (
