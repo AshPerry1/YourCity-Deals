@@ -75,10 +75,10 @@
       ]
     },
     {
-      "name": "Seller Setup",
+      "name": "Seller Dashboard",
       "short_name": "Seller",
-      "description": "Complete seller onboarding",
-      "url": "/invite/TEST123",
+      "description": "Access seller dashboard",
+      "url": "/seller",
       "icons": [
         {
           "src": "/icons/icon-96.png",

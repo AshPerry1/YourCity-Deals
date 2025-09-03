@@ -7,7 +7,7 @@ import { Book, Merchant, Organization, BookOffer, Offer } from '../../lib/types'
 
 export default function AdminConsole() {
   const { currentRole, isAuthenticated, availableRoles, switchRole } = useRole();
-  const [activeTab, setActiveTab] = useState<'books' | 'merchants' | 'organizations' | 'analytics' | 'blasts' | 'invites'>('books');
+  const [activeTab, setActiveTab] = useState<'books' | 'merchants' | 'organizations' | 'analytics' | 'blasts' | 'invites' | 'approvals'>('books');
   const [books, setBooks] = useState<Book[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -194,6 +194,16 @@ export default function AdminConsole() {
             >
               Seller Invites
             </button>
+            <button
+              onClick={() => setActiveTab('approvals')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'approvals'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Seller Approvals
+            </button>
           </nav>
                 </div>
               </div>
@@ -206,6 +216,7 @@ export default function AdminConsole() {
         {activeTab === 'analytics' && <AnalyticsTab />}
         {activeTab === 'blasts' && <BlastsTab />}
         {activeTab === 'invites' && <InvitesTab />}
+        {activeTab === 'approvals' && <ApprovalsTab />}
       </div>
     </div>
   );
@@ -472,11 +483,33 @@ function InvitesTab() {
   const [inviteForm, setInviteForm] = useState({
     firstName: '',
     lastName: '',
-    email: ''
+    email: '',
+    organizationHub: '',
+    couponBook: ''
   });
   const [generatedInvite, setGeneratedInvite] = useState<any>(null);
   const [selectedInvite, setSelectedInvite] = useState<any>(null);
   const [showInviteDetails, setShowInviteDetails] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterOrganization, setFilterOrganization] = useState('');
+  const [filterBook, setFilterBook] = useState('');
+
+  // Mock organizational hubs and coupon books for assignment
+  const organizationalHubs = [
+    { id: 'hub-1', name: 'Downtown Business Association', city: 'Downtown' },
+    { id: 'hub-2', name: 'Westside Chamber of Commerce', city: 'Westside' },
+    { id: 'hub-3', name: 'Eastside Entrepreneurs', city: 'Eastside' },
+    { id: 'hub-4', name: 'Northside Business Network', city: 'Northside' },
+    { id: 'hub-5', name: 'Southside Commerce Group', city: 'Southside' }
+  ];
+
+  const couponBooks = [
+    { id: 'book-1', name: 'Downtown Deals 2024', price: 25, type: 'Local Business' },
+    { id: 'book-2', name: 'Westside Savings', price: 20, type: 'Restaurant' },
+    { id: 'book-3', name: 'Eastside Essentials', price: 30, type: 'Mixed' },
+    { id: 'book-4', name: 'Northside Neighborhood', price: 15, type: 'Retail' },
+    { id: 'book-5', name: 'Southside Specials', price: 22, type: 'Entertainment' }
+  ];
 
   // Mock data for testing
   useEffect(() => {
@@ -557,7 +590,9 @@ function InvitesTab() {
       inviteToken: inviteToken,
       status: 'pending',
       sentAt: new Date().toISOString().split('T')[0],
-      acceptedAt: null
+      acceptedAt: null,
+      organizationHub: inviteForm.organizationHub,
+      couponBook: inviteForm.couponBook
     };
 
     setInvites([newInvite, ...invites]);
@@ -566,7 +601,7 @@ function InvitesTab() {
       inviteLink: inviteLink
     });
     setShowInviteForm(false);
-    setInviteForm({ firstName: '', lastName: '', email: '' });
+    setInviteForm({ firstName: '', lastName: '', email: '', organizationHub: '', couponBook: '' });
 
     // Save to localStorage
     const updatedInvites = [newInvite, ...invites];
@@ -709,6 +744,29 @@ The YourCity Deals Team`;
     }
   };
 
+  // Filter invites based on search and filters
+  const filteredInvites = invites.filter((invite: any) => {
+    const matchesSearch = searchTerm === '' || 
+      invite.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesOrganization = filterOrganization === '' || invite.organizationHub === filterOrganization;
+    const matchesBook = filterBook === '' || invite.couponBook === filterBook;
+    
+    return matchesSearch && matchesOrganization && matchesBook;
+  });
+
+  const getOrganizationName = (hubId: string) => {
+    const hub = organizationalHubs.find(h => h.id === hubId);
+    return hub ? hub.name : 'Not assigned';
+  };
+
+  const getBookName = (bookId: string) => {
+    const book = couponBooks.find(b => b.id === bookId);
+    return book ? book.name : 'Not assigned';
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -759,6 +817,38 @@ The YourCity Deals Team`;
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter email address"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Organizational Hub</label>
+                <select
+                  value={inviteForm.organizationHub}
+                  onChange={(e) => setInviteForm({...inviteForm, organizationHub: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select an organizational hub (optional)</option>
+                  {organizationalHubs.map((hub) => (
+                    <option key={hub.id} value={hub.id}>
+                      {hub.name} - {hub.city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Book</label>
+                <select
+                  value={inviteForm.couponBook}
+                  onChange={(e) => setInviteForm({...inviteForm, couponBook: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select a coupon book (optional)</option>
+                  {couponBooks.map((book) => (
+                    <option key={book.id} value={book.id}>
+                      {book.name} - ${book.price} ({book.type})
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             
@@ -817,6 +907,64 @@ The YourCity Deals Team`;
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">Invite History</h3>
+        </div>
+
+        {/* Search and Filter Controls */}
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by name or email..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+              <select
+                value={filterOrganization}
+                onChange={(e) => setFilterOrganization(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Organizations</option>
+                {organizationalHubs.map((hub) => (
+                  <option key={hub.id} value={hub.id}>
+                    {hub.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Book</label>
+              <select
+                value={filterBook}
+                onChange={(e) => setFilterBook(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Books</option>
+                {couponBooks.map((book) => (
+                  <option key={book.id} value={book.id}>
+                    {book.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-end">
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setFilterOrganization('');
+                  setFilterBook('');
+                }}
+                className="w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+              >
+                Clear Filters
+              </button>
+            </div>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -994,6 +1142,302 @@ The YourCity Deals Team`;
                   <button
                     onClick={() => setShowInviteDetails(false)}
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Approvals Tab Component
+function ApprovalsTab() {
+  const [pendingSellers, setPendingSellers] = useState<any[]>([]);
+  const [selectedSeller, setSelectedSeller] = useState<any>(null);
+  const [showSellerDetails, setShowSellerDetails] = useState(false);
+  const [organizations, setOrganizations] = useState<any[]>([]);
+  const [books, setBooks] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Load pending sellers
+    const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+    if (savedSellers) {
+      const sellers = JSON.parse(savedSellers);
+      const pending = sellers.filter((seller: any) => seller.status === 'pending_review');
+      setPendingSellers(pending);
+    }
+
+    // Load organizations and books for assignment
+    const savedOrgs = localStorage.getItem('yourcitydeals_organizations');
+    if (savedOrgs) {
+      setOrganizations(JSON.parse(savedOrgs));
+    }
+
+    const savedBooks = localStorage.getItem('yourcitydeals_books');
+    if (savedBooks) {
+      setBooks(JSON.parse(savedBooks));
+    }
+  }, []);
+
+  const handleApproveSeller = (seller: any) => {
+    const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+    if (savedSellers) {
+      const sellers = JSON.parse(savedSellers);
+      const updatedSellers = sellers.map((s: any) => 
+        s.id === seller.id ? { ...s, status: 'approved', approvedAt: new Date().toISOString() } : s
+      );
+      localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+      
+      // Update invites status
+      const savedInvites = localStorage.getItem('yourcitydeals_invites');
+      if (savedInvites) {
+        const invites = JSON.parse(savedInvites);
+        const updatedInvites = invites.map((inv: any) => 
+          inv.id === seller.inviteId ? { ...inv, status: 'approved', approvedAt: new Date().toISOString() } : inv
+        );
+        localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+      }
+
+      // Refresh pending sellers list
+      const newPending = updatedSellers.filter((s: any) => s.status === 'pending_review');
+      setPendingSellers(newPending);
+      setShowSellerDetails(false);
+    }
+  };
+
+  const handleRejectSeller = (seller: any) => {
+    const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+    if (savedSellers) {
+      const sellers = JSON.parse(savedSellers);
+      const updatedSellers = sellers.map((s: any) => 
+        s.id === seller.id ? { ...s, status: 'rejected', rejectedAt: new Date().toISOString() } : s
+      );
+      localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+      
+      // Update invites status
+      const savedInvites = localStorage.getItem('yourcitydeals_invites');
+      if (savedInvites) {
+        const invites = JSON.parse(savedInvites);
+        const updatedInvites = invites.map((inv: any) => 
+          inv.id === seller.inviteId ? { ...inv, status: 'rejected', rejectedAt: new Date().toISOString() } : inv
+        );
+        localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+      }
+
+      // Refresh pending sellers list
+      const newPending = updatedSellers.filter((s: any) => s.status === 'pending_review');
+      setPendingSellers(newPending);
+      setShowSellerDetails(false);
+    }
+  };
+
+  const handleAssignToOrganization = (seller: any, orgId: string) => {
+    const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+    if (savedSellers) {
+      const sellers = JSON.parse(savedSellers);
+      const updatedSellers = sellers.map((s: any) => 
+        s.id === seller.id ? { ...s, organizationId: orgId, assignedAt: new Date().toISOString() } : s
+      );
+      localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+      setShowSellerDetails(false);
+    }
+  };
+
+  const handleAssignToBook = (seller: any, bookId: string) => {
+    const savedSellers = localStorage.getItem('yourcitydeals_sellers');
+    if (savedSellers) {
+      const sellers = JSON.parse(savedSellers);
+      const updatedSellers = sellers.map((s: any) => 
+        s.id === seller.id ? { ...s, bookId: bookId, bookAssignedAt: new Date().toISOString() } : s
+      );
+      localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+      setShowSellerDetails(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Seller Approvals</h2>
+        <div className="text-sm text-gray-600">
+          {pendingSellers.length} pending review
+        </div>
+      </div>
+
+      {pendingSellers.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+          <svg className="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Pending Approvals</h3>
+          <p className="text-gray-600">All seller applications have been reviewed.</p>
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {pendingSellers.map((seller) => (
+            <div key={seller.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center">
+                  {seller.profilePicture ? (
+                    <img 
+                      src={seller.profilePicture} 
+                      alt="Profile" 
+                      className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 mr-3"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                      <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {seller.firstName} {seller.lastName}
+                    </h3>
+                    <p className="text-sm text-gray-600">{seller.email}</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                  Pending Review
+                </span>
+              </div>
+
+              <div className="space-y-2 text-sm mb-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Phone:</span>
+                  <span className="font-medium">{seller.phone}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">ZIP Code:</span>
+                  <span className="font-medium">{seller.zipCode}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Applied:</span>
+                  <span className="font-medium">{new Date(seller.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => {
+                    setSelectedSeller(seller);
+                    setShowSellerDetails(true);
+                  }}
+                  className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                >
+                  Review
+                </button>
+                <button
+                  onClick={() => handleApproveSeller(seller)}
+                  className="flex-1 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => handleRejectSeller(seller)}
+                  className="flex-1 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Seller Details Modal */}
+      {showSellerDetails && selectedSeller && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Review Seller: {selectedSeller.firstName} {selectedSeller.lastName}
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Profile Picture */}
+                {selectedSeller.profilePicture && (
+                  <div className="text-center">
+                    <img 
+                      src={selectedSeller.profilePicture} 
+                      alt="Profile" 
+                      className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 mx-auto"
+                    />
+                  </div>
+                )}
+
+                {/* Contact Info */}
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Phone</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.phone}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.zipCode}</p>
+                  </div>
+                </div>
+
+                {/* Assignment Options */}
+                <div className="space-y-3">
+                  <h4 className="text-md font-semibold text-gray-900">Assignment Options</h4>
+                  
+                  {/* Organization Assignment */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Assign to Organization</label>
+                    <select 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={(e) => handleAssignToOrganization(selectedSeller, e.target.value)}
+                    >
+                      <option value="">Select Organization</option>
+                      {organizations.map((org) => (
+                        <option key={org.id} value={org.id}>{org.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Book Assignment */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Assign to Book</label>
+                    <select 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={(e) => handleAssignToBook(selectedSeller, e.target.value)}
+                    >
+                      <option value="">Select Book</option>
+                      {books.map((book) => (
+                        <option key={book.id} value={book.id}>{book.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    onClick={() => handleApproveSeller(selectedSeller)}
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleRejectSeller(selectedSeller)}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    Reject
+                  </button>
+                  <button
+                    onClick={() => setShowSellerDetails(false)}
+                    className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
                   >
                     Close
                   </button>
