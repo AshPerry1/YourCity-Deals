@@ -103,15 +103,16 @@ export default function AboutUs() {
           </div>
         </div>
         
-        {/* Decorative Elements - Option 1: Dots Pattern */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-3">
+        {/* Decorative Elements - Tech Forward Pattern */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-15">
           <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
-              <pattern id="dots" width="2" height="2" patternUnits="userSpaceOnUse">
-                <circle cx="1" cy="1" r="0.1" fill="currentColor"/>
+              <pattern id="tech-grid" width="12" height="12" patternUnits="userSpaceOnUse">
+                <path d="M12 0L0 0 0 12" fill="none" stroke="currentColor" strokeWidth="0.3"/>
+                <circle cx="6" cy="6" r="0.5" fill="currentColor"/>
               </pattern>
             </defs>
-            <rect width="100" height="100" fill="url(#dots)"/>
+            <rect width="100" height="100" fill="url(#tech-grid)"/>
           </svg>
         </div>
       </section>
