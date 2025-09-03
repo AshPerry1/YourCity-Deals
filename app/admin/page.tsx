@@ -39,8 +39,32 @@ export default function AdminConsole() {
     }
   };
 
-  // Redirect if not admin
-  if (!isAuthenticated || currentRole !== 'admin') {
+  // Redirect if not admin - but allow access for testing
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-gray-200/30">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h1>
+            <p className="text-gray-600 mb-6">Please authenticate to access the admin console.</p>
+            <div className="border-t border-gray-200 pt-4">
+              <a href="/" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                ← Back to Marketplace
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show role switcher if not admin but authenticated
+  if (currentRole !== 'admin') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center max-w-md">
@@ -75,6 +99,17 @@ export default function AdminConsole() {
                   </button>
                 ))}
               </div>
+            </div>
+            <div className="mb-4">
+              <button
+                onClick={() => {
+                  switchRole('admin');
+                  setTimeout(() => window.location.reload(), 100);
+                }}
+                className="text-sm text-green-600 hover:text-green-700 font-medium underline"
+              >
+                🚀 Quick Access: Switch to Admin
+              </button>
             </div>
             <div className="border-t border-gray-200 pt-4">
               <a href="/" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
