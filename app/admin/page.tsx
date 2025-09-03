@@ -478,37 +478,42 @@ function InvitesTab() {
 
   // Mock data for testing
   useEffect(() => {
-    setInvites([
-      {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Smith',
-        email: 'john@example.com',
-        inviteToken: 'ABC123XYZ',
-        status: 'pending',
-        sentAt: '2024-01-15',
-        acceptedAt: null
-      },
-      {
-        id: '2',
-        firstName: 'Jane',
-        lastName: 'Doe',
-        email: 'jane@example.com',
-        inviteToken: 'DEF456UVW',
-        status: 'accepted',
-        sentAt: '2024-01-10',
-        acceptedAt: '2024-01-12'
-      }
-    ]);
+    // Load invites from localStorage
+    const savedInvites = localStorage.getItem('yourcitydeals_invites');
+    if (savedInvites) {
+      setInvites(JSON.parse(savedInvites));
+    } else {
+      // Default test data
+      const defaultInvites = [
+        {
+          id: '1',
+          firstName: 'John',
+          lastName: 'Smith',
+          email: 'john@example.com',
+          inviteToken: 'TEST123',
+          status: 'pending',
+          sentAt: '2024-01-15',
+          acceptedAt: null
+        },
+        {
+          id: '2',
+          firstName: 'Jane',
+          lastName: 'Doe',
+          email: 'jane@example.com',
+          inviteToken: 'DEF456UVW',
+          status: 'accepted',
+          sentAt: '2024-01-10',
+          acceptedAt: '2024-01-12'
+        }
+      ];
+      setInvites(defaultInvites);
+      localStorage.setItem('yourcitydeals_invites', JSON.stringify(defaultInvites));
+    }
   }, []);
 
   const generateInviteToken = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
-    for (let i = 0; i < 8; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
+    // For testing, always use TEST123
+    return 'TEST123';
   };
 
   const handleCreateInvite = () => {
@@ -539,6 +544,10 @@ function InvitesTab() {
     });
     setShowInviteForm(false);
     setInviteForm({ firstName: '', lastName: '', email: '' });
+
+    // Save to localStorage
+    const updatedInvites = [newInvite, ...invites];
+    localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
 
     // Log to console for testing
     console.log('Invite created:', newInvite);
