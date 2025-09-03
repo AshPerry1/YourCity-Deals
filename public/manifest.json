@@ -75,6 +75,18 @@
       ]
     },
     {
+      "name": "Seller Setup",
+      "short_name": "Seller",
+      "description": "Complete seller onboarding",
+      "url": "/invite/TEST123",
+      "icons": [
+        {
+          "src": "/icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
       "name": "Merchant Verify",
       "short_name": "Verify",
       "description": "Verify coupons",

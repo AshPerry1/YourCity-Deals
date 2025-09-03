@@ -18,9 +18,22 @@ export default function InvitePage() {
     zipCode: '',
     profilePicture: null as string | null
   });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [sellerAccount, setSellerAccount] = useState<any>(null);
 
   useEffect(() => {
     console.log('Loading invite for token:', token);
+    
+    // Check for existing authentication
+    const savedAuth = localStorage.getItem('yourcitydeals_seller_auth');
+    if (savedAuth) {
+      const auth = JSON.parse(savedAuth);
+      if (auth.isAuthenticated && auth.sellerData) {
+        setIsAuthenticated(true);
+        setSellerAccount(auth.sellerData);
+        console.log('Found existing authentication:', auth.sellerData);
+      }
+    }
     
     // Load invite from localStorage
     const savedInvites = localStorage.getItem('yourcitydeals_invites');
@@ -262,8 +275,29 @@ export default function InvitePage() {
     );
     localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
 
+    // Sign in the seller
+    const currentSeller = updatedSellers.find((seller: any) => seller.phone === phone);
+    if (currentSeller) {
+      setIsAuthenticated(true);
+      setSellerAccount(currentSeller);
+      
+      // Save authentication state
+      localStorage.setItem('yourcitydeals_seller_auth', JSON.stringify({
+        isAuthenticated: true,
+        sellerId: currentSeller.id,
+        sellerData: currentSeller
+      }));
+    }
+
     console.log('Profile completed:', profileData);
     setStep('success');
+  };
+
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+    setSellerAccount(null);
+    localStorage.removeItem('yourcitydeals_seller_auth');
+    setStep('pwa'); // Reset to beginning
   };
 
   if (loading) {
@@ -681,6 +715,21 @@ export default function InvitePage() {
                   </svg>
                   Back to Marketplace
                 </a>
+                
+                {isAuthenticated && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800 mb-3">
+                      <strong>Signed in as:</strong> {sellerAccount?.firstName} {sellerAccount?.lastName}
+                    </p>
+                    <button
+                      onClick={handleSignOut}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+                
                 <p className="text-sm text-gray-500">
                   Questions? Contact us at <a href="mailto:support@yourcitydeals.com" className="text-green-600 hover:text-green-700">support@yourcitydeals.com</a>
                 </p>
