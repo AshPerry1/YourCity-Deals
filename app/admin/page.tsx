@@ -546,6 +546,19 @@ function InvitesTab() {
     }
   }, []);
 
+  // Refresh invites every 3 seconds to catch new completions
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const savedInvites = localStorage.getItem('yourcitydeals_invites');
+      if (savedInvites) {
+        const currentInvites = JSON.parse(savedInvites);
+        setInvites(currentInvites);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const generateInviteToken = () => {
     // For testing, always use TEST123
     return 'TEST123';
@@ -1389,7 +1402,10 @@ The YourCity Deals Team`;
               {(() => {
                 const savedSellers = localStorage.getItem('yourcitydeals_sellers');
                 const sellers = savedSellers ? JSON.parse(savedSellers) : [];
+                console.log('All sellers:', sellers);
+                console.log('Looking for invite ID:', selectedInvite.id);
                 const seller = sellers.find((s: any) => s.inviteId === selectedInvite.id);
+                console.log('Found seller:', seller);
                 return seller ? (
                   <div>
                     <h4 className="text-md font-semibold text-gray-900 mb-3">Profile Information</h4>

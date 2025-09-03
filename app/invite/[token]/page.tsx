@@ -270,10 +270,23 @@ export default function InvitePage() {
         lastName: profileData.lastName,
         zipCode: profileData.zipCode,
         profilePicture: profileData.profilePicture,
-        status: 'pending_review'
+        status: 'ready_for_review',
+        profileCompletedAt: new Date().toISOString()
       } : seller
     );
     localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+
+    // Update invite status to 'ready_for_review'
+    const savedInvites = localStorage.getItem('yourcitydeals_invites');
+    const invites = JSON.parse(savedInvites);
+    const updatedInvites = invites.map((inv: any) => 
+      inv.inviteToken === token ? { 
+        ...inv, 
+        status: 'ready_for_review',
+        profileCompletedAt: new Date().toISOString()
+      } : inv
+    );
+    localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
 
     // Sign in the seller
     const currentSeller = updatedSellers.find((seller: any) => seller.phone === phone);
