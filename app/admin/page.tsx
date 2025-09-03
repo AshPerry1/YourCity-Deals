@@ -553,6 +553,7 @@ function InvitesTab() {
       if (savedInvites) {
         const currentInvites = JSON.parse(savedInvites);
         setInvites(currentInvites);
+        console.log('Refreshed invites from localStorage');
       }
     }, 3000);
 
