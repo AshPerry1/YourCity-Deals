@@ -104,11 +104,11 @@ export default function AboutUs() {
         </div>
         
         {/* Decorative Elements - Option 1: Dots Pattern */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-5">
+        <div className="absolute top-0 left-0 w-full h-full opacity-3">
           <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
-              <pattern id="dots" width="4" height="4" patternUnits="userSpaceOnUse">
-                <circle cx="2" cy="2" r="0.3" fill="currentColor"/>
+              <pattern id="dots" width="2" height="2" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="0.1" fill="currentColor"/>
               </pattern>
             </defs>
             <rect width="100" height="100" fill="url(#dots)"/>
