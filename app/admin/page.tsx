@@ -559,17 +559,21 @@ function InvitesTab() {
 
     const emailTemplate = `Hi ${generatedInvite.firstName},
 
-You've been invited to join YourCity Deals as a seller!
+We're thrilled to invite you to join YourCity Deals as a seller! 🎉
 
-Join our platform and start earning by sharing great deals with your community.
+You're about to become part of an amazing community of sellers who are earning great money while helping their local businesses grow. We're excited to see what you'll accomplish!
 
-Click here to set up your account:
+Ready to get started? Click here to set up your account:
 ${generatedInvite.inviteLink}
 
-This invite expires in 7 days.
+This invite expires in 7 days, so don't wait too long!
+
+We're here to support you every step of the way. If you have any questions or need help getting started, just reply to this email - we'd love to hear from you!
+
+Welcome to the team!
 
 Best regards,
-YourCity Deals Team`;
+The YourCity Deals Team`;
 
     // Create mailto link with pre-filled content
     const mailtoLink = `mailto:${generatedInvite.email}?subject=${encodeURIComponent('Welcome to YourCity Deals!')}&body=${encodeURIComponent(emailTemplate)}`;
@@ -583,17 +587,21 @@ YourCity Deals Team`;
 
     const emailTemplate = `Hi ${generatedInvite.firstName},
 
-You've been invited to join YourCity Deals as a seller!
+We're thrilled to invite you to join YourCity Deals as a seller! 🎉
 
-Join our platform and start earning by sharing great deals with your community.
+You're about to become part of an amazing community of sellers who are earning great money while helping their local businesses grow. We're excited to see what you'll accomplish!
 
-Click here to set up your account:
+Ready to get started? Click here to set up your account:
 ${generatedInvite.inviteLink}
 
-This invite expires in 7 days.
+This invite expires in 7 days, so don't wait too long!
+
+We're here to support you every step of the way. If you have any questions or need help getting started, just reply to this email - we'd love to hear from you!
+
+Welcome to the team!
 
 Best regards,
-YourCity Deals Team`;
+The YourCity Deals Team`;
 
     navigator.clipboard.writeText(emailTemplate).then(() => {
       alert('Email template copied to clipboard!');
