@@ -568,27 +568,38 @@ function InvitesTab({
                         onClick={() => {
                           const emailTemplate = `Hi ${invite.first_name || invite.firstName},
 
-You've been invited to become a seller with YourCity Deals! 
+I hope this email finds you well. I'm reaching out because we'd like to invite you to join our team of sellers at YourCity Deals!
 
-We're excited to have you join our team of sellers who help local businesses grow while supporting great causes.
+YourCity Deals is a platform that helps local businesses grow while supporting great causes in our community. We're excited about the opportunity to work with you and believe you would be a valuable addition to our seller network.
 
-To get started, please click the link below to complete your profile:
+Here's what we're offering:
+• Flexible, commission-based earning opportunities
+• Support for local businesses and community causes
+• Comprehensive training and ongoing support
+• Access to our proven sales system and marketing materials
+
+To get started, please click the link below to complete your seller profile:
 https://yourcitydeals.com/invite/TEST123
 
-This link will take you through a simple process to:
+The profile setup process is simple and takes just a few minutes. You'll be able to:
 • Complete your seller profile
-• Set up your account
-• Get started with your first deals
+• Set up your account preferences
+• Review our seller guidelines and policies
+• Access your seller dashboard
 
-If you have any questions, please don't hesitate to reach out to us.
+If you have any questions about this opportunity or need assistance with the setup process, please don't hesitate to reach out. We're here to help you succeed!
 
-We look forward to working with you!
+We look forward to welcoming you to the YourCity Deals team.
 
 Best regards,
-The YourCity Deals Team`;
+Ash Perry
+YourCity Deals Team
+support@yourcitydeals.com`;
 
-                          const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Seller Invitation')}&body=${encodeURIComponent(emailTemplate)}`;
+                          const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('Invitation to Join YourCity Deals as a Seller')}&body=${encodeURIComponent(emailTemplate)}`;
                           window.open(mailtoLink, '_blank');
+                          
+                          // Update sent date
                           
                           // Update sent date
                           const updatedInvites = sellerInvites.map((inv: any) => 
