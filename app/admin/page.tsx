@@ -84,8 +84,8 @@ export default function AdminPage() {
 
     loadDashboardData();
     
-    // Set up interval to refresh data every 3 seconds
-    const interval = setInterval(loadDashboardData, 3000);
+    // Set up interval to refresh data every 10 seconds (reduced from 3 seconds)
+    const interval = setInterval(loadDashboardData, 10000);
     
     return () => clearInterval(interval);
   }, []);
@@ -147,58 +147,67 @@ export default function AdminPage() {
       return;
     }
 
-    // Check for duplicate email in Supabase
-    const { data: existingInvite, error: checkError } = await supabase
-      .from('seller_invites')
-      .select('*')
-      .eq('email', inviteForm.email.toLowerCase())
-      .single();
+    try {
+      console.log('Starting invite creation process...');
 
-    if (existingInvite && !checkError) {
-      alert('An invite with this email already exists');
-      return;
-    }
+      // Check for duplicate email in Supabase
+      const { data: existingInvite, error: checkError } = await supabase
+        .from('seller_invites')
+        .select('*')
+        .eq('email', inviteForm.email.toLowerCase())
+        .single();
 
-    const inviteToken = generateInviteToken();
-    console.log('Creating invite with token:', inviteToken);
-    const newInvite = {
-      token: inviteToken,
-      first_name: inviteForm.firstName,
-      last_name: inviteForm.lastName,
-      email: inviteForm.email,
-      status: 'pending',
-      organization_hub: inviteForm.organizationHub,
-      coupon_book: inviteForm.couponBook,
-      sent_at: new Date().toISOString(),
-      email_sent: true,
-      link_clicked: false,
-      profile_completed: false
-    };
+      if (existingInvite && !checkError) {
+        alert('An invite with this email already exists');
+        return;
+      }
 
-    // Save to Supabase
-    const { data: savedInvite, error: saveError } = await supabase
-      .from('seller_invites')
-      .insert(newInvite)
-      .select()
-      .single();
+      const inviteToken = generateInviteToken();
+      console.log('Creating invite with token:', inviteToken);
+      
+      const newInvite = {
+        token: inviteToken,
+        first_name: inviteForm.firstName,
+        last_name: inviteForm.lastName,
+        email: inviteForm.email,
+        status: 'pending',
+        organization_hub: inviteForm.organizationHub,
+        coupon_book: inviteForm.couponBook,
+        sent_at: new Date().toISOString(),
+        email_sent: true,
+        link_clicked: false,
+        profile_completed: false
+      };
 
-    if (saveError) {
-      console.error('Error saving invite to Supabase:', saveError);
-      alert('Failed to create invite. Please try again.');
-      return;
-    }
+      console.log('Saving invite to Supabase:', newInvite);
 
-    console.log('Invite saved to Supabase:', savedInvite);
+      // Save to Supabase
+      const { data: savedInvite, error: saveError } = await supabase
+        .from('seller_invites')
+        .insert(newInvite)
+        .select()
+        .single();
 
-    // Also save to localStorage as fallback
-    const updatedInvites = [...sellerInvites, savedInvite];
-    localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
-    setSellerInvites(updatedInvites);
-    
-    console.log('Updated sellerInvites state:', updatedInvites);
+      if (saveError) {
+        console.error('Error saving invite to Supabase:', saveError);
+        alert('Failed to create invite. Please try again.');
+        return;
+      }
 
-    // Send initial email
-    const emailTemplate = `Hi ${inviteForm.firstName},
+      console.log('Invite saved to Supabase:', savedInvite);
+
+      // Update local state immediately
+      const updatedInvites = [savedInvite, ...sellerInvites];
+      setSellerInvites(updatedInvites);
+      
+      // Also save to localStorage as fallback
+      localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+      
+      console.log('Updated sellerInvites state:', updatedInvites);
+      console.log('Total invites in state:', updatedInvites.length);
+
+      // Send initial email
+      const emailTemplate = `Hi ${inviteForm.firstName},
 
 You've been invited to become a seller with YourCity Deals! 
 
@@ -219,18 +228,25 @@ We look forward to working with you!
 Best regards,
 The YourCity Deals Team`;
 
-    const mailtoLink = `mailto:${inviteForm.email}?subject=${encodeURIComponent('YourCity Deals - Seller Invitation')}&body=${encodeURIComponent(emailTemplate)}`;
-    window.open(mailtoLink, '_blank');
+      const mailtoLink = `mailto:${inviteForm.email}?subject=${encodeURIComponent('YourCity Deals - Seller Invitation')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
 
-    // Reset form
-    setInviteForm({
-      firstName: '',
-      lastName: '',
-      email: '',
-      organizationHub: '',
-      couponBook: ''
-    });
-    setShowInviteForm(false);
+      // Reset form
+      setInviteForm({
+        firstName: '',
+        lastName: '',
+        email: '',
+        organizationHub: '',
+        couponBook: ''
+      });
+      setShowInviteForm(false);
+      
+      alert(`Invite created successfully! Token: ${inviteToken}`);
+      
+    } catch (error) {
+      console.error('Error in handleCreateInvite:', error);
+      alert('Failed to create invite. Please try again.');
+    }
   };
 
   if (loading) {
