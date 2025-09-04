@@ -17,11 +17,38 @@ interface ReferralData {
   }>;
 }
 
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+}
+
+interface CouponBook {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  school: string;
+  totalOffers: number;
+  validFrom: string;
+  validTo: string;
+  coverImage?: string;
+  featured: boolean;
+  category: 'elementary' | 'middle' | 'high' | 'community';
+  purchased: boolean;
+  purchaseDate?: string;
+}
+
 export default function ReferralPage({ params }: { params: Promise<{ code: string }> }) {
   const [referralData, setReferralData] = useState<ReferralData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState<string>('');
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [couponBooks, setCouponBooks] = useState<CouponBook[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,10 +56,139 @@ export default function ReferralPage({ params }: { params: Promise<{ code: strin
     const getParams = async () => {
       const resolvedParams = await params;
       setCode(resolvedParams.code);
+      checkAuthStatus();
       fetchReferralData(resolvedParams.code);
+      fetchData();
     };
     getParams();
   }, [params]);
+
+  const checkAuthStatus = () => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setIsAuthenticated(true);
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      // Try to load from localStorage first
+      const savedBooks = localStorage.getItem('yourcitydeals_books');
+      const savedOffers = localStorage.getItem('yourcitydeals_offers');
+      
+      if (savedBooks && savedOffers) {
+        const books = JSON.parse(savedBooks);
+        const offers = JSON.parse(savedOffers);
+        
+        // Convert to CouponBook format
+        const couponBooks: CouponBook[] = books.map((book: any) => ({
+          id: book.id,
+          title: book.title,
+          description: book.description,
+          price: book.price,
+          school: book.school,
+          totalOffers: book.offersCount,
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          featured: book.featured || false,
+          category: book.category || 'high',
+          purchased: false
+        }));
+        
+        setCouponBooks(couponBooks);
+        return;
+      }
+      
+      // If no localStorage data, use default data and save it
+      const defaultBooks: CouponBook[] = [
+        {
+          id: '1',
+          title: 'Lincoln High School 2025 Coupon Book',
+          description: 'Amazing deals from local businesses to support our school fundraising efforts.',
+          price: 25.00,
+          school: 'Lincoln High School',
+          totalOffers: 8,
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          featured: true,
+          category: 'high',
+          purchased: false
+        },
+        {
+          id: '2',
+          title: 'Washington Middle School Fundraiser',
+          description: 'Support our middle school with great local business deals.',
+          price: 20.00,
+          school: 'Washington Middle School',
+          totalOffers: 6,
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          featured: true,
+          category: 'middle',
+          purchased: false
+        },
+        {
+          id: '3',
+          title: 'Elementary School Community Book',
+          description: 'Building community through local business partnerships.',
+          price: 15.00,
+          school: 'Elementary School',
+          totalOffers: 4,
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          featured: false,
+          category: 'elementary',
+          purchased: false
+        }
+      ];
+
+      const defaultOffers: any[] = [
+        {
+          id: '1',
+          title: '20% Off Pizza',
+          business: 'Pizza Palace',
+          businessAddress: '123 Main St, Omaha, NE',
+          businessCoordinates: { lat: 41.2565, lng: -95.9345 },
+          discount: '20% Off',
+          category: 'Food & Dining',
+          description: 'Get 20% off any large pizza, any toppings',
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          bookId: '1',
+          bookTitle: 'Lincoln High School 2025 Coupon Book',
+          school: 'Lincoln High School',
+          redeemed: false,
+          shared: false
+        },
+        {
+          id: '2',
+          title: 'Buy 1 Get 1 Free Coffee',
+          business: 'Coffee Corner',
+          businessAddress: '456 Oak Ave, Omaha, NE',
+          businessCoordinates: { lat: 41.2570, lng: -95.9350 },
+          discount: 'Buy 1 Get 1 Free',
+          category: 'Food & Dining',
+          description: 'Purchase any coffee and get a second one free',
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          bookId: '1',
+          bookTitle: 'Lincoln High School 2025 Coupon Book',
+          school: 'Lincoln High School',
+          redeemed: false,
+          shared: false
+        }
+      ];
+      
+      // Save to localStorage
+      localStorage.setItem('yourcitydeals_books', JSON.stringify(defaultBooks));
+      localStorage.setItem('yourcitydeals_offers', JSON.stringify(defaultOffers));
+      
+      setCouponBooks(defaultBooks);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   const fetchReferralData = async (code: string) => {
     try {
@@ -77,6 +233,17 @@ export default function ReferralPage({ params }: { params: Promise<{ code: strin
     router.push(`/signup?ref=${code}`);
   };
 
+  const handleLogin = () => {
+    // Redirect to login with referral code
+    router.push(`/login?ref=${code}`);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
@@ -116,8 +283,39 @@ export default function ReferralPage({ params }: { params: Promise<{ code: strin
                 YourCity Deals
               </h1>
             </div>
-            <div className="text-sm text-gray-600">
-              Referral: {code}
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-600">
+                Referral: {code}
+              </div>
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm text-gray-700">
+                    Welcome, {user?.firstName}!
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={handleLogin}
+                    className="text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    Sign In
+                  </button>
+                  <span className="text-gray-400">|</span>
+                  <button
+                    onClick={handleSignup}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -211,17 +409,34 @@ export default function ReferralPage({ params }: { params: Promise<{ code: strin
         <div className="text-center">
           <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Ready to Get Started?
+              {isAuthenticated ? 'Ready to Purchase?' : 'Ready to Get Started?'}
             </h2>
             <p className="text-gray-600 mb-6">
-              Create your account to track your purchases and access your digital coupons.
+              {isAuthenticated 
+                ? 'You\'re signed in! Click below to purchase your coupon book and start saving.'
+                : 'Create your account to track your purchases and access your digital coupons.'
+              }
             </p>
-            <button
-              onClick={handleSignup}
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-lg hover:shadow-xl transition-all duration-200"
-            >
-              Create Account & Purchase
-            </button>
+            {isAuthenticated ? (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-500">
+                  Welcome back, {user?.firstName}! You can now purchase coupon books and access your digital coupons.
+                </p>
+                <Link
+                  href="/"
+                  className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-lg hover:shadow-xl transition-all duration-200"
+                >
+                  Go to Marketplace
+                </Link>
+              </div>
+            ) : (
+              <button
+                onClick={handleSignup}
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-lg hover:shadow-xl transition-all duration-200"
+              >
+                Create Account & Purchase
+              </button>
+            )}
           </div>
         </div>
 
