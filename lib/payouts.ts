@@ -361,12 +361,16 @@ export function validatePayoutData(payout: Partial<Payout>): {
 export function getPayoutStatusColor(status: Payout['status']): string {
   switch (status) {
     case 'pending':
-      return 'text-yellow-600 bg-yellow-100';
+      return 'text-orange-600 bg-orange-100';
     case 'processed':
       return 'text-blue-600 bg-blue-100';
     case 'completed':
       return 'text-green-600 bg-green-100';
+    case 'accepted':
+      return 'text-green-600 bg-green-100';
     case 'failed':
+      return 'text-red-600 bg-red-100';
+    case 'declined':
       return 'text-red-600 bg-red-100';
     default:
       return 'text-gray-600 bg-gray-100';

@@ -4,6 +4,17 @@ import React, { useState, useEffect } from 'react';
 import { useRole } from '../../lib/roleContext';
 import { mockDataService } from '../../lib/mockDataService';
 import { Book, Merchant, Organization, BookOffer, Offer } from '../../lib/types';
+import { 
+  sellerInvitesService, 
+  sellerProfilesService, 
+  organizationalHubsService, 
+  couponBooksService,
+  adminSellerService,
+  type SellerInvite,
+  type SellerProfile,
+  type OrganizationalHub,
+  type CouponBook
+} from '../../lib/sellerDatabase';
 
 export default function AdminConsole() {
   const { currentRole, isAuthenticated, availableRoles, switchRole } = useRole();
@@ -14,6 +25,16 @@ export default function AdminConsole() {
   const [bookOffers, setBookOffers] = useState<BookOffer[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Seller system state
+  const [sellerInvites, setSellerInvites] = useState<SellerInvite[]>([]);
+  const [sellerProfiles, setSellerProfiles] = useState<SellerProfile[]>([]);
+  const [organizationalHubs, setOrganizationalHubs] = useState<OrganizationalHub[]>([]);
+  const [couponBooks, setCouponBooks] = useState<CouponBook[]>([]);
+
+  // Edit modal state
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editingInvite, setEditingInvite] = useState<any>(null);
 
   // Debug logging
   useEffect(() => {
@@ -25,9 +46,22 @@ export default function AdminConsole() {
     });
   }, [isAuthenticated, currentRole, availableRoles, loading]);
 
+  // Real-time updates for seller system
   useEffect(() => {
     if (currentRole === 'admin') {
-      fetchData();
+      const subscription = adminSellerService.subscribeToAllUpdates((payload) => {
+        console.log('Real-time update received:', payload);
+        
+        // Refresh data when changes occur
+        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE' || payload.eventType === 'DELETE') {
+          fetchData();
+        }
+      });
+
+      return () => {
+        subscription.invites.unsubscribe();
+        subscription.profiles.unsubscribe();
+      };
     }
   }, [currentRole]);
 
@@ -42,6 +76,13 @@ export default function AdminConsole() {
       setOrganizations(mockDataService.getOrganizations());
       setBookOffers(mockDataService.getBookOffers());
       setOffers(mockDataService.getOffers());
+      
+      // Fetch seller system data
+      const dashboardData = await adminSellerService.getDashboardData();
+      setSellerInvites(dashboardData.invites);
+      setSellerProfiles(dashboardData.profiles);
+      setOrganizationalHubs(dashboardData.hubs);
+      setCouponBooks(dashboardData.books);
     } catch (error) {
       console.error('Error fetching admin data:', error);
     } finally {
@@ -192,7 +233,14 @@ export default function AdminConsole() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Seller Invites
+              <div className="flex items-center space-x-2">
+                <span>Seller Invites</span>
+                {filteredInvites.length > 0 && (
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                    {filteredInvites.length}
+                  </span>
+                )}
+              </div>
             </button>
             <button
               onClick={() => setActiveTab('approvals')}
@@ -202,7 +250,14 @@ export default function AdminConsole() {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Seller Approvals
+              <div className="flex items-center space-x-2">
+                <span>Seller Approvals</span>
+                {readyForReviewInvites.length > 0 && (
+                  <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2 py-0.5 rounded-full animate-pulse">
+                    {readyForReviewInvites.length}
+                  </span>
+                )}
+              </div>
             </button>
           </nav>
                 </div>
@@ -215,9 +270,153 @@ export default function AdminConsole() {
         {activeTab === 'organizations' && <OrganizationsTab organizations={organizations} />}
         {activeTab === 'analytics' && <AnalyticsTab />}
         {activeTab === 'blasts' && <BlastsTab />}
-        {activeTab === 'invites' && <InvitesTab />}
-        {activeTab === 'approvals' && <ApprovalsTab />}
+        {activeTab === 'invites' && <InvitesTab 
+          sellerInvites={sellerInvites}
+          setSellerInvites={setSellerInvites}
+          organizationalHubs={organizationalHubs}
+          couponBooks={couponBooks}
+        />}
+        {activeTab === 'approvals' && <ApprovalsTab 
+          sellerInvites={sellerInvites}
+          setSellerInvites={setSellerInvites}
+          organizationalHubs={organizationalHubs}
+          couponBooks={couponBooks}
+        />}
       </div>
+
+      {/* Edit Profile Modal */}
+      {showEditProfileModal && editingInvite && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Edit Seller Profile</h3>
+              <button
+                onClick={() => setShowEditProfileModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input
+                  type="text"
+                  defaultValue={editingInvite.first_name}
+                  id="editFirstName"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  defaultValue={editingInvite.last_name}
+                  id="editLastName"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  defaultValue={editingInvite.email}
+                  id="editEmail"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <input
+                  type="tel"
+                  defaultValue={editingInvite.phone || ''}
+                  id="editPhone"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                <input
+                  type="text"
+                  defaultValue={editingInvite.zip_code || ''}
+                  id="editZipCode"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  onClick={() => {
+                    const firstName = (document.getElementById('editFirstName') as HTMLInputElement)?.value;
+                    const lastName = (document.getElementById('editLastName') as HTMLInputElement)?.value;
+                    const email = (document.getElementById('editEmail') as HTMLInputElement)?.value;
+                    const phone = (document.getElementById('editPhone') as HTMLInputElement)?.value;
+                    const zipCode = (document.getElementById('editZipCode') as HTMLInputElement)?.value;
+
+                    if (firstName && lastName && email) {
+                      // Update invite in database
+                      const updatedInvites = sellerInvites.map((inv: any) => 
+                        inv.id === editingInvite.id ? { 
+                          ...inv, 
+                          first_name: firstName,
+                          last_name: lastName,
+                          email: email,
+                          phone: phone,
+                          zip_code: zipCode,
+                          manuallyEdited: true,
+                          editedAt: new Date().toISOString()
+                        } : inv
+                      );
+                      setSellerInvites(updatedInvites);
+
+                      // Send notification email
+                      const emailTemplate = `Hi ${firstName},
+
+Your seller profile information has been updated by our admin team.
+
+Updated Information:
+- Name: ${firstName} ${lastName}
+- Email: ${email}
+- Phone: ${phone || 'Not provided'}
+- ZIP Code: ${zipCode || 'Not provided'}
+
+If you have any questions about these changes, please contact us.
+
+Best regards,
+The YourCity Deals Team`;
+
+                      const mailtoLink = `mailto:${email}?subject=${encodeURIComponent('YourCity Deals - Profile Updated')}&body=${encodeURIComponent(emailTemplate)}`;
+                      window.open(mailtoLink, '_blank');
+
+                      setShowEditProfileModal(false);
+                      setEditingInvite(null);
+                      alert('Profile updated! Notification email has been opened.');
+                    } else {
+                      alert('Please fill in all required fields (First Name, Last Name, Email).');
+                    }
+                  }}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+                <button
+                  onClick={() => setShowEditProfileModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -477,8 +676,18 @@ function BlastsTab() {
 }
 
 // Invites Tab Component
-function InvitesTab() {
-  const [invites, setInvites] = useState<any[]>([]);
+function InvitesTab({ 
+  sellerInvites, 
+  setSellerInvites, 
+  organizationalHubs, 
+  couponBooks 
+}: {
+  sellerInvites: any[];
+  setSellerInvites: (invites: any[]) => void;
+  organizationalHubs: any[];
+  couponBooks: any[];
+}) {
+  // Use the main component's state and functions
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteForm, setInviteForm] = useState({
     firstName: '',
@@ -494,71 +703,21 @@ function InvitesTab() {
   const [filterOrganization, setFilterOrganization] = useState('');
   const [filterBook, setFilterBook] = useState('');
 
-  // Mock organizational hubs and coupon books for assignment
-  const organizationalHubs = [
-    { id: 'hub-1', name: 'Downtown Business Association', city: 'Downtown' },
-    { id: 'hub-2', name: 'Westside Chamber of Commerce', city: 'Westside' },
-    { id: 'hub-3', name: 'Eastside Entrepreneurs', city: 'Eastside' },
-    { id: 'hub-4', name: 'Northside Business Network', city: 'Northside' },
-    { id: 'hub-5', name: 'Southside Commerce Group', city: 'Southside' }
-  ];
-
-  const couponBooks = [
-    { id: 'book-1', name: 'Downtown Deals 2024', price: 25, type: 'Local Business' },
-    { id: 'book-2', name: 'Westside Savings', price: 20, type: 'Restaurant' },
-    { id: 'book-3', name: 'Eastside Essentials', price: 30, type: 'Mixed' },
-    { id: 'book-4', name: 'Northside Neighborhood', price: 15, type: 'Retail' },
-    { id: 'book-5', name: 'Southside Specials', price: 22, type: 'Entertainment' }
-  ];
-
-  // Mock data for testing
-  useEffect(() => {
-    // Load invites from localStorage
-    const savedInvites = localStorage.getItem('yourcitydeals_invites');
-    if (savedInvites) {
-      setInvites(JSON.parse(savedInvites));
-    } else {
-      // Default test data
-      const defaultInvites = [
-        {
-          id: '1',
-          firstName: 'John',
-          lastName: 'Smith',
-          email: 'john@example.com',
-          inviteToken: 'TEST123',
-          status: 'pending',
-          sentAt: '2024-01-15',
-          acceptedAt: null
-        },
-        {
-          id: '2',
-          firstName: 'Jane',
-          lastName: 'Doe',
-          email: 'jane@example.com',
-          inviteToken: 'DEF456UVW',
-          status: 'accepted',
-          sentAt: '2024-01-10',
-          acceptedAt: '2024-01-12'
-        }
-      ];
-      setInvites(defaultInvites);
-      localStorage.setItem('yourcitydeals_invites', JSON.stringify(defaultInvites));
-    }
-  }, []);
-
-  // Refresh invites every 3 seconds to catch new completions
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const savedInvites = localStorage.getItem('yourcitydeals_invites');
-      if (savedInvites) {
-        const currentInvites = JSON.parse(savedInvites);
-        setInvites(currentInvites);
-        console.log('Refreshed invites from localStorage at:', new Date().toLocaleTimeString());
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
+  // Filter invites based on search and filters (only pending invites)
+  const filteredInvites = sellerInvites.filter((invite: any) => {
+    const matchesSearch = searchTerm === '' || 
+      invite.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesOrganization = filterOrganization === '' || invite.organizationHub === filterOrganization;
+    const matchesBook = filterBook === '' || invite.couponBook === filterBook;
+    
+    // Only show pending invites (not ready_for_review, approved, rejected, etc.)
+    const isPending = invite.status === 'pending';
+    
+    return matchesSearch && matchesOrganization && matchesBook && isPending;
+  });
 
   const generateInviteToken = () => {
     // For testing, always use TEST123
@@ -572,9 +731,69 @@ function InvitesTab() {
     }
 
     // Check for duplicate email
-    const existingInvite = invites.find(invite => 
+    const existingInvite = sellerInvites.find(invite => 
       invite.email.toLowerCase() === inviteForm.email.toLowerCase()
     );
+    
+    if (existingInvite) {
+      alert(`A seller with the email "${inviteForm.email}" has already been invited. Please use a different email address or check the invite history.`);
+      return;
+    }
+
+    // Check for duplicate name combination
+    const existingName = sellerInvites.find(invite => 
+      invite.firstName.toLowerCase() === inviteForm.firstName.toLowerCase() &&
+      invite.lastName.toLowerCase() === inviteForm.lastName.toLowerCase()
+    );
+    
+    if (existingName) {
+      alert(`A seller with the name "${inviteForm.firstName} ${inviteForm.lastName}" has already been invited. Please verify this is a different person or use a different name.`);
+      return;
+    }
+
+    const newInvite = {
+      id: Date.now().toString(),
+      firstName: inviteForm.firstName,
+      lastName: inviteForm.lastName,
+      email: inviteForm.email,
+      inviteToken: generateInviteToken(),
+      status: 'pending',
+      sentAt: new Date().toISOString(),
+      acceptedAt: null,
+      organizationHub: inviteForm.organizationHub,
+      couponBook: inviteForm.couponBook
+    };
+
+    setSellerInvites([newInvite, ...sellerInvites]);
+    setInviteForm({ firstName: '', lastName: '', email: '', organizationHub: '', couponBook: '' });
+    setShowInviteForm(false);
+    setGeneratedInvite(newInvite);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-3">
+          <h2 className="text-xl font-semibold text-gray-900">Seller Invites</h2>
+          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+            {filteredInvites.length} pending
+          </span>
+        </div>
+        <button 
+          onClick={() => setShowInviteForm(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Invite Seller
+        </button>
+      </div>
+
+      {/* Rest of the InvitesTab content would go here */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <p className="text-gray-600">Pending invites will appear here. Sellers who complete their profiles will move to the "Seller Approvals" tab.</p>
+      </div>
+    </div>
+  );
+}
     
     if (existingInvite) {
       alert(`A seller with the email "${inviteForm.email}" has already been invited. Please use a different email address or check the invite history.`);
@@ -721,28 +940,16 @@ The YourCity Deals Team`;
   };
 
   const handleApproveSeller = (invite: any) => {
-    if (confirm(`Are you sure you want to approve ${invite.firstName} ${invite.lastName}?`)) {
-      // Find the seller in localStorage
-      const savedSellers = localStorage.getItem('yourcitydeals_sellers');
-      const sellers = JSON.parse(savedSellers);
-      const seller = sellers.find((s: any) => s.inviteId === invite.id);
-      
-      if (seller) {
-        const updatedSellers = sellers.map((s: any) => 
-          s.id === seller.id ? { ...s, status: 'approved' } : s
-        );
-        localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
-        
-        // Update invite status
-        const updatedInvites = invites.map((inv: any) => 
-          inv.id === invite.id ? { ...inv, status: 'approved', approvedAt: new Date().toISOString() } : inv
-        );
-        setInvites(updatedInvites);
-        localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
-        
-        // Send approval email
-        const approvalLink = `https://yourcitydeals.com/activate/${invite.id}`;
-        const emailTemplate = `Hi ${invite.firstName},
+    if (confirm(`Are you sure you want to approve ${invite.first_name} ${invite.last_name}?`)) {
+      // Update invite status in database
+      const updatedInvites = sellerInvites.map((inv: any) => 
+        inv.id === invite.id ? { ...inv, status: 'approved', approvedAt: new Date().toISOString() } : inv
+      );
+      setSellerInvites(updatedInvites);
+
+      // Send approval email
+      const approvalLink = `https://yourcitydeals.com/activate/${invite.token}`;
+      const emailTemplate = `Hi ${invite.first_name},
 
 Great news! Your seller application has been approved! 🎉
 
@@ -756,8 +963,6 @@ This link will take you to a secure page where you can:
 • Access your seller dashboard
 • Start creating your first deals
 
-Your username will be: ${seller.phone || seller.email}
-
 If you have any questions or need help getting started, please don't hesitate to reach out to us.
 
 Welcome to the team!
@@ -765,14 +970,11 @@ Welcome to the team!
 Best regards,
 The YourCity Deals Team`;
 
-        const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Application Approved!')}&body=${encodeURIComponent(emailTemplate)}`;
-        window.open(mailtoLink, '_blank');
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Application Approved!')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
 
-        setShowInviteDetails(false);
-        alert('Seller approved! Approval email has been opened.');
-      } else {
-        alert('Seller not found. They may not have completed their profile yet.');
-      }
+      setShowInviteDetails(false);
+      alert('Seller approved! Approval email has been opened.');
     }
   };
 
@@ -1012,9 +1214,9 @@ The YourCity Deals Team`;
     }
   };
     const reason = prompt('Please provide a reason for rejection (optional):');
-    if (confirm(`Are you sure you want to reject ${invite.firstName} ${invite.lastName}?`)) {
+    if (confirm(`Are you sure you want to reject ${invite.first_name} ${invite.last_name}?`)) {
       // Update invite status
-      const updatedInvites = invites.map((inv: any) => 
+      const updatedInvites = sellerInvites.map((inv: any) => 
         inv.id === invite.id ? { 
           ...inv, 
           status: 'rejected', 
@@ -1022,25 +1224,10 @@ The YourCity Deals Team`;
           rejectionReason: reason || 'Application did not meet our requirements'
         } : inv
       );
-      setInvites(updatedInvites);
-      localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
-
-      // Update seller status
-      const savedSellers = localStorage.getItem('yourcitydeals_sellers');
-      if (savedSellers) {
-        const sellers = JSON.parse(savedSellers);
-        const updatedSellers = sellers.map((seller: any) => 
-          seller.inviteId === invite.id ? { 
-            ...seller, 
-            status: 'rejected',
-            rejectionReason: reason || 'Application did not meet our requirements'
-          } : seller
-        );
-        localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
-      }
+      setSellerInvites(updatedInvites);
 
       // Send rejection email
-      const emailTemplate = `Hi ${invite.firstName},
+      const emailTemplate = `Hi ${invite.first_name},
 
 Thank you for your interest in becoming a seller with YourCity Deals.
 
@@ -1063,18 +1250,69 @@ The YourCity Deals Team`;
     }
   };
 
+  const handleRequestEdits = (invite: any) => {
+    const editRequest = prompt('Please specify what edits are needed:');
+    if (editRequest) {
+      // Update invite status
+      const updatedInvites = sellerInvites.map((inv: any) => 
+        inv.id === invite.id ? { ...inv, status: 'edit_requested', editRequest, editRequestedAt: new Date().toISOString() } : inv
+      );
+      setSellerInvites(updatedInvites);
+
+      // Send edit request email
+      const emailTemplate = `Hi ${invite.first_name},
+
+Thank you for your interest in becoming a seller with YourCity Deals.
+
+We've reviewed your application and would like you to make some changes before we can approve it.
+
+Requested Changes:
+${editRequest}
+
+Please update your profile with the requested changes and resubmit your application.
+
+If you have any questions, please don't hesitate to contact us.
+
+Best regards,
+The YourCity Deals Team`;
+
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Profile Update Requested')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
+
+      setShowInviteDetails(false);
+      alert('Edit request sent! Email has been opened.');
+    }
+  };
+
+  const handleManualEdit = (invite: any) => {
+    // Open edit modal or redirect to edit page
+    alert('Manual edit functionality will be implemented here. For now, you can edit the data directly in the database.');
+  };
+
+  const handleEditProfile = (invite: any) => {
+    // Open edit profile modal
+    setShowEditProfileModal(true);
+    setEditingInvite(invite);
+  };
+
   // Filter invites based on search and filters
-  const filteredInvites = invites.filter((invite: any) => {
+  const filteredInvites = sellerInvites.filter((invite: any) => {
     const matchesSearch = searchTerm === '' || 
-      invite.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invite.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invite.email.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesOrganization = filterOrganization === '' || invite.organizationHub === filterOrganization;
     const matchesBook = filterBook === '' || invite.couponBook === filterBook;
     
-    return matchesSearch && matchesOrganization && matchesBook;
+    // Only show pending invites (not ready_for_review, approved, rejected, etc.)
+    const isPending = invite.status === 'pending';
+    
+    return matchesSearch && matchesOrganization && matchesBook && isPending;
   });
+
+  // Get ready for review invites for the Approvals tab
+  const readyForReviewInvites = sellerInvites.filter((invite: any) => invite.status === 'ready_for_review');
 
   const getOrganizationName = (hubId: string) => {
     const hub = organizationalHubs.find(h => h.id === hubId);
@@ -1086,17 +1324,22 @@ The YourCity Deals Team`;
     return book ? book.name : 'Not assigned';
   };
 
-  return (
+    return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-900">Seller Invites</h2>
+        <div className="flex items-center space-x-3">
+          <h2 className="text-xl font-semibold text-gray-900">Seller Invites</h2>
+          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+            {filteredInvites.length} pending
+          </span>
+        </div>
         <button 
           onClick={() => setShowInviteForm(true)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           Invite Seller
         </button>
-                </div>
+      </div>
 
       {/* Invite Form Modal */}
       {showInviteForm && (
@@ -1300,26 +1543,28 @@ The YourCity Deals Team`;
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {invites.map((invite) => (
+              {filteredInvites.map((invite) => (
                 <tr key={invite.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {invite.firstName} {invite.lastName}
+                    {invite.first_name} {invite.last_name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {invite.email}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                    {invite.inviteToken}
+                    {invite.token}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       invite.status === 'accepted' 
                         ? 'bg-green-100 text-green-800' 
-                        : invite.status === 'rejected'
+                        : invite.status === 'rejected' || invite.status === 'declined'
                         ? 'bg-red-100 text-red-800'
                         : invite.status === 'ready_for_review'
                         ? 'bg-blue-100 text-blue-800'
                         : invite.status === 'edit_requested'
+                        ? 'bg-orange-100 text-orange-800'
+                        : invite.status === 'pending'
                         ? 'bg-orange-100 text-orange-800'
                         : 'bg-yellow-100 text-yellow-800'
                     }`}>
@@ -1334,7 +1579,7 @@ The YourCity Deals Team`;
                     {invite.couponBook || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {invite.sentAt}
+                    {new Date(invite.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button 
@@ -1374,7 +1619,7 @@ The YourCity Deals Team`;
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Name</label>
-                    <p className="text-sm text-gray-900">{selectedInvite.firstName} {selectedInvite.lastName}</p>
+                    <p className="text-sm text-gray-900">{selectedInvite.first_name} {selectedInvite.last_name}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Email</label>
@@ -1382,15 +1627,17 @@ The YourCity Deals Team`;
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Invite Token</label>
-                    <p className="text-sm text-gray-900 font-mono">{selectedInvite.inviteToken}</p>
+                    <p className="text-sm text-gray-900 font-mono">{selectedInvite.token}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Status</label>
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       selectedInvite.status === 'accepted' || selectedInvite.status === 'approved'
                         ? 'bg-green-100 text-green-800' 
-                        : selectedInvite.status === 'rejected'
+                        : selectedInvite.status === 'rejected' || selectedInvite.status === 'declined'
                         ? 'bg-red-100 text-red-800'
+                        : selectedInvite.status === 'pending'
+                        ? 'bg-orange-100 text-orange-800'
                         : 'bg-yellow-100 text-yellow-800'
                     }`}>
                       {selectedInvite.status}
@@ -1517,6 +1764,12 @@ The YourCity Deals Team`;
                   >
                     Resend Invite
                   </button>
+                  <button
+                    onClick={() => handleEditProfile(selectedInvite)}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                  >
+                    Edit Profile
+                  </button>
                   {selectedInvite.status === 'ready_for_review' && (
                     <>
                       <button
@@ -1527,7 +1780,7 @@ The YourCity Deals Team`;
                       </button>
                       <button
                         onClick={() => handleManualEdit(selectedInvite)}
-                        className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
                       >
                         Edit Manually
                       </button>
@@ -1563,11 +1816,407 @@ The YourCity Deals Team`;
 
 // Approvals Tab Component
 function ApprovalsTab() {
-  const [pendingSellers, setPendingSellers] = useState<any[]>([]);
-  const [selectedSeller, setSelectedSeller] = useState<any>(null);
-  const [showSellerDetails, setShowSellerDetails] = useState(false);
-  const [organizations, setOrganizations] = useState<any[]>([]);
-  const [books, setBooks] = useState<any[]>([]);
+  const [readyForReviewInvites, setReadyForReviewInvites] = useState<any[]>([]);
+  const [selectedInvite, setSelectedInvite] = useState<any>(null);
+  const [showInviteDetails, setShowInviteDetails] = useState(false);
+  const [organizationalHubs, setOrganizationalHubs] = useState<any[]>([]);
+  const [couponBooks, setCouponBooks] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterOrganization, setFilterOrganization] = useState('');
+  const [filterBook, setFilterBook] = useState('');
+
+  useEffect(() => {
+    // Load ready for review invites from the main component
+    const loadReadyForReviewInvites = () => {
+      // This will be passed from the parent component
+      const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
+      if (savedInvites) {
+        const invites = JSON.parse(savedInvites);
+        const readyForReview = invites.filter((invite: any) => invite.status === 'ready_for_review');
+        setReadyForReviewInvites(readyForReview);
+      }
+    };
+
+    loadReadyForReviewInvites();
+    
+    // Set up interval to check for new ready_for_review invites
+    const interval = setInterval(loadReadyForReviewInvites, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Filter ready for review invites
+  const filteredReadyForReviewInvites = readyForReviewInvites.filter((invite: any) => {
+    const matchesSearch = searchTerm === '' || 
+      invite.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesOrganization = filterOrganization === '' || invite.organizationHub === filterOrganization;
+    const matchesBook = filterBook === '' || invite.couponBook === filterBook;
+    
+    return matchesSearch && matchesOrganization && matchesBook;
+  });
+
+  const handleViewDetails = (invite: any) => {
+    setSelectedInvite(invite);
+    setShowInviteDetails(true);
+  };
+
+  const handleApproveSeller = (invite: any) => {
+    if (confirm(`Are you sure you want to approve ${invite.first_name} ${invite.last_name}?`)) {
+      // Update invite status
+      const updatedInvites = readyForReviewInvites.map((inv: any) => 
+        inv.id === invite.id ? { ...inv, status: 'approved', approvedAt: new Date().toISOString() } : inv
+      );
+      setReadyForReviewInvites(updatedInvites);
+
+      // Send approval email
+      const approvalLink = `https://yourcitydeals.com/activate/${invite.token}`;
+      const emailTemplate = `Hi ${invite.first_name},
+
+Great news! Your seller application has been approved! 🎉
+
+We're excited to welcome you to the YourCity Deals team. You're now ready to start creating and selling deals to help local businesses grow while supporting great causes.
+
+To get started, please create your account by clicking the link below:
+${approvalLink}
+
+This link will take you to a secure page where you can:
+• Set up your password
+• Access your seller dashboard
+• Start creating your first deals
+
+If you have any questions or need help getting started, please don't hesitate to reach out to us.
+
+Welcome to the team!
+
+Best regards,
+The YourCity Deals Team`;
+
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Application Approved!')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
+
+      setShowInviteDetails(false);
+      alert('Seller approved! Approval email has been opened.');
+    }
+  };
+
+  const handleRejectSeller = (invite: any) => {
+    const reason = prompt('Please provide a reason for rejection (optional):');
+    if (confirm(`Are you sure you want to reject ${invite.first_name} ${invite.last_name}?`)) {
+      // Update invite status
+      const updatedInvites = readyForReviewInvites.map((inv: any) => 
+        inv.id === invite.id ? { 
+          ...inv, 
+          status: 'rejected', 
+          rejectedAt: new Date().toISOString(),
+          rejectionReason: reason || 'Application did not meet our requirements'
+        } : inv
+      );
+      setReadyForReviewInvites(updatedInvites);
+
+      // Send rejection email
+      const emailTemplate = `Hi ${invite.first_name},
+
+Thank you for your interest in becoming a seller with YourCity Deals.
+
+After careful review of your application, we regret to inform you that we are unable to approve your seller application at this time.
+
+${reason ? `Reason: ${reason}` : 'We appreciate your interest and encourage you to apply again in the future if your circumstances change.'}
+
+If you have any questions about this decision or would like to discuss it further, please don't hesitate to contact us.
+
+Thank you for your understanding.
+
+Best regards,
+The YourCity Deals Team`;
+
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Application Status Update')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
+
+      setShowInviteDetails(false);
+      alert('Seller rejected! Rejection email has been opened.');
+    }
+  };
+
+  const handleRequestEdits = (invite: any) => {
+    const editRequest = prompt('Please specify what edits are needed:');
+    if (editRequest) {
+      // Update invite status
+      const updatedInvites = readyForReviewInvites.map((inv: any) => 
+        inv.id === invite.id ? { ...inv, status: 'edit_requested', editRequest, editRequestedAt: new Date().toISOString() } : inv
+      );
+      setReadyForReviewInvites(updatedInvites);
+
+      // Send edit request email
+      const emailTemplate = `Hi ${invite.first_name},
+
+Thank you for your interest in becoming a seller with YourCity Deals.
+
+We've reviewed your application and would like you to make some changes before we can approve it.
+
+Requested Changes:
+${editRequest}
+
+Please update your profile with the requested changes and resubmit your application.
+
+If you have any questions, please don't hesitate to contact us.
+
+Best regards,
+The YourCity Deals Team`;
+
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Profile Update Requested')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
+
+      setShowInviteDetails(false);
+      alert('Edit request sent! Email has been opened.');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-3">
+          <h2 className="text-xl font-semibold text-gray-900">Seller Approvals</h2>
+          {readyForReviewInvites.length > 0 && (
+            <div className="flex items-center space-x-2">
+              <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full animate-pulse">
+                {readyForReviewInvites.length} ready for review
+              </span>
+              <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-full animate-bounce">
+                NEW!
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Notification Banner */}
+      {readyForReviewInvites.length > 0 && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-orange-800">
+                {readyForReviewInvites.length} seller{readyForReviewInvites.length === 1 ? '' : 's'} ready for review
+              </h3>
+              <p className="text-sm text-orange-700 mt-1">
+                These sellers have completed their profiles and are waiting for your approval.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Search and Filter Controls */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name or email..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+            <select
+              value={filterOrganization}
+              onChange={(e) => setFilterOrganization(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Organizations</option>
+              {organizationalHubs.map((hub) => (
+                <option key={hub.id} value={hub.name}>
+                  {hub.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Book</label>
+            <select
+              value={filterBook}
+              onChange={(e) => setFilterBook(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Books</option>
+              {couponBooks.map((book) => (
+                <option key={book.id} value={book.name}>
+                  {book.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Ready for Review Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Ready for Review</h3>
+        </div>
+        
+        {filteredReadyForReviewInvites.length === 0 ? (
+          <div className="px-6 py-8 text-center">
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No sellers ready for review</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Sellers will appear here once they complete their profiles.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coupon Book</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile Completed</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredReadyForReviewInvites.map((invite) => (
+                  <tr key={invite.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {invite.first_name} {invite.last_name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {invite.email}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {invite.organizationHub || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {invite.couponBook || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {invite.profile_completed_at ? new Date(invite.profile_completed_at).toLocaleDateString() : '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button 
+                        onClick={() => handleViewDetails(invite)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        Review
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Seller Details Modal */}
+      {showInviteDetails && selectedInvite && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Review Seller Application</h3>
+              <button
+                onClick={() => setShowInviteDetails(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Basic Information</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                    <p className="text-sm text-gray-900">{selectedInvite.first_name} {selectedInvite.last_name}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <p className="text-sm text-gray-900">{selectedInvite.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Phone</label>
+                    <p className="text-sm text-gray-900">{selectedInvite.phone || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">ZIP Code</label>
+                    <p className="text-sm text-gray-900">{selectedInvite.zip_code || 'Not provided'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Current Assignments */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Current Assignments</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <span className="font-medium text-gray-700">Organization Hub:</span>
+                      <p className="text-gray-900">{selectedInvite.organizationHub || 'Not assigned'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <span className="font-medium text-gray-700">Coupon Book:</span>
+                      <p className="text-gray-900">{selectedInvite.couponBook || 'Not assigned'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Actions</h4>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => handleRequestEdits(selectedInvite)}
+                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+                  >
+                    Request Edits
+                  </button>
+                  <button
+                    onClick={() => handleApproveSeller(selectedInvite)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                  >
+                    Approve Seller
+                  </button>
+                  <button
+                    onClick={() => handleRejectSeller(selectedInvite)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    Reject Seller
+                  </button>
+                  <button
+                    onClick={() => setShowInviteDetails(false)}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   useEffect(() => {
     // Load pending sellers

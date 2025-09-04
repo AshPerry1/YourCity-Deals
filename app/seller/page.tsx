@@ -88,7 +88,7 @@ export default function SellerDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending_review':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-orange-100 text-orange-800';
       case 'ready_for_review':
         return 'bg-blue-100 text-blue-800';
       case 'edit_requested':
@@ -96,6 +96,8 @@ export default function SellerDashboard() {
       case 'approved':
         return 'bg-green-100 text-green-800';
       case 'rejected':
+        return 'bg-red-100 text-red-800';
+      case 'declined':
         return 'bg-red-100 text-red-800';
       case 'active':
         return 'bg-blue-100 text-blue-800';

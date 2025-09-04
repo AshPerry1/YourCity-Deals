@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { sellerInvitesService, sellerProfilesService } from '@/lib/sellerDatabase';
 
 export default function InvitePage() {
   const params = useParams();
@@ -24,69 +25,73 @@ export default function InvitePage() {
   useEffect(() => {
     console.log('Loading invite for token:', token);
     
-    // Check for existing authentication
-    const savedAuth = localStorage.getItem('yourcitydeals_seller_auth');
-    if (savedAuth) {
-      const auth = JSON.parse(savedAuth);
-      if (auth.isAuthenticated && auth.sellerData) {
-        setIsAuthenticated(true);
-        setSellerAccount(auth.sellerData);
-        console.log('Found existing authentication:', auth.sellerData);
-      }
-    }
-    
-    // Load invite from localStorage
-    const savedInvites = localStorage.getItem('yourcitydeals_invites');
-    console.log('Saved invites:', savedInvites);
-    
-    if (savedInvites) {
-      const invites = JSON.parse(savedInvites);
-      const foundInvite = invites.find((inv: any) => inv.inviteToken === token);
-      console.log('Found invite:', foundInvite);
-      if (foundInvite) {
-        setInvite(foundInvite);
-        setLoading(false);
-        return;
-      }
-    }
-    
-    // For testing: TEST123 is always valid - but we need to find the actual invite
-    if (token === 'TEST123') {
-      console.log('TEST123 token detected, looking for TEST123 invite');
-      const savedInvites = localStorage.getItem('yourcitydeals_invites');
-      if (savedInvites) {
-        const invites = JSON.parse(savedInvites);
-        const testInvite = invites.find((inv: any) => inv.inviteToken === 'TEST123');
-        console.log('Found TEST123 invite:', testInvite);
-        if (testInvite) {
-          setInvite(testInvite);
-        } else {
-          // Fallback if no TEST123 invite exists
-          console.log('No TEST123 invite found, creating fallback');
-          setInvite({
-            id: 'test-invite',
-            firstName: 'John',
-            lastName: 'Seller',
-            email: 'john@example.com',
-            inviteToken: 'TEST123',
-            status: 'pending'
-          });
+    const loadInvite = async () => {
+      try {
+        // Check for existing authentication
+        const savedAuth = localStorage.getItem('yourcitydeals_seller_auth');
+        if (savedAuth) {
+          const auth = JSON.parse(savedAuth);
+          if (auth.isAuthenticated && auth.sellerData) {
+            setIsAuthenticated(true);
+            setSellerAccount(auth.sellerData);
+            console.log('Found existing authentication:', auth.sellerData);
+          }
         }
-      } else {
-        // Fallback if no invites exist
-        console.log('No invites exist, creating fallback');
-        setInvite({
-          id: 'test-invite',
-          firstName: 'John',
-          lastName: 'Seller',
-          email: 'john@example.com',
-          inviteToken: 'TEST123',
-          status: 'pending'
-        });
+        
+        // Load invite from database
+        const foundInvite = await sellerInvitesService.getInviteByToken(token);
+        console.log('Found invite from database:', foundInvite);
+        
+        if (foundInvite) {
+          setInvite(foundInvite);
+          setLoading(false);
+          return;
+        }
+        
+        // For testing: TEST123 is always valid - but we need to find the actual invite
+        if (token === 'TEST123') {
+          console.log('TEST123 token detected, looking for TEST123 invite');
+          const savedInvites = localStorage.getItem('yourcitydeals_invites');
+          if (savedInvites) {
+            const invites = JSON.parse(savedInvites);
+            const testInvite = invites.find((inv: any) => inv.inviteToken === 'TEST123');
+            console.log('Found TEST123 invite:', testInvite);
+            if (testInvite) {
+              setInvite(testInvite);
+            } else {
+              // Fallback if no TEST123 invite exists
+              console.log('No TEST123 invite found, creating fallback');
+              setInvite({
+                id: 'test-invite',
+                first_name: 'John',
+                last_name: 'Seller',
+                email: 'john@example.com',
+                token: 'TEST123',
+                status: 'pending'
+              });
+            }
+          } else {
+            // Fallback if no invites exist
+            console.log('No invites exist, creating fallback');
+            setInvite({
+              id: 'test-invite',
+              first_name: 'John',
+              last_name: 'Seller',
+              email: 'john@example.com',
+              token: 'TEST123',
+              status: 'pending'
+            });
+          }
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading invite:', error);
+        setLoading(false);
       }
-    }
+    };
     
-    setLoading(false);
+    loadInvite();
   }, [token]);
 
   const handleSendVerification = () => {
@@ -254,56 +259,70 @@ export default function InvitePage() {
     }
   };
 
-  const handleCompleteProfile = () => {
+  const handleCompleteProfile = async () => {
     if (!profileData.firstName || !profileData.lastName || !profileData.zipCode) {
       alert('Please fill in all required fields');
       return;
     }
 
-    // Update seller data with profile information
-    const savedSellers = localStorage.getItem('yourcitydeals_sellers');
-    const sellers = JSON.parse(savedSellers);
-    const updatedSellers = sellers.map((seller: any) => 
-      seller.phone === phone ? { 
-        ...seller, 
-        firstName: profileData.firstName,
-        lastName: profileData.lastName,
-        zipCode: profileData.zipCode,
-        profilePicture: profileData.profilePicture,
-        status: 'ready_for_review',
-        profileCompletedAt: new Date().toISOString()
-      } : seller
-    );
-    localStorage.setItem('yourcitydeals_sellers', JSON.stringify(updatedSellers));
+    try {
+      // Create or update seller profile in database
+      const profileDataToSave = {
+        invite_id: invite.id,
+        first_name: profileData.firstName,
+        last_name: profileData.lastName,
+        email: invite.email,
+        phone: phone,
+        zip_code: profileData.zipCode,
+        profile_picture_url: profileData.profilePicture,
+        status: 'ready_for_review' as const,
+        profile_completed_at: new Date().toISOString()
+      };
 
-    // Update invite status to 'ready_for_review'
-    const savedInvites = localStorage.getItem('yourcitydeals_invites');
-    const invites = JSON.parse(savedInvites);
-    const updatedInvites = invites.map((inv: any) => 
-      inv.inviteToken === token ? { 
-        ...inv, 
-        status: 'ready_for_review',
-        profileCompletedAt: new Date().toISOString()
-      } : inv
-    );
-    localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+      // Check if profile already exists
+      const existingProfile = await sellerProfilesService.getProfileByInviteId(invite.id);
+      
+      let profile;
+      if (existingProfile) {
+        // Update existing profile
+        await sellerProfilesService.updateProfile(existingProfile.id, profileDataToSave);
+        profile = { ...existingProfile, ...profileDataToSave };
+      } else {
+        // Create new profile
+        profile = await sellerProfilesService.createProfile(profileDataToSave);
+      }
 
-    // Sign in the seller
-    const currentSeller = updatedSellers.find((seller: any) => seller.phone === phone);
-    if (currentSeller) {
+      if (!profile) {
+        throw new Error('Failed to save profile');
+      }
+
+      // Update invite status in database
+      await sellerInvitesService.updateInvite(invite.id, {
+        status: 'ready_for_review'
+      });
+
+      // Update local state for immediate UI feedback
+      const updatedInvite = { ...invite, status: 'ready_for_review' };
+      setInvite(updatedInvite);
+
+      // Sign in the seller
       setIsAuthenticated(true);
-      setSellerAccount(currentSeller);
+      setSellerAccount(profile);
       
       // Save authentication state
       localStorage.setItem('yourcitydeals_seller_auth', JSON.stringify({
         isAuthenticated: true,
-        sellerId: currentSeller.id,
-        sellerData: currentSeller
+        sellerId: profile.id,
+        sellerData: profile
       }));
-    }
 
-    console.log('Profile completed:', profileData);
-    setStep('ready_for_review');
+      console.log('Profile completed and saved to database:', profile);
+      setStep('ready_for_review');
+      
+    } catch (error) {
+      console.error('Error completing profile:', error);
+      alert('Failed to complete profile. Please try again.');
+    }
   };
 
   const handleSignOut = () => {
@@ -345,7 +364,7 @@ export default function InvitePage() {
         <div className="text-center mb-8">
           <div className="mx-auto w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to YourCity Deals!</h1>
@@ -379,7 +398,7 @@ export default function InvitePage() {
               <div className="text-center">
                 <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                   <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Add YourCity Deals to Your Home Screen</h2>
@@ -415,18 +434,12 @@ export default function InvitePage() {
               <div className="flex space-x-4">
                 <button
                   onClick={() => setStep('phone')}
-                  className="flex-1 px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg flex items-center justify-center"
+                  className="w-full px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg flex items-center justify-center"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
                   Continue Setup
-                </button>
-                <button
-                  onClick={() => setStep('phone')}
-                  className="px-6 py-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                >
-                  Skip for Now
                 </button>
               </div>
             </div>
@@ -513,17 +526,6 @@ export default function InvitePage() {
                   </svg>
                   Verify Code
                 </button>
-                
-                {/* Debug button for testing */}
-                <button
-                  onClick={() => {
-                    console.log('Debug: Manually advancing to profile step');
-                    setStep('profile');
-                  }}
-                  className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium text-sm mt-2"
-                >
-                  Debug: Skip to Profile Step
-                </button>
               </div>
             </div>
           )}
@@ -608,17 +610,6 @@ export default function InvitePage() {
                   </p>
                   
                   <div className="space-y-3">
-                    <button
-                      onClick={handleTakePhoto}
-                      className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
-                    >
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      Take Photo with Camera
-                    </button>
-                    
                     <div className="relative">
                       <input
                         type="file"
@@ -630,7 +621,7 @@ export default function InvitePage() {
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
-                        Upload Photo from Device
+                        Upload or Take Photo
                       </button>
                     </div>
                   </div>
@@ -734,18 +725,33 @@ export default function InvitePage() {
               </div>
 
               <div className="text-center space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <h4 className="text-blue-900 font-semibold mb-3">What to expect next:</h4>
+                  <div className="space-y-2 text-sm text-blue-800">
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      Check your email for our decision within 24-48 hours
+                    </div>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      You'll receive approval or feedback via email
+                    </div>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Your account will be activated only after approval
+                    </div>
+                  </div>
+                </div>
+                
                 <p className="text-sm text-gray-600">
                   You can close this page now. We'll contact you via email with the next steps.
                 </p>
-                <a 
-                  href="/" 
-                  className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                  Back to Marketplace
-                </a>
               </div>
             </div>
           )}
@@ -792,29 +798,33 @@ export default function InvitePage() {
               </div>
               
               <div className="text-center space-y-4">
-                <a 
-                  href="/" 
-                  className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                  Back to Marketplace
-                </a>
-                
-                {isAuthenticated && (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800 mb-3">
-                      <strong>Signed in as:</strong> {sellerAccount?.firstName} {sellerAccount?.lastName}
-                    </p>
-                    <button
-                      onClick={handleSignOut}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                    >
-                      Sign Out
-                    </button>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <h4 className="text-blue-900 font-semibold mb-3">Important: Check Your Email</h4>
+                  <div className="space-y-2 text-sm text-blue-800">
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      Check your email for our decision within 24-48 hours
+                    </div>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Your account will be activated only after approval
+                    </div>
+                    <div className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      You'll receive approval or feedback via email
+                    </div>
                   </div>
-                )}
+                </div>
+                
+                <p className="text-sm text-gray-600">
+                  You can close this page now. We'll contact you via email with the next steps.
+                </p>
                 
                 <p className="text-sm text-gray-500">
                   Questions? Contact us at <a href="mailto:support@yourcitydeals.com" className="text-green-600 hover:text-green-700">support@yourcitydeals.com</a>
