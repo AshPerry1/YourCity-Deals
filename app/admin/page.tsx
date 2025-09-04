@@ -334,6 +334,73 @@ The YourCity Deals Team`;
           }
         };
 
+  const handleTestDatabaseConnection = async () => {
+    try {
+      console.log('=== TESTING DATABASE CONNECTION ===');
+      
+      // Test 1: Try to insert a test record
+      const testInvite = {
+        token: 'TEST-CONNECTION-' + Date.now(),
+        first_name: 'Test',
+        last_name: 'Connection',
+        email: 'test@connection.com',
+        status: 'pending',
+        sent_at: new Date().toISOString(),
+        email_sent: true
+      };
+
+      console.log('Attempting to insert test invite:', testInvite);
+      
+      const { data: insertedData, error: insertError } = await supabase
+        .from('seller_invites')
+        .insert(testInvite)
+        .select()
+        .single();
+
+      console.log('Insert result:', { data: insertedData, error: insertError });
+
+      if (insertError) {
+        console.error('Insert failed:', insertError);
+        alert(`Database connection test failed: ${insertError.message}`);
+        return;
+      }
+
+      // Test 2: Try to read the record back
+      const { data: readData, error: readError } = await supabase
+        .from('seller_invites')
+        .select('*')
+        .eq('token', testInvite.token)
+        .single();
+
+      console.log('Read result:', { data: readData, error: readError });
+
+      if (readError) {
+        console.error('Read failed:', readError);
+        alert(`Database read test failed: ${readError.message}`);
+        return;
+      }
+
+      // Test 3: Clean up the test record
+      const { error: deleteError } = await supabase
+        .from('seller_invites')
+        .delete()
+        .eq('token', testInvite.token);
+
+      if (deleteError) {
+        console.error('Delete failed:', deleteError);
+        alert(`Database delete test failed: ${deleteError.message}`);
+        return;
+      }
+
+      alert('Database connection test successful! All operations (insert, read, delete) worked.');
+      console.log('=== DATABASE CONNECTION TEST COMPLETED ===');
+
+    } catch (error) {
+      console.error('Database connection test error:', error);
+      alert(`Database connection test failed: ${error}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -648,6 +715,12 @@ The YourCity Deals Team`;
           </span>
         </div>
         <div className="flex space-x-2">
+          <button
+            onClick={handleTestDatabaseConnection}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+          >
+            Test Database
+          </button>
           <button
             onClick={handleClearAllTestData}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
