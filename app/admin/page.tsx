@@ -97,7 +97,6 @@ export default function AdminPage() {
   const loadDashboardData = async () => {
     try {
       console.log('=== LOADING DASHBOARD DATA ===');
-      console.log('Current sellerInvites state length:', sellerInvites.length);
       
       // Load seller invites from Supabase
       let { data: invites, error: invitesError } = await supabase
@@ -117,10 +116,10 @@ export default function AdminPage() {
       } else {
         console.log('Successfully loaded from Supabase:', invites);
         console.log('Total invites loaded:', invites?.length || 0);
-        console.log('Current state has:', sellerInvites.length, 'invites');
         
         // Always use Supabase data - it's the source of truth
         console.log('Updating state with Supabase data');
+        console.log('Data to set:', invites);
         setSellerInvites(invites || []);
         console.log('State updated, new length should be:', invites?.length || 0);
       }
