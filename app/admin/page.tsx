@@ -8,6 +8,20 @@ export default function AdminPage() {
   const [organizationalHubs, setOrganizationalHubs] = useState<any[]>([]);
   const [couponBooks, setCouponBooks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [inviteForm, setInviteForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    organizationHub: '',
+    couponBook: ''
+  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterOrganization, setFilterOrganization] = useState('');
+  const [filterBook, setFilterBook] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [selectedInvite, setSelectedInvite] = useState<any>(null);
+  const [showInviteDetails, setShowInviteDetails] = useState(false);
 
   useEffect(() => {
     const loadDashboardData = () => {
@@ -282,7 +296,11 @@ function InvitesTab({
       organizationHub: inviteForm.organizationHub,
       couponBook: inviteForm.couponBook,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      sentAt: new Date().toLocaleString(),
+      emailSent: true,
+      linkClicked: false,
+      profileCompleted: false
     };
 
     // Add to localStorage
@@ -406,7 +424,7 @@ function InvitesTab({
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization Hub</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coupon Book</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Sent</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -443,19 +461,9 @@ function InvitesTab({
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {invite.sentAt}
+                      {invite.sentAt || invite.created_at ? new Date(invite.sentAt || invite.created_at).toLocaleString() : 'Not sent'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button 
-                        onClick={() => {
-                          const inviteLink = `https://yourcitydeals.com/invite/${invite.token}`;
-                          navigator.clipboard.writeText(inviteLink);
-                          alert('Invite link copied to clipboard!');
-                        }}
-                        className="text-blue-600 hover:text-blue-900 mr-3"
-                      >
-                        Copy Link
-                      </button>
                       <button 
                         onClick={() => {
                           const emailTemplate = `Hi ${invite.first_name || invite.firstName},
@@ -481,10 +489,26 @@ The YourCity Deals Team`;
 
                           const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Seller Invitation')}&body=${encodeURIComponent(emailTemplate)}`;
                           window.open(mailtoLink, '_blank');
+                          
+                          // Update sent date
+                          const updatedInvites = sellerInvites.map((inv: any) => 
+                            inv.id === invite.id ? { ...inv, sentAt: new Date().toLocaleString(), emailSent: true } : inv
+                          );
+                          localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+                          setSellerInvites(updatedInvites);
                         }}
-                        className="text-green-600 hover:text-green-900"
+                        className={`mr-3 ${invite.emailSent ? 'text-green-600 hover:text-green-900' : 'text-blue-600 hover:text-blue-900'}`}
                       >
-                        Resend Email
+                        {invite.emailSent ? 'Re-send Email' : 'Send Email'}
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setSelectedInvite(invite);
+                          setShowInviteDetails(true);
+                        }}
+                        className="text-purple-600 hover:text-purple-900"
+                      >
+                        View Details
                       </button>
                     </td>
                   </tr>
