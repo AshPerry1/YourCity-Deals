@@ -245,12 +245,18 @@ export default function InvitePage() {
   };
 
   const handleCompleteProfile = async () => {
+    console.log('Starting profile completion...');
+    console.log('Profile data:', profileData);
+    console.log('Phone:', phone);
+    console.log('Invite:', invite);
+    
     if (!profileData.firstName || !profileData.lastName || !profileData.zipCode) {
       alert('Please fill in all required fields');
       return;
     }
 
     try {
+      console.log('Creating profile data to save...');
       // Create or update seller profile in localStorage
       const profileDataToSave = {
         invite_id: invite.id,
@@ -263,14 +269,18 @@ export default function InvitePage() {
         status: 'ready_for_review' as const,
         profile_completed_at: new Date().toISOString()
       };
+      console.log('Profile data to save:', profileDataToSave);
 
       // Check if profile already exists in localStorage
       const savedProfiles = localStorage.getItem('yourcitydeals_seller_profiles');
       const profiles = savedProfiles ? JSON.parse(savedProfiles) : [];
       const existingProfile = profiles.find((p: any) => p.invite_id === invite.id);
+      console.log('Existing profiles:', profiles);
+      console.log('Existing profile found:', existingProfile);
       
       let profile;
       if (existingProfile) {
+        console.log('Updating existing profile...');
         // Update existing profile
         const updatedProfiles = profiles.map((p: any) => 
           p.invite_id === invite.id ? { ...p, ...profileDataToSave, updated_at: new Date().toISOString() } : p
@@ -278,6 +288,7 @@ export default function InvitePage() {
         localStorage.setItem('yourcitydeals_seller_profiles', JSON.stringify(updatedProfiles));
         profile = { ...existingProfile, ...profileDataToSave };
       } else {
+        console.log('Creating new profile...');
         // Create new profile
         const newProfile = {
           id: Date.now().toString(),
@@ -289,11 +300,15 @@ export default function InvitePage() {
         localStorage.setItem('yourcitydeals_seller_profiles', JSON.stringify(profiles));
         profile = newProfile;
       }
+      console.log('Profile saved:', profile);
 
+      console.log('Updating invite status in localStorage...');
       // Update invite status in localStorage
       const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
+      console.log('Saved invites:', savedInvites);
       if (savedInvites) {
         const invites = JSON.parse(savedInvites);
+        console.log('Parsed invites:', invites);
         const updatedInvites = invites.map((inv: any) => 
           inv.id === invite.id ? { 
             ...inv, 
@@ -308,7 +323,9 @@ export default function InvitePage() {
           } : inv
         );
         localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+        console.log('Updated invites saved');
       } else {
+        console.log('No saved invites, creating new array...');
         // If no invites exist, create the array with this invite
         const newInvite = {
           ...invite,
@@ -322,8 +339,10 @@ export default function InvitePage() {
           profile_picture_url: profileData.profilePicture
         };
         localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify([newInvite]));
+        console.log('New invite array created');
       }
 
+      console.log('Updating local state...');
       // Update local state for immediate UI feedback
       const updatedInvite = { 
         ...invite, 
@@ -337,6 +356,7 @@ export default function InvitePage() {
       };
       setInvite(updatedInvite);
 
+      console.log('Setting authentication...');
       // Sign in the seller
       setIsAuthenticated(true);
       setSellerAccount(updatedInvite);
@@ -348,11 +368,13 @@ export default function InvitePage() {
         sellerData: updatedInvite
       }));
 
-      console.log('Profile completed and saved:', updatedInvite);
+      console.log('Profile completed successfully!');
       setStep('ready_for_review');
       
     } catch (error) {
       console.error('Error completing profile:', error);
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
       alert('Failed to complete profile. Please try again.');
     }
   };
