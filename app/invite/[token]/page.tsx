@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function InvitePage() {
   const params = useParams();
@@ -24,7 +25,7 @@ export default function InvitePage() {
   useEffect(() => {
     console.log('Loading invite for token:', token);
     
-    const loadInvite = () => {
+    const loadInvite = async () => {
       try {
         console.log('Starting invite load process...');
         // Check for existing authentication
@@ -38,7 +39,23 @@ export default function InvitePage() {
           }
         }
         
-        // Load invite from localStorage
+        console.log('Loading invite from Supabase...');
+        // Try to load from Supabase first
+        const { data: supabaseInvite, error } = await supabase
+          .from('seller_invites')
+          .select('*')
+          .eq('token', token)
+          .single();
+
+        if (supabaseInvite && !error) {
+          console.log('Found invite in Supabase:', supabaseInvite);
+          setInvite(supabaseInvite);
+          setLoading(false);
+          return;
+        }
+
+        console.log('No invite found in Supabase, checking localStorage...');
+        // Fallback to localStorage
         const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
         console.log('Saved invites from localStorage:', savedInvites);
         if (savedInvites) {
@@ -265,7 +282,7 @@ export default function InvitePage() {
 
     try {
       console.log('Creating profile data to save...');
-      // Create or update seller profile in localStorage
+      // Create or update seller profile in Supabase
       const profileDataToSave = {
         invite_id: invite.id || 'test-invite',
         first_name: profileData.firstName,
@@ -279,26 +296,58 @@ export default function InvitePage() {
       };
       console.log('Profile data to save:', profileDataToSave);
 
-      // Check if profile already exists in localStorage
+      // Save profile to Supabase
+      const { data: profile, error: profileError } = await supabase
+        .from('seller_profiles')
+        .upsert(profileDataToSave, { 
+          onConflict: 'invite_id',
+          ignoreDuplicates: false 
+        })
+        .select()
+        .single();
+
+      if (profileError) {
+        console.error('Error saving profile to Supabase:', profileError);
+        throw profileError;
+      }
+
+      console.log('Profile saved to Supabase:', profile);
+
+      // Update invite status in Supabase
+      const { error: inviteError } = await supabase
+        .from('seller_invites')
+        .update({
+          status: 'ready_for_review',
+          updated_at: new Date().toISOString(),
+          profile_completed_at: new Date().toISOString(),
+          first_name: profileData.firstName,
+          last_name: profileData.lastName,
+          phone: phone,
+          zip_code: profileData.zipCode,
+          profile_picture_url: profileData.profilePicture,
+          profile_completed: true
+        })
+        .eq('token', token);
+
+      if (inviteError) {
+        console.error('Error updating invite in Supabase:', inviteError);
+        throw inviteError;
+      }
+
+      console.log('Invite updated in Supabase');
+
+      // Also save to localStorage as fallback
+      console.log('Saving to localStorage as fallback...');
       const savedProfiles = localStorage.getItem('yourcitydeals_seller_profiles');
       const profiles = savedProfiles ? JSON.parse(savedProfiles) : [];
       const existingProfile = profiles.find((p: any) => p.invite_id === (invite.id || 'test-invite'));
-      console.log('Existing profiles:', profiles);
-      console.log('Looking for invite_id:', invite.id || 'test-invite');
-      console.log('Existing profile found:', existingProfile);
       
-      let profile;
       if (existingProfile) {
-        console.log('Updating existing profile...');
-        // Update existing profile
         const updatedProfiles = profiles.map((p: any) => 
           p.invite_id === (invite.id || 'test-invite') ? { ...p, ...profileDataToSave, updated_at: new Date().toISOString() } : p
         );
         localStorage.setItem('yourcitydeals_seller_profiles', JSON.stringify(updatedProfiles));
-        profile = { ...existingProfile, ...profileDataToSave };
       } else {
-        console.log('Creating new profile...');
-        // Create new profile
         const newProfile = {
           id: Date.now().toString(),
           ...profileDataToSave,
@@ -307,17 +356,12 @@ export default function InvitePage() {
         };
         profiles.push(newProfile);
         localStorage.setItem('yourcitydeals_seller_profiles', JSON.stringify(profiles));
-        profile = newProfile;
       }
-      console.log('Profile saved:', profile);
 
-      console.log('Updating invite status in localStorage...');
-      // Update invite status in localStorage
+      // Update invite in localStorage
       const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
-      console.log('Saved invites:', savedInvites);
       if (savedInvites) {
         const invites = JSON.parse(savedInvites);
-        console.log('Parsed invites:', invites);
         const updatedInvites = invites.map((inv: any) => 
           inv.id === (invite.id || 'test-invite') ? { 
             ...inv, 
@@ -332,10 +376,7 @@ export default function InvitePage() {
           } : inv
         );
         localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
-        console.log('Updated invites saved');
       } else {
-        console.log('No saved invites, creating new array...');
-        // If no invites exist, create the array with this invite
         const newInvite = {
           ...invite,
           status: 'ready_for_review',
@@ -348,7 +389,6 @@ export default function InvitePage() {
           profile_picture_url: profileData.profilePicture
         };
         localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify([newInvite]));
-        console.log('New invite array created');
       }
 
       console.log('Updating local state...');
