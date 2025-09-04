@@ -737,12 +737,6 @@ function ApprovalsTab({
     organizationHub: '',
     couponBook: ''
   });
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [emailContent, setEmailContent] = useState({
-    to: '',
-    subject: '',
-    body: ''
-  });
 
   useEffect(() => {
     // Load ready for review invites from the main component
@@ -827,16 +821,11 @@ Best regards,
 The YourCity Deals Team
 support@yourcitydeals.com`;
 
-      // Show email modal instead of opening mailto link
-      setEmailContent({
-        to: invite.email,
-        subject: '🎉 APPROVED: YourCity Deals Seller Account',
-        body: emailTemplate
-      });
-      setShowEmailModal(true);
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('🎉 APPROVED: YourCity Deals Seller Account')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
 
       setShowInviteDetails(false);
-      alert(`Seller approved! Login credentials:\nUsername: ${sellerUsername}\nPassword: ${sellerPassword}\n\nEmail content is ready for you to review and send.`);
+      alert(`Seller approved! Login credentials:\nUsername: ${sellerUsername}\nPassword: ${sellerPassword}\n\nEmail has been opened for you to review and send.`);
     }
   };
 
@@ -880,16 +869,11 @@ Best regards,
 The YourCity Deals Team
 support@yourcitydeals.com`;
 
-      // Show email modal instead of opening mailto link
-      setEmailContent({
-        to: invite.email,
-        subject: '❌ DECLINED: YourCity Deals Seller Application',
-        body: emailTemplate
-      });
-      setShowEmailModal(true);
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('❌ DECLINED: YourCity Deals Seller Application')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
 
       setShowInviteDetails(false);
-      alert('Seller rejected! Email content is ready for you to review and send.');
+      alert('Seller rejected! Email has been opened for you to review and send.');
     }
   };
 
@@ -934,50 +918,11 @@ Best regards,
 The YourCity Deals Team
 support@yourcitydeals.com`;
 
-      // Show email modal instead of opening mailto link
-      setEmailContent({
-        to: invite.email,
-        subject: '📝 ACTION REQUIRED: Update YourCity Deals Seller Profile',
-        body: emailTemplate
-      });
-      setShowEmailModal(true);
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('📝 ACTION REQUIRED: Update YourCity Deals Seller Profile')}&body=${encodeURIComponent(emailTemplate)}`;
+      window.open(mailtoLink, '_blank');
 
       setShowInviteDetails(false);
-      alert('Edit request ready! Email content is ready for you to review and send.');
-    }
-  };
-
-  const sendEmailDirectly = async () => {
-    try {
-      // For now, we'll use a mock email service
-      // In production, you'd integrate with EmailJS, SendGrid, or similar
-      
-      // Simulate email sending
-      console.log('Sending email to:', emailContent.to);
-      console.log('Subject:', emailContent.subject);
-      console.log('Body:', emailContent.body);
-      
-      // Mock successful email send
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update the invite to mark email as sent
-      const updatedInvites = sellerInvites.map((inv: any) => 
-        inv.email === emailContent.to ? { 
-          ...inv, 
-          emailSent: true,
-          emailSentAt: new Date().toISOString()
-        } : inv
-      );
-      localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
-      setSellerInvites(updatedInvites);
-      
-      // Close modal and show success message
-      setShowEmailModal(false);
-      alert('Email sent successfully! The seller has been notified.');
-      
-    } catch (error) {
-      console.error('Error sending email:', error);
-      alert('Failed to send email. Please try the "Copy to Clipboard" option instead.');
+      alert('Edit request ready! Email has been opened for you to review and send.');
     }
   };
 
