@@ -3,156 +3,374 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 
-interface CouponBook {
+interface Offer {
+  id: string;
+  bookId: string;
+  title: string;
+  description: string;
+  businessName: string;
+  businessLogo: string;
+  discountType: 'percentage' | 'fixed' | 'bogo';
+  discountValue: number;
+  originalPrice?: number;
+  newPrice?: number;
+  terms: string;
+  validUntil: string;
+  category: string;
+  heroImage: string;
+  isActive: boolean;
+}
+
+interface BookDetails {
   id: string;
   title: string;
   description: string;
-  price: number;
   school: string;
-  totalOffers: number;
-  validFrom: string;
-  validTo: string;
-  coverImage?: string;
-  featured: boolean;
-  category: 'elementary' | 'middle' | 'high' | 'community';
-  purchased: boolean;
-  purchaseDate?: string;
-}
-
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
+  price: number;
+  coverImage: string;
+  offersCount: number;
+  isActive: boolean;
+  category: string;
+  rating: number;
+  soldCount: number;
+  totalValue: number;
+  savings: number;
 }
 
 export default function BookPreviewPage({ params }: { params: Promise<{ id: string }> }) {
-  const [book, setBook] = useState<CouponBook | null>(null);
+  const [bookDetails, setBookDetails] = useState<BookDetails | null>(null);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [filteredOffers, setFilteredOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [bookId, setBookId] = useState<string>('');
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [showPurchasePrompt, setShowPurchasePrompt] = useState(false);
   const router = useRouter();
+
+  const categories = ['all', 'restaurant', 'retail', 'entertainment', 'services', 'health'];
 
   useEffect(() => {
     // Handle async params
     const getParams = async () => {
       const resolvedParams = await params;
-      setBookId(resolvedParams.id);
-      checkAuthStatus();
-      fetchBookData(resolvedParams.id);
+      loadBookData(resolvedParams.id);
     };
     getParams();
   }, [params]);
 
-  const checkAuthStatus = () => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
-    }
-  };
-
-  const fetchBookData = async (id: string) => {
+  const loadBookData = (bookId: string) => {
     try {
       // Try to load from localStorage first
       const savedBooks = localStorage.getItem('yourcitydeals_books');
+      const savedOffers = localStorage.getItem('yourcitydeals_offers');
       
-      if (savedBooks) {
+      if (savedBooks && savedOffers) {
         const books = JSON.parse(savedBooks);
-        const foundBook = books.find((b: any) => b.id === id);
+        const offers = JSON.parse(savedOffers);
         
-        if (foundBook) {
-          // Convert to CouponBook format
-          const couponBook: CouponBook = {
-            id: foundBook.id,
-            title: foundBook.title,
-            description: foundBook.description,
-            price: foundBook.price,
-            school: foundBook.school,
-            totalOffers: foundBook.offersCount || 8,
-            validFrom: '2025-01-01',
-            validTo: '2025-12-31',
-            featured: foundBook.featured || false,
-            category: foundBook.category || 'high',
-            purchased: false
-          };
-          
-          setBook(couponBook);
+        // Find the specific book by ID
+        const book = books.find((b: BookDetails) => b.id === bookId);
+        const bookOffers = offers.filter((o: Offer) => o.bookId === bookId);
+        
+        if (book && bookOffers.length > 0) {
+          setBookDetails(book);
+          setOffers(bookOffers);
+          setFilteredOffers(bookOffers);
           setLoading(false);
           return;
         }
       }
       
-      // Fallback to default data if not found
-      const defaultBook: CouponBook = {
-        id,
+      // If no localStorage data or book not found, use default data and save it
+      const defaultBook: BookDetails = {
+        id: bookId,
         title: 'Lincoln High School 2025 Coupon Book',
         description: 'Amazing discounts at the best local businesses. Save money while supporting your school!',
-        price: 25,
         school: 'Lincoln High School',
-        totalOffers: 8,
-        validFrom: '2025-01-01',
-        validTo: '2025-12-31',
-        featured: true,
+        price: 25,
+        coverImage: '/api/placeholder/300/400',
+        offersCount: 8,
+        isActive: true,
         category: 'high',
-        purchased: false
+        rating: 4.8,
+        soldCount: 234,
+        totalValue: 1250,
+        savings: 450
       };
+
+      const defaultOffers: Offer[] = [
+        {
+          id: '1',
+          bookId: bookId,
+          title: '20% Off Any Purchase',
+          description: 'Get 20% off your entire bill at any participating restaurant',
+          businessName: 'Local Italian Restaurant',
+          businessLogo: '/api/placeholder/50/50',
+          discountType: 'percentage',
+          discountValue: 20,
+          terms: 'Valid for dine-in only. Cannot be combined with other offers. Expires 12/31/2024.',
+          validUntil: '2024-12-31',
+          category: 'restaurant',
+          heroImage: '/api/placeholder/300/200',
+          isActive: true
+        },
+        {
+          id: '2',
+          bookId: bookId,
+          title: 'Free Appetizer',
+          description: 'Get a free appetizer with any entrée purchase',
+          businessName: 'Downtown Grill',
+          businessLogo: '/api/placeholder/50/50',
+          discountType: 'bogo',
+          discountValue: 100,
+          originalPrice: 15,
+          newPrice: 0,
+          terms: 'Valid for dine-in only. Must purchase entrée. Expires 12/31/2024.',
+          validUntil: '2024-12-31',
+          category: 'restaurant',
+          heroImage: '/api/placeholder/300/200',
+          isActive: true
+        },
+        {
+          id: '3',
+          bookId: bookId,
+          title: '$10 Off $50 Purchase',
+          description: 'Save $10 on any purchase of $50 or more',
+          businessName: 'Fashion Boutique',
+          businessLogo: '/api/placeholder/50/50',
+          discountType: 'fixed',
+          discountValue: 10,
+          originalPrice: 50,
+          newPrice: 40,
+          terms: 'Valid for in-store purchases only. Cannot be combined with other offers.',
+          validUntil: '2024-12-31',
+          category: 'retail',
+          heroImage: '/api/placeholder/300/200',
+          isActive: true
+        },
+        {
+          id: '4',
+          bookId: bookId,
+          title: 'Buy One Get One Free',
+          description: 'Buy any item and get the second one free',
+          businessName: 'Movie Theater',
+          businessLogo: '/api/placeholder/50/50',
+          discountType: 'bogo',
+          discountValue: 100,
+          originalPrice: 12,
+          newPrice: 12,
+          terms: 'Valid for movie tickets only. Cannot be combined with other offers.',
+          validUntil: '2024-12-31',
+          category: 'entertainment',
+          heroImage: '/api/placeholder/300/200',
+          isActive: true
+        },
+        {
+          id: '5',
+          bookId: bookId,
+          title: '50% Off First Session',
+          description: 'Get 50% off your first tutoring session',
+          businessName: 'Academic Excellence',
+          businessLogo: '/api/placeholder/50/50',
+          discountType: 'percentage',
+          discountValue: 50,
+          originalPrice: 60,
+          newPrice: 30,
+          terms: 'Valid for first-time customers only. Must book in advance.',
+          validUntil: '2024-12-31',
+          category: 'services',
+          heroImage: '/api/placeholder/300/200',
+          isActive: true
+        },
+        {
+          id: '6',
+          bookId: bookId,
+          title: 'Free Gym Membership',
+          description: 'Get one month of free gym membership',
+          businessName: 'Fitness Center',
+          businessLogo: '/api/placeholder/50/50',
+          discountType: 'fixed',
+          discountValue: 50,
+          originalPrice: 50,
+          newPrice: 0,
+          terms: 'Valid for new members only. Must sign up for at least 3 months.',
+          validUntil: '2024-12-31',
+          category: 'health',
+          heroImage: '/api/placeholder/300/200',
+          isActive: true
+        }
+      ];
+
+      // Save to localStorage
+      const existingBooks = savedBooks ? JSON.parse(savedBooks) : [];
+      const existingOffers = savedOffers ? JSON.parse(savedOffers) : [];
       
-      setBook(defaultBook);
+      // Check if book already exists, if not add it
+      const bookExists = existingBooks.some((b: BookDetails) => b.id === bookId);
+      if (!bookExists) {
+        existingBooks.push(defaultBook);
+        localStorage.setItem('yourcitydeals_books', JSON.stringify(existingBooks));
+      }
+      
+      // Check if offers already exist, if not add them
+      const offersExist = existingOffers.some((o: Offer) => o.bookId === bookId);
+      if (!offersExist) {
+        existingOffers.push(...defaultOffers);
+        localStorage.setItem('yourcitydeals_offers', JSON.stringify(existingOffers));
+      }
+
+      setBookDetails(defaultBook);
+      setOffers(defaultOffers);
+      setFilteredOffers(defaultOffers);
+      setLoading(false);
+      
     } catch (error) {
-      console.error('Error fetching book data:', error);
-      setError('Book not found');
-    } finally {
+      console.error('Error loading book data:', error);
+      // Fallback to default data if localStorage fails
+      const fallbackBook: BookDetails = {
+        id: bookId,
+        title: 'Lincoln High School 2025 Coupon Book',
+        description: 'Amazing discounts at the best local businesses. Save money while supporting your school!',
+        school: 'Lincoln High School',
+        price: 25,
+        coverImage: '/api/placeholder/300/400',
+        offersCount: 6,
+        isActive: true,
+        category: 'high',
+        rating: 4.8,
+        soldCount: 234,
+        totalValue: 1250,
+        savings: 450
+      };
+
+      const fallbackOffers: Offer[] = [
+        {
+          id: '1',
+          bookId: bookId,
+          title: '20% Off Any Purchase',
+          description: 'Get 20% off your entire bill at any participating restaurant',
+          businessName: 'Local Italian Restaurant',
+          businessLogo: '/api/placeholder/50/50',
+          discountType: 'percentage',
+          discountValue: 20,
+          terms: 'Valid for dine-in only. Cannot be combined with other offers. Expires 12/31/2024.',
+          validUntil: '2024-12-31',
+          category: 'restaurant',
+          heroImage: '/api/placeholder/300/200',
+          isActive: true
+        },
+        {
+          id: '2',
+          bookId: bookId,
+          title: 'Free Appetizer',
+          description: 'Get a free appetizer with any entrée purchase',
+          businessName: 'Downtown Grill',
+          businessLogo: '/api/placeholder/50/50',
+          discountType: 'bogo',
+          discountValue: 100,
+          originalPrice: 15,
+          newPrice: 0,
+          terms: 'Valid for dine-in only. Must purchase entrée. Expires 12/31/2024.',
+          validUntil: '2024-12-31',
+          category: 'restaurant',
+          heroImage: '/api/placeholder/300/200',
+          isActive: true
+        },
+        {
+          id: '3',
+          bookId: bookId,
+          title: '$10 Off $50 Purchase',
+          description: 'Save $10 on any purchase of $50 or more',
+          businessName: 'Fashion Boutique',
+          businessLogo: '/api/placeholder/50/50',
+          discountType: 'fixed',
+          discountValue: 10,
+          originalPrice: 50,
+          newPrice: 40,
+          terms: 'Valid for in-store purchases only. Cannot be combined with other offers.',
+          validUntil: '2024-12-31',
+          category: 'retail',
+          heroImage: '/api/placeholder/300/200',
+          isActive: true
+        }
+      ];
+
+      setBookDetails(fallbackBook);
+      setOffers(fallbackOffers);
+      setFilteredOffers(fallbackOffers);
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    let filtered = offers.filter(offer => offer.isActive);
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(offer =>
+        offer.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        offer.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        offer.businessName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by category
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(offer => offer.category === selectedCategory);
+    }
+
+    setFilteredOffers(filtered);
+  }, [offers, searchTerm, selectedCategory]);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
   const handlePurchase = () => {
-    // Redirect to purchase flow
-    router.push(`/purchase?book=${bookId}`);
+    router.push(`/purchase?book=${bookDetails?.id}`);
   };
 
-  const handleSignup = () => {
-    // Redirect to signup
-    router.push(`/signup`);
+  const handleOfferClick = (offer: Offer) => {
+    setSelectedOffer(offer);
   };
 
-  const handleLogin = () => {
-    // Redirect to login
-    router.push(`/login`);
+  const closeOfferModal = () => {
+    setSelectedOffer(null);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-    setIsAuthenticated(false);
+  const handleGetRedemptionCode = () => {
+    setShowPurchasePrompt(true);
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading preview...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading book preview...</p>
         </div>
       </div>
     );
   }
 
-  if (error || !book) {
+  if (!bookDetails) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Book Not Found</h1>
-          <p className="text-gray-600 mb-6">This coupon book could not be found or may have been removed.</p>
-          <Link 
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Book Not Found</h2>
+          <p className="text-gray-600 mb-6">The book you're looking for doesn't exist.</p>
+          <Link
             href="/"
-            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
           >
-            Go to Homepage
+            Go Home
           </Link>
         </div>
       </div>
@@ -160,52 +378,32 @@ export default function BookPreviewPage({ params }: { params: Promise<{ id: stri
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-gray-600 hover:text-gray-800 mr-4">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Link
+                href="/"
+                className="text-purple-600 hover:text-purple-700"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </Link>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">Book Preview</h1>
-                <p className="text-sm text-gray-600">{book.title}</p>
+                <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Book Preview</h1>
+                <p className="text-sm sm:text-base text-gray-600">{bookDetails.title}</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm text-gray-700">
-                    Welcome, {user?.firstName}!
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="text-sm text-gray-600 hover:text-gray-800"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={handleLogin}
-                    className="text-sm text-gray-600 hover:text-gray-800"
-                  >
-                    Sign In
-                  </button>
-                  <span className="text-gray-400">|</span>
-                  <button
-                    onClick={handleSignup}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    Sign Up
-                  </button>
-                </div>
-              )}
+            <div className="flex space-x-2 sm:space-x-3">
+              <button
+                onClick={handlePurchase}
+                className="bg-purple-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base"
+              >
+                Buy Now - {formatCurrency(bookDetails.price)}
+              </button>
             </div>
           </div>
         </div>
@@ -229,100 +427,78 @@ export default function BookPreviewPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Coupon Book Card */}
-        <div className="group mb-8">
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/30 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
-            {/* Card Header with Organization Logo */}
-            <div className="relative h-32 bg-gray-100">
-              <div className="absolute inset-0 bg-black/5"></div>
-              <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full border border-gray-300 bg-white/80 backdrop-blur-sm text-gray-700">
-                  School
-                </span>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Book Details Section */}
+        <div className="bg-white rounded-xl shadow-sm border mb-8">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Book Details</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="text-sm font-medium text-gray-700">School:</span>
+                <p className="text-gray-900">{bookDetails.school}</p>
               </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 bg-white/80 rounded-full flex items-center justify-center shadow-lg">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
+              <div>
+                <span className="text-sm font-medium text-gray-700">Price:</span>
+                <p className="text-gray-900">{formatCurrency(bookDetails.price)}</p>
               </div>
-              <div className="absolute bottom-4 left-4 right-4">
-                <h3 className="text-lg font-bold text-gray-800 leading-tight bg-white/80 px-2 py-1 rounded">{book.title}</h3>
+              <div>
+                <span className="text-sm font-medium text-gray-700">Offers:</span>
+                <p className="text-gray-900">{bookDetails.offersCount} amazing deals</p>
               </div>
-            </div>
-            
-            <div className="p-6">
-              <p className="text-gray-600 text-sm mb-6 leading-relaxed">{book.description}</p>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center text-sm text-gray-500">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  </div>
-                  {book.school}
-                </div>
-                <div className="flex items-center text-sm text-gray-500">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                    </svg>
-                  </div>
-                  {book.totalOffers} amazing offers
-                </div>
-                <div className="flex items-center text-sm text-gray-500">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  Valid until Dec 30, 2025
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between mt-6">
-                <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  ${(book.price).toFixed(2)}
-                </div>
-                <button
-                  onClick={handlePurchase}
-                  className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  Buy Now
-                </button>
+              <div>
+                <span className="text-sm font-medium text-gray-700">Valid Until:</span>
+                <p className="text-gray-900">Dec 30, 2025</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Call to Action */}
-        <div className="text-center">
-          <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              {isAuthenticated ? 'Ready to Purchase?' : 'Ready to Get Started?'}
-            </h2>
+        {/* Sample Offers Section */}
+        <div className="bg-white rounded-xl shadow-sm border mb-8">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Sample Offers</h2>
+            <div className="space-y-4">
+              {filteredOffers.slice(0, 3).map((offer) => (
+                <div key={offer.id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{offer.businessName} - {offer.title}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{offer.terms}</p>
+                    </div>
+                    <div className="text-right ml-4">
+                      <span className="text-lg font-bold text-green-600">
+                        {offer.discountType === 'percentage' ? `${offer.discountValue}%` : formatCurrency(offer.discountValue)}
+                      </span>
+                      {offer.originalPrice && (
+                        <p className="text-sm text-gray-500 line-through">{formatCurrency(offer.originalPrice)}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Ready to Purchase Section */}
+        <div className="bg-white rounded-xl shadow-sm border">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Ready to Purchase?</h2>
             <p className="text-gray-600 mb-6">
-              {isAuthenticated 
-                ? `Get access to all ${book.totalOffers} amazing offers and support local community initiatives!`
-                : 'Sign up to purchase this coupon book and start saving at local businesses while supporting your school.'
-              }
+              Get access to all {bookDetails.offersCount} amazing offers and support local community initiatives!
             </p>
-            <div className="flex items-center justify-center space-x-4">
+            <div className="flex space-x-4">
               <Link
                 href="/"
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+                className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
               >
-                Back to Marketplace
+                Close Preview
               </Link>
               <button
                 onClick={handlePurchase}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:scale-105"
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                {isAuthenticated ? 'Purchase Now' : 'Sign Up to Buy'}
+                Sign Up to Buy
               </button>
             </div>
           </div>
