@@ -39,7 +39,7 @@ export default function InvitePage() {
           }
         }
         
-        console.log('Loading invite from Supabase...');
+        console.log('Loading invite from Supabase for token:', token);
         // Try to load from Supabase first
         const { data: supabaseInvite, error } = await supabase
           .from('seller_invites')
@@ -47,6 +47,8 @@ export default function InvitePage() {
           .eq('token', token)
           .single();
 
+        console.log('Supabase response:', { data: supabaseInvite, error });
+        
         if (supabaseInvite && !error) {
           console.log('Found invite in Supabase:', supabaseInvite);
           setInvite(supabaseInvite);
@@ -472,7 +474,7 @@ export default function InvitePage() {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to YourCity Deals!</h1>
           <p className="text-lg text-gray-600 max-w-md mx-auto">
-            Hi {invite?.firstName || 'there'}, you've been invited to become a seller!
+            Hi {invite?.first_name || 'there'}, you've been invited to become a seller!
           </p>
         </div>
 
