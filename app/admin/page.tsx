@@ -692,43 +692,59 @@ function ApprovalsTab({
 
   const handleApproveSeller = (invite: any) => {
     if (confirm(`Are you sure you want to approve ${invite.firstName} ${invite.lastName}?`)) {
+      // Generate seller portal credentials
+      const sellerUsername = invite.email;
+      const sellerPassword = Math.random().toString(36).slice(-8); // Generate random 8-character password
+      
       // Update invite status in localStorage
       const updatedInvites = sellerInvites.map((inv: any) => 
-        inv.id === invite.id ? { ...inv, status: 'approved', approvedAt: new Date().toISOString() } : inv
+        inv.id === invite.id ? { 
+          ...inv, 
+          status: 'approved', 
+          approvedAt: new Date().toISOString(),
+          sellerUsername,
+          sellerPassword
+        } : inv
       );
       
       // Save to localStorage
       localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
       setSellerInvites(updatedInvites);
 
-      // Send approval email
-      const approvalLink = `https://yourcitydeals.com/activate/${invite.token}`;
+      // Send approval email with seller portal credentials
+      const sellerPortalLink = `https://yourcitydeals.com/seller`;
       const emailTemplate = `Hi ${invite.firstName},
 
-Great news! Your seller application has been approved! 🎉
+🎉 CONGRATULATIONS! Your seller application has been APPROVED! 🎉
 
-We're excited to welcome you to the YourCity Deals team. You're now ready to start creating and selling deals to help local businesses grow while supporting great causes.
+We're excited to welcome you to the YourCity Deals team! You're now ready to start creating and selling deals to help local businesses grow while supporting great causes.
 
-To get started, please create your account by clicking the link below:
-${approvalLink}
+YOUR SELLER PORTAL CREDENTIALS:
+• Portal URL: ${sellerPortalLink}
+• Username: ${sellerUsername}
+• Password: ${sellerPassword}
 
-This link will take you to a secure page where you can:
-• Set up your password
-• Access your seller dashboard
-• Start creating your first deals
+NEXT STEPS:
+1. Visit the seller portal using the credentials above
+2. Complete your seller profile setup
+3. Start creating your first deals
+4. Connect with local businesses
 
-If you have any questions or need help getting started, please don't hesitate to reach out to us.
+IMPORTANT: Please change your password after your first login for security.
+
+If you have any questions or need help getting started, please don't hesitate to reach out to us at support@yourcitydeals.com.
 
 Welcome to the team!
 
 Best regards,
-The YourCity Deals Team`;
+The YourCity Deals Team
+support@yourcitydeals.com`;
 
-      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Application Approved!')}&body=${encodeURIComponent(emailTemplate)}`;
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('🎉 APPROVED: YourCity Deals Seller Account')}&body=${encodeURIComponent(emailTemplate)}`;
       window.open(mailtoLink, '_blank');
 
       setShowInviteDetails(false);
-      alert('Seller approved! Approval email has been opened.');
+      alert(`Seller approved! Login credentials:\nUsername: ${sellerUsername}\nPassword: ${sellerPassword}\n\nApproval email has been opened.`);
     }
   };
 
@@ -756,16 +772,23 @@ Thank you for your interest in becoming a seller with YourCity Deals.
 
 After careful review of your application, we regret to inform you that we are unable to approve your seller application at this time.
 
-${reason ? `Reason: ${reason}` : 'We appreciate your interest and encourage you to apply again in the future if your circumstances change.'}
+${reason ? `REASON FOR DECISION: ${reason}` : 'We appreciate your interest and encourage you to apply again in the future if your circumstances change.'}
 
-If you have any questions about this decision or would like to discuss it further, please don't hesitate to contact us.
+WHAT THIS MEANS:
+• Your current application will not be processed further
+• You may reapply in the future if your situation changes
+• We encourage you to review our seller requirements on our website
 
-Thank you for your understanding.
+NEXT STEPS:
+If you believe this decision was made in error or if you have additional information to share, please contact us at support@yourcitydeals.com.
+
+We appreciate your understanding and wish you the best in your future endeavors.
 
 Best regards,
-The YourCity Deals Team`;
+The YourCity Deals Team
+support@yourcitydeals.com`;
 
-      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Application Status Update')}&body=${encodeURIComponent(emailTemplate)}`;
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('❌ DECLINED: YourCity Deals Seller Application')}&body=${encodeURIComponent(emailTemplate)}`;
       window.open(mailtoLink, '_blank');
 
       setShowInviteDetails(false);
@@ -792,17 +815,29 @@ Thank you for your interest in becoming a seller with YourCity Deals.
 
 We've reviewed your application and would like you to make some changes before we can approve it.
 
-Requested Changes:
+REQUESTED CHANGES:
 ${editRequest}
 
-Please update your profile with the requested changes and resubmit your application.
+WHAT YOU NEED TO DO:
+1. Review the requested changes above
+2. Update your profile information
+3. Resubmit your application
+4. We'll review your updated application within 24-48 hours
 
-If you have any questions, please don't hesitate to contact us.
+HOW TO UPDATE YOUR PROFILE:
+• Visit: https://yourcitydeals.com/invite/${invite.token}
+• Complete the profile setup with the requested changes
+• Submit your updated application
+
+If you have any questions about the requested changes or need assistance, please contact us at support@yourcitydeals.com.
+
+We look forward to reviewing your updated application!
 
 Best regards,
-The YourCity Deals Team`;
+The YourCity Deals Team
+support@yourcitydeals.com`;
 
-      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Profile Update Requested')}&body=${encodeURIComponent(emailTemplate)}`;
+      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('📝 ACTION REQUIRED: Update YourCity Deals Seller Profile')}&body=${encodeURIComponent(emailTemplate)}`;
       window.open(mailtoLink, '_blank');
 
       setShowInviteDetails(false);
