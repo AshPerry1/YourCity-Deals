@@ -1201,9 +1201,107 @@ The YourCity Deals Team`;
             </div>
 
             <div className="space-y-6">
+              {/* Application Status */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Application Status</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <span className="font-medium text-gray-700">Current Status:</span>
+                      <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        selectedInvite.status === 'pending' ? 'bg-orange-100 text-orange-800' :
+                        selectedInvite.status === 'ready_for_review' ? 'bg-blue-100 text-blue-800' :
+                        selectedInvite.status === 'approved' ? 'bg-green-100 text-green-800' :
+                        selectedInvite.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        selectedInvite.status === 'edit_requested' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {selectedInvite.status === 'pending' ? 'Application Pending' :
+                         selectedInvite.status === 'ready_for_review' ? 'Ready for Review' :
+                         selectedInvite.status === 'approved' ? 'Approved' :
+                         selectedInvite.status === 'rejected' ? 'Rejected' :
+                         selectedInvite.status === 'edit_requested' ? 'Edit Requested' :
+                         selectedInvite.status}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Progress Tracking */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <span className="font-medium text-gray-700">Email Sent:</span>
+                      <p className="text-gray-900">{selectedInvite.emailSent ? 'Yes' : 'No'}</p>
+                      {selectedInvite.sentAt && <p className="text-xs text-gray-500">{new Date(selectedInvite.sentAt).toLocaleString()}</p>}
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <span className="font-medium text-gray-700">Link Clicked:</span>
+                      <p className="text-gray-900">{selectedInvite.linkClicked ? 'Yes' : 'No'}</p>
+                      {selectedInvite.linkClickedAt && <p className="text-xs text-gray-500">{new Date(selectedInvite.linkClickedAt).toLocaleString()}</p>}
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <span className="font-medium text-gray-700">Profile Completed:</span>
+                      <p className="text-gray-900">{selectedInvite.profile_completed_at ? 'Yes' : 'No'}</p>
+                      {selectedInvite.profile_completed_at && <p className="text-xs text-gray-500">{new Date(selectedInvite.profile_completed_at).toLocaleString()}</p>}
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <span className="font-medium text-gray-700">Application Submitted:</span>
+                      <p className="text-gray-900">{selectedInvite.status === 'ready_for_review' ? 'Yes' : 'No'}</p>
+                      {selectedInvite.updated_at && <p className="text-xs text-gray-500">{new Date(selectedInvite.updated_at).toLocaleString()}</p>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Decision History */}
+              {(selectedInvite.status === 'rejected' || selectedInvite.status === 'edit_requested' || selectedInvite.status === 'approved') && (
+                <div>
+                  <h4 className="text-md font-semibold text-gray-900 mb-3">Decision History</h4>
+                  <div className="space-y-3">
+                    {selectedInvite.status === 'rejected' && (
+                      <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <span className="font-medium text-red-700">Rejection Reason:</span>
+                            <p className="text-red-900 mt-1">{selectedInvite.rejectionReason || 'No reason provided'}</p>
+                          </div>
+                          <span className="text-xs text-red-600">{selectedInvite.rejectedAt ? new Date(selectedInvite.rejectedAt).toLocaleDateString() : 'Recently'}</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedInvite.status === 'edit_requested' && (
+                      <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <span className="font-medium text-yellow-700">Edit Request:</span>
+                            <p className="text-yellow-900 mt-1">{selectedInvite.editRequest || 'No specific edits requested'}</p>
+                          </div>
+                          <span className="text-xs text-yellow-600">{selectedInvite.editRequestedAt ? new Date(selectedInvite.editRequestedAt).toLocaleDateString() : 'Recently'}</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedInvite.status === 'approved' && (
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <span className="font-medium text-green-700">Approval Details:</span>
+                            <p className="text-green-900 mt-1">Seller approved with portal access</p>
+                            {selectedInvite.sellerUsername && (
+                              <p className="text-sm text-green-800 mt-1">Username: {selectedInvite.sellerUsername}</p>
+                            )}
+                          </div>
+                          <span className="text-xs text-green-600">{selectedInvite.approvedAt ? new Date(selectedInvite.approvedAt).toLocaleDateString() : 'Recently'}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Basic Info */}
               <div>
-                <h4 className="text-md font-semibold text-gray-900 mb-3">Basic Information</h4>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Submitted Application</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Name</label>
@@ -1222,6 +1320,23 @@ The YourCity Deals Team`;
                     <p className="text-sm text-gray-900">{selectedInvite.zip_code || 'Not provided'}</p>
                   </div>
                 </div>
+                
+                {/* Profile Picture */}
+                {selectedInvite.profile_picture_url && (
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+                    <div className="w-24 h-24 rounded-lg overflow-hidden border">
+                      <img 
+                        src={selectedInvite.profile_picture_url} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/api/placeholder/96/96';
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Current Assignments */}
