@@ -308,6 +308,20 @@ export default function InvitePage() {
           } : inv
         );
         localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+      } else {
+        // If no invites exist, create the array with this invite
+        const newInvite = {
+          ...invite,
+          status: 'ready_for_review',
+          updated_at: new Date().toISOString(),
+          profile_completed_at: new Date().toISOString(),
+          first_name: profileData.firstName,
+          last_name: profileData.lastName,
+          phone: phone,
+          zip_code: profileData.zipCode,
+          profile_picture_url: profileData.profilePicture
+        };
+        localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify([newInvite]));
       }
 
       // Update local state for immediate UI feedback
