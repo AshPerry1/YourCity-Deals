@@ -295,13 +295,32 @@ export default function InvitePage() {
       if (savedInvites) {
         const invites = JSON.parse(savedInvites);
         const updatedInvites = invites.map((inv: any) => 
-          inv.id === invite.id ? { ...inv, status: 'ready_for_review', updated_at: new Date().toISOString() } : inv
+          inv.id === invite.id ? { 
+            ...inv, 
+            status: 'ready_for_review', 
+            updated_at: new Date().toISOString(),
+            profile_completed_at: new Date().toISOString(),
+            first_name: profileData.firstName,
+            last_name: profileData.lastName,
+            phone: phone,
+            zip_code: profileData.zipCode,
+            profile_picture_url: profileData.profilePicture
+          } : inv
         );
         localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
       }
 
       // Update local state for immediate UI feedback
-      const updatedInvite = { ...invite, status: 'ready_for_review' };
+      const updatedInvite = { 
+        ...invite, 
+        status: 'ready_for_review',
+        first_name: profileData.firstName,
+        last_name: profileData.lastName,
+        phone: phone,
+        zip_code: profileData.zipCode,
+        profile_picture_url: profileData.profilePicture,
+        profile_completed_at: new Date().toISOString()
+      };
       setInvite(updatedInvite);
 
       // Sign in the seller
