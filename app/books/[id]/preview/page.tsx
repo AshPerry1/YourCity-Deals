@@ -228,78 +228,10 @@ export default function BookPreviewPage({ params }: { params: Promise<{ id: stri
       
     } catch (error) {
       console.error('Error loading book data:', error);
-      // Fallback to default data if localStorage fails
-      const fallbackBook: BookDetails = {
-        id: bookId,
-        title: 'Lincoln High School 2025 Coupon Book',
-        description: 'Amazing discounts at the best local businesses. Save money while supporting your school!',
-        school: 'Lincoln High School',
-        price: 25,
-        coverImage: '/api/placeholder/300/400',
-        offersCount: 6,
-        isActive: true,
-        category: 'high',
-        rating: 4.8,
-        soldCount: 234,
-        totalValue: 1250,
-        savings: 450
-      };
-
-      const fallbackOffers: Offer[] = [
-        {
-          id: '1',
-          bookId: bookId,
-          title: '20% Off Any Purchase',
-          description: 'Get 20% off your entire bill at any participating restaurant',
-          businessName: 'Local Italian Restaurant',
-          businessLogo: '/api/placeholder/50/50',
-          discountType: 'percentage',
-          discountValue: 20,
-          terms: 'Valid for dine-in only. Cannot be combined with other offers. Expires 12/31/2024.',
-          validUntil: '2024-12-31',
-          category: 'restaurant',
-          heroImage: '/api/placeholder/300/200',
-          isActive: true
-        },
-        {
-          id: '2',
-          bookId: bookId,
-          title: 'Free Appetizer',
-          description: 'Get a free appetizer with any entrée purchase',
-          businessName: 'Downtown Grill',
-          businessLogo: '/api/placeholder/50/50',
-          discountType: 'bogo',
-          discountValue: 100,
-          originalPrice: 15,
-          newPrice: 0,
-          terms: 'Valid for dine-in only. Must purchase entrée. Expires 12/31/2024.',
-          validUntil: '2024-12-31',
-          category: 'restaurant',
-          heroImage: '/api/placeholder/300/200',
-          isActive: true
-        },
-        {
-          id: '3',
-          bookId: bookId,
-          title: '$10 Off $50 Purchase',
-          description: 'Save $10 on any purchase of $50 or more',
-          businessName: 'Fashion Boutique',
-          businessLogo: '/api/placeholder/50/50',
-          discountType: 'fixed',
-          discountValue: 10,
-          originalPrice: 50,
-          newPrice: 40,
-          terms: 'Valid for in-store purchases only. Cannot be combined with other offers.',
-          validUntil: '2024-12-31',
-          category: 'retail',
-          heroImage: '/api/placeholder/300/200',
-          isActive: true
-        }
-      ];
-
-      setBookDetails(fallbackBook);
-      setOffers(fallbackOffers);
-      setFilteredOffers(fallbackOffers);
+      // Show book not found if there's an error
+      setBookDetails(null);
+      setOffers([]);
+      setFilteredOffers([]);
       setLoading(false);
     }
   };

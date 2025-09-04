@@ -25,54 +25,23 @@ export default function AdminPage() {
         if (savedInvites) {
           invites = JSON.parse(savedInvites);
         } else {
-          // Create default invites if none exist
-          const defaultInvites = [
-            {
-              id: '1',
-              token: 'TEST123',
-              first_name: 'John',
-              last_name: 'Doe',
-              email: 'john.doe@example.com',
-              organizationHub: 'Mountain Brook High School',
-              couponBook: 'Birmingham Restaurant Deals',
-              status: 'pending',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            },
-            {
-              id: '2',
-              token: 'TEST456',
-              first_name: 'Jane',
-              last_name: 'Smith',
-              email: 'jane.smith@example.com',
-              organizationHub: 'Lincoln High School',
-              couponBook: 'Lincoln High School 2025 Coupon Book',
-              status: 'ready_for_review',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-          ];
-          localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(defaultInvites));
-          invites = defaultInvites;
+          // Start with empty invites - let user add real people
+          localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify([]));
+          invites = [];
         }
         
         if (savedHubs) {
           hubs = JSON.parse(savedHubs);
         } else {
-          // Create default hubs if none exist
-          const defaultHubs = [
-            { id: '1', name: 'Mountain Brook High School', location: 'Birmingham, AL' },
-            { id: '2', name: 'Lincoln High School', location: 'Lincoln, NE' },
-            { id: '3', name: 'Washington Middle School', location: 'Washington, DC' }
-          ];
-          localStorage.setItem('yourcitydeals_organizational_hubs', JSON.stringify(defaultHubs));
-          hubs = defaultHubs;
+          // Start with empty hubs - let user add real organizations
+          localStorage.setItem('yourcitydeals_organizational_hubs', JSON.stringify([]));
+          hubs = [];
         }
         
         if (savedBooks) {
           books = JSON.parse(savedBooks);
         } else {
-          // Create default books if none exist
+          // Keep mock books for testing preview functionality
           const defaultBooks = [
             { id: '1', title: 'Birmingham Restaurant Deals', school: 'Mountain Brook High School' },
             { id: '2', title: 'Lincoln High School 2025 Coupon Book', school: 'Lincoln High School' },
