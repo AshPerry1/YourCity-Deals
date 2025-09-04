@@ -52,14 +52,24 @@ const createMockClient = () => {
 const isValidUrl = (url: string) => {
   try {
     new URL(url);
-    return !url.includes('your_supabase_project_url') && !url.includes('your_supabase_anon_key');
+    return true; // Always return true if URL is valid
   } catch {
     return false;
   }
 };
 
 // Use real Supabase client if environment variables are available and valid, otherwise use mock
-export const supabase = (supabaseUrl && supabaseAnonKey && isValidUrl(supabaseUrl)) 
+const useRealClient = (supabaseUrl && supabaseAnonKey && isValidUrl(supabaseUrl));
+
+console.log('Supabase Client Configuration:', {
+  hasUrl: !!supabaseUrl,
+  hasAnonKey: !!supabaseAnonKey,
+  isValidUrl: supabaseUrl ? isValidUrl(supabaseUrl) : false,
+  usingRealClient: useRealClient,
+  url: supabaseUrl
+});
+
+export const supabase = useRealClient
   ? createClient(supabaseUrl, supabaseAnonKey)
   : createMockClient();
 
