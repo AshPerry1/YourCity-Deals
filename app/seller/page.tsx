@@ -245,7 +245,7 @@ export default function SellerDashboard() {
                 <div className="mt-4 p-4 bg-orange-100 rounded-lg">
                   <h4 className="text-orange-900 font-semibold mb-2">Requested Changes:</h4>
                   <p className="text-orange-800 text-sm">
-                    {sellerData.editRequest || 'Please review your profile information and make any necessary updates.'}
+                    {(sellerData as any).editRequest || 'Please review your profile information and make any necessary updates.'}
                   </p>
                 </div>
                 <div className="mt-4">
