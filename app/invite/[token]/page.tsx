@@ -290,7 +290,7 @@ export default function InvitePage() {
         first_name: profileData.firstName,
         last_name: profileData.lastName,
         email: invite.email,
-        phone: phone,
+        phone: phone || null, // Ensure phone is null if empty
         zip_code: profileData.zipCode,
         profile_picture_url: profileData.profilePicture,
         status: 'ready_for_review' as const,
@@ -310,6 +310,19 @@ export default function InvitePage() {
 
       if (profileError) {
         console.error('Error saving profile to Supabase:', profileError);
+        console.error('Error details:', {
+          code: profileError.code,
+          message: profileError.message,
+          details: profileError.details,
+          hint: profileError.hint
+        });
+        
+        // Check if it's a phone number constraint error
+        if (profileError.message && profileError.message.includes('phone')) {
+          alert('This phone number is already in use. Please use a different phone number or contact support.');
+          return;
+        }
+        
         throw profileError;
       }
 
