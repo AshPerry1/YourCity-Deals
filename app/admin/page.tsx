@@ -108,7 +108,9 @@ export default function AdminPage() {
     // Generate a unique token for each invite
     const timestamp = Date.now().toString(36);
     const random = Math.random().toString(36).substring(2, 8);
-    return `${timestamp}${random}`.toUpperCase();
+    const token = `${timestamp}${random}`.toUpperCase();
+    console.log('Generated unique token:', token);
+    return token;
   };
 
   // Handle creating new invite
@@ -131,6 +133,7 @@ export default function AdminPage() {
     }
 
     const inviteToken = generateInviteToken();
+    console.log('Creating invite with token:', inviteToken);
     const newInvite = {
       token: inviteToken,
       first_name: inviteForm.firstName,
