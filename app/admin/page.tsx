@@ -96,6 +96,36 @@ export default function AdminPage() {
                 )}
               </div>
             </button>
+            <button
+              onClick={() => setActiveTab('merchants')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'merchants'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <span>Add Merchant</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('books')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'books'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <span>Add Book</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('organizations')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${
+                activeTab === 'organizations'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <span>Add Organization</span>
+            </button>
           </nav>
         </div>
       </div>
@@ -114,6 +144,9 @@ export default function AdminPage() {
           organizationalHubs={organizationalHubs}
           couponBooks={couponBooks}
         />}
+        {activeTab === 'merchants' && <MerchantsTab />}
+        {activeTab === 'books' && <BooksTab />}
+        {activeTab === 'organizations' && <OrganizationsTab />}
       </div>
     </div>
   );
@@ -1115,6 +1148,51 @@ The YourCity Deals Team`;
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// Merchants Tab Component
+function MerchantsTab() {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Add Merchant</h2>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <p className="text-gray-600">Merchant management functionality coming soon...</p>
+      </div>
+    </div>
+  );
+}
+
+// Books Tab Component
+function BooksTab() {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Add Book</h2>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <p className="text-gray-600">Coupon book management functionality coming soon...</p>
+      </div>
+    </div>
+  );
+}
+
+// Organizations Tab Component
+function OrganizationsTab() {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-gray-900">Add Organization</h2>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <p className="text-gray-600">Organization management functionality coming soon...</p>
+      </div>
     </div>
   );
 }
