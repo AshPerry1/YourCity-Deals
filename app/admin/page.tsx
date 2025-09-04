@@ -45,16 +45,9 @@ export default function AdminPage() {
           console.log('Total invites loaded:', invites?.length || 0);
           console.log('Current state has:', sellerInvites.length, 'invites');
           
-          // Only update if we have more invites than current state
-          if (invites && invites.length > sellerInvites.length) {
-            console.log('New invites detected, updating state...');
-            setSellerInvites(invites || []);
-          } else if (invites && invites.length === sellerInvites.length) {
-            console.log('No new invites, keeping current state');
-          } else {
-            console.log('Using Supabase data (first load or fallback)');
-            setSellerInvites(invites || []);
-          }
+          // Always use Supabase data - it's the source of truth
+          console.log('Updating state with Supabase data');
+          setSellerInvites(invites || []);
         }
 
         // Load organizational hubs from Supabase
@@ -94,9 +87,10 @@ export default function AdminPage() {
 
     loadDashboardData();
     
-    // Disable auto-refresh for now to prevent overwriting local state
-    // const interval = setInterval(loadDashboardData, 10000);
-    // return () => clearInterval(interval);
+    // Re-enable auto-refresh to get updates from Supabase
+    const interval = setInterval(loadDashboardData, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // Move loadDashboardData outside useEffect so it can be used by the refresh button
@@ -120,16 +114,9 @@ export default function AdminPage() {
         console.log('Total invites loaded:', invites?.length || 0);
         console.log('Current state has:', sellerInvites.length, 'invites');
         
-        // Only update if we have more invites than current state
-        if (invites && invites.length > sellerInvites.length) {
-          console.log('New invites detected, updating state...');
-          setSellerInvites(invites || []);
-        } else if (invites && invites.length === sellerInvites.length) {
-          console.log('No new invites, keeping current state');
-        } else {
-          console.log('Using Supabase data (first load or fallback)');
-          setSellerInvites(invites || []);
-        }
+        // Always use Supabase data - it's the source of truth
+        console.log('Updating state with Supabase data');
+        setSellerInvites(invites || []);
       }
 
       // Load organizational hubs from Supabase
