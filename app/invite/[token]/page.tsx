@@ -59,9 +59,9 @@ export default function InvitePage() {
           console.log('TEST123 token detected, creating fallback invite');
           const fallbackInvite = {
             id: 'test-invite',
-            first_name: 'John',
-            last_name: 'Seller',
-            email: 'john@example.com',
+            first_name: 'Ash',
+            last_name: 'Perry',
+            email: 'adperry18@gmail.com',
             token: 'TEST123',
             status: 'pending',
             organizationHub: 'Mountain Brook High School',
@@ -267,7 +267,7 @@ export default function InvitePage() {
       console.log('Creating profile data to save...');
       // Create or update seller profile in localStorage
       const profileDataToSave = {
-        invite_id: invite.id,
+        invite_id: invite.id || 'test-invite',
         first_name: profileData.firstName,
         last_name: profileData.lastName,
         email: invite.email,
