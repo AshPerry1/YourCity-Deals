@@ -92,9 +92,9 @@ export default function AdminPage() {
 
   // Filter invites based on search and filters
   const filteredInvites = sellerInvites.filter((invite: any) => {
-    // Only show pending invites (not ready_for_review, approved, rejected, etc.)
-    const isPending = invite.status === 'pending';
-    return isPending;
+    // Show all invites for now (pending, ready_for_review, etc.)
+    console.log('Filtering invite:', invite.id, invite.status, invite.first_name, invite.email);
+    return true; // Show all invites
   });
 
   // Get ready for review invites for the Approvals tab
@@ -194,6 +194,8 @@ export default function AdminPage() {
     const updatedInvites = [...sellerInvites, savedInvite];
     localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
     setSellerInvites(updatedInvites);
+    
+    console.log('Updated sellerInvites state:', updatedInvites);
 
     // Send initial email
     const emailTemplate = `Hi ${inviteForm.firstName},
