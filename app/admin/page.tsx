@@ -266,8 +266,10 @@ function InvitesTab({
   });
 
   const generateInviteToken = () => {
-    // For testing, always use TEST123
-    return 'TEST123';
+    // Generate a unique token for each invite
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substring(2, 8);
+    return `${timestamp}${random}`.toUpperCase();
   };
 
   const handleCreateInvite = () => {
@@ -691,7 +693,7 @@ function ApprovalsTab({
   };
 
   const handleApproveSeller = (invite: any) => {
-    if (confirm(`Are you sure you want to approve ${invite.firstName} ${invite.lastName}?`)) {
+    if (confirm(`Are you sure you want to approve ${invite.first_name} ${invite.last_name}?`)) {
       // Generate seller portal credentials
       const sellerUsername = invite.email;
       const sellerPassword = Math.random().toString(36).slice(-8); // Generate random 8-character password
@@ -713,7 +715,7 @@ function ApprovalsTab({
 
       // Send approval email with seller portal credentials
       const sellerPortalLink = `https://yourcitydeals.com/seller`;
-      const emailTemplate = `Hi ${invite.firstName},
+      const emailTemplate = `Hi ${invite.first_name},
 
 🎉 CONGRATULATIONS! Your seller application has been APPROVED! 🎉
 
@@ -750,7 +752,7 @@ support@yourcitydeals.com`;
 
   const handleRejectSeller = (invite: any) => {
     const reason = prompt('Please provide a reason for rejection (optional):');
-    if (confirm(`Are you sure you want to reject ${invite.firstName} ${invite.lastName}?`)) {
+    if (confirm(`Are you sure you want to reject ${invite.first_name} ${invite.last_name}?`)) {
       // Update invite status in localStorage
       const updatedInvites = sellerInvites.map((inv: any) => 
         inv.id === invite.id ? { 
@@ -766,7 +768,7 @@ support@yourcitydeals.com`;
       setSellerInvites(updatedInvites);
 
       // Send rejection email
-      const emailTemplate = `Hi ${invite.firstName},
+      const emailTemplate = `Hi ${invite.first_name},
 
 Thank you for your interest in becoming a seller with YourCity Deals.
 
@@ -809,7 +811,7 @@ support@yourcitydeals.com`;
       setSellerInvites(updatedInvites);
 
       // Send edit request email
-      const emailTemplate = `Hi ${invite.firstName},
+      const emailTemplate = `Hi ${invite.first_name},
 
 Thank you for your interest in becoming a seller with YourCity Deals.
 
