@@ -956,6 +956,21 @@ support@yourcitydeals.com`;
     setPendingEmail(null);
   };
 
+  const handleDeleteInvite = (invite: any) => {
+    if (confirm(`Are you sure you want to delete ${invite.first_name} ${invite.last_name}? This will permanently remove all their data and cannot be undone.`)) {
+      // Remove the invite from localStorage
+      const updatedInvites = sellerInvites.filter((inv: any) => inv.id !== invite.id);
+      localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+      setSellerInvites(updatedInvites);
+      
+      // Close the modal
+      setShowInviteDetails(false);
+      setSelectedInvite(null);
+      
+      alert('Seller invite deleted successfully. You can now create a new invite with the same data for testing.');
+    }
+  };
+
   const handleEditProfile = (invite: any) => {
     setEditingInvite(invite);
     setEditForm({
@@ -1031,6 +1046,21 @@ The YourCity Deals Team`;
             </div>
           )}
         </div>
+        {readyForReviewInvites.length > 0 && (
+          <button
+            onClick={() => {
+              if (confirm(`Are you sure you want to delete ALL ${readyForReviewInvites.length} seller invites? This cannot be undone.`)) {
+                const updatedInvites = sellerInvites.filter((inv: any) => inv.status !== 'ready_for_review');
+                localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+                setSellerInvites(updatedInvites);
+                alert('All seller invites have been deleted. You can now create new invites for testing.');
+              }
+            }}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm"
+          >
+            Clear All
+          </button>
+        )}
       </div>
 
       {/* Notification Banner */}
@@ -1190,9 +1220,15 @@ The YourCity Deals Team`;
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button 
                         onClick={() => handleViewDetails(invite)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-blue-600 hover:text-blue-900 mr-3"
                       >
                         Review
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteInvite(invite)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
                       </button>
                     </td>
                   </tr>
@@ -1410,6 +1446,12 @@ The YourCity Deals Team`;
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
                   >
                     Close
+                  </button>
+                  <button
+                    onClick={() => handleDeleteInvite(selectedInvite)}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    Delete Invite
                   </button>
                 </div>
               </div>
