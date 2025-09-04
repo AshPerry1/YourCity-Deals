@@ -249,10 +249,10 @@ export const couponBooksService = {
   // Get all active books
   async getActiveBooks(): Promise<CouponBook[]> {
     const { data, error } = await supabase
-      .from('coupon_books')
+      .from('admin_coupon_books')
       .select('*')
       .eq('is_active', true)
-      .order('name');
+      .order('title');
 
     if (error) {
       console.error('Error getting books:', error);

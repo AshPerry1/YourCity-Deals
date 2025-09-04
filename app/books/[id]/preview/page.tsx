@@ -304,337 +304,85 @@ function BookPreviewContent() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Book Overview */}
-        <div className="bg-white rounded-xl shadow-sm border mb-8">
-          <div className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-              <div className="lg:col-span-1">
-                <div className="w-full h-48 sm:h-64 bg-gray-100 rounded-lg flex items-center justify-center relative">
-                  <div className="absolute inset-0 bg-black/5"></div>
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white/80 rounded-full flex items-center justify-center shadow-lg relative z-10">
-                    <svg className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <div className="lg:col-span-2">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{bookDetails.title}</h2>
-                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">{bookDetails.description}</p>
-                
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-gray-900">{bookDetails.offersCount}</p>
-                    <p className="text-sm text-gray-600">Total Offers</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-gray-900">{formatCurrency(bookDetails.totalValue)}</p>
-                    <p className="text-sm text-gray-600">Total Value</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-green-600">{formatCurrency(bookDetails.savings)}</p>
-                    <p className="text-sm text-gray-600">Total Savings</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-gray-900">{bookDetails.soldCount}</p>
-                    <p className="text-sm text-gray-600">Books Sold</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <svg
-                        key={i}
-                        className={`w-5 h-5 ${i < Math.floor(bookDetails.rating) ? 'text-yellow-400' : 'text-gray-300'}`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                    <span className="ml-2 text-sm text-gray-600">({bookDetails.rating})</span>
-                  </div>
-                  <span className="text-sm text-gray-500">•</span>
-                  <span className="text-sm text-gray-500">{bookDetails.category}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Search and Filters */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Book Details Section */}
         <div className="bg-white rounded-xl shadow-sm border mb-8">
           <div className="p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-              <div className="flex-1 max-w-md">
-                <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
-                  Search Offers
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    id="search"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by offer, business, or description..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                  <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Book Details</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="text-sm font-medium text-gray-700">School:</span>
+                <p className="text-gray-900">{bookDetails.school}</p>
               </div>
-
-              <div className="flex items-center space-x-4">
-                <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
-                  </label>
-                  <select
-                    id="category"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  >
-                    {categories.map(category => (
-                      <option key={category} value={category}>
-                        {category === 'all' ? 'All Categories' : category.charAt(0).toUpperCase() + category.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                    </svg>
-                  </button>
-                </div>
+              <div>
+                <span className="text-sm font-medium text-gray-700">Price:</span>
+                <p className="text-gray-900">{formatCurrency(bookDetails.price)}</p>
               </div>
-            </div>
-
-            <div className="mt-4 text-sm text-gray-600">
-              Showing {filteredOffers.length} of {offers.length} offers
+              <div>
+                <span className="text-sm font-medium text-gray-700">Offers:</span>
+                <p className="text-gray-900">{bookDetails.offersCount} amazing deals</p>
+              </div>
+              <div>
+                <span className="text-sm font-medium text-gray-700">Valid Until:</span>
+                <p className="text-gray-900">Dec 30, 2025</p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Offers Grid/List */}
-        {filteredOffers.length === 0 ? (
-          <div className="text-center py-12">
-            <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No offers found</h3>
-            <p className="text-gray-600">Try adjusting your search or filters</p>
+        {/* Sample Offers Section */}
+        <div className="bg-white rounded-xl shadow-sm border mb-8">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Sample Offers</h2>
+            <div className="space-y-4">
+              {filteredOffers.slice(0, 3).map((offer) => (
+                <div key={offer.id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{offer.businessName} - {offer.title}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{offer.terms}</p>
+                    </div>
+                    <div className="text-right ml-4">
+                      <span className="text-lg font-bold text-green-600">
+                        {offer.discountType === 'percentage' ? `${offer.discountValue}%` : formatCurrency(offer.discountValue)}
+                      </span>
+                      {offer.originalPrice && (
+                        <p className="text-sm text-gray-500 line-through">{formatCurrency(offer.originalPrice)}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        ) : (
-          <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
-            {filteredOffers.map((offer) => (
-              <div
-                key={offer.id}
-                onClick={() => handleOfferClick(offer)}
-                className={`bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow cursor-pointer ${
-                  viewMode === 'list' ? 'flex items-center p-6' : 'p-6'
-                }`}
+        </div>
+
+        {/* Ready to Purchase Section */}
+        <div className="bg-white rounded-xl shadow-sm border">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Ready to Purchase?</h2>
+            <p className="text-gray-600 mb-6">
+              Get access to all {bookDetails.offersCount} amazing offers and support local community initiatives!
+            </p>
+            <div className="flex space-x-4">
+              <Link
+                href="/"
+                className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
               >
-                {viewMode === 'grid' ? (
-                  <>
-                    <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center relative">
-                      <div className="absolute inset-0 bg-black/5"></div>
-                      <div className="w-16 h-16 bg-white/80 rounded-full flex items-center justify-center shadow-lg relative z-10">
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{offer.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{offer.description}</p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-gray-900">{offer.businessName}</p>
-                        <p className="text-sm text-gray-500">{offer.category}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-green-600">
-                          {offer.discountType === 'percentage' ? `${offer.discountValue}%` : formatCurrency(offer.discountValue)}
-                        </p>
-                        {offer.originalPrice && (
-                          <p className="text-sm text-gray-500 line-through">{formatCurrency(offer.originalPrice)}</p>
-                        )}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 relative">
-                      <div className="absolute inset-0 bg-black/5"></div>
-                      <div className="w-12 h-12 bg-white/80 rounded-full flex items-center justify-center shadow-lg relative z-10">
-                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="ml-6 flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{offer.title}</h3>
-                      <p className="text-gray-600 text-sm mb-2">{offer.description}</p>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">{offer.businessName}</p>
-                          <p className="text-sm text-gray-500">{offer.category}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-green-600">
-                            {offer.discountType === 'percentage' ? `${offer.discountValue}%` : formatCurrency(offer.discountValue)}
-                          </p>
-                          {offer.originalPrice && (
-                            <p className="text-sm text-gray-500 line-through">{formatCurrency(offer.originalPrice)}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Purchase CTA */}
-        <div className="mt-8 bg-white rounded-xl shadow-sm border p-8 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to Start Saving?</h3>
-          <p className="text-gray-600 mb-6">
-            Purchase this book for {formatCurrency(bookDetails.price)} and get access to all {bookDetails.offersCount} offers with unique redemption codes.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={handlePurchase}
-              className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors text-lg font-semibold"
-            >
-              Buy Now - {formatCurrency(bookDetails.price)}
-            </button>
-            <Link
-              href="/"
-              className="bg-gray-100 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-200 transition-colors text-lg font-semibold"
-            >
-              Browse Other Books
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Offer Detail Modal */}
-      {selectedOffer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">{selectedOffer.title}</h2>
-                <button
-                  onClick={closeOfferModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="w-full h-48 bg-gray-100 rounded-lg mb-6 flex items-center justify-center relative">
-                <div className="absolute inset-0 bg-black/5"></div>
-                <div className="w-20 h-20 bg-white/80 rounded-full flex items-center justify-center shadow-lg relative z-10">
-                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
-                  <p className="text-gray-600">{selectedOffer.description}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Business</h3>
-                    <p className="text-gray-600">{selectedOffer.businessName}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Category</h3>
-                    <p className="text-gray-600 capitalize">{selectedOffer.category}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Discount</h3>
-                    <p className="text-2xl font-bold text-green-600">
-                      {selectedOffer.discountType === 'percentage' ? `${selectedOffer.discountValue}%` : formatCurrency(selectedOffer.discountValue)}
-                    </p>
-                    {selectedOffer.originalPrice && (
-                      <p className="text-sm text-gray-500 line-through">{formatCurrency(selectedOffer.originalPrice)}</p>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Valid Until</h3>
-                    <p className="text-gray-600">{selectedOffer.validUntil}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Terms & Conditions</h3>
-                  <p className="text-gray-600 text-sm">{selectedOffer.terms}</p>
-                </div>
-
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <div className="flex">
-                    <svg className="h-5 w-5 text-yellow-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    <div className="ml-3">
-                      <p className="text-sm text-yellow-700">
-                        <strong>Preview Mode:</strong> Purchase the book to get your unique redemption code for this offer.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 flex space-x-4">
-                <button
-                  onClick={closeOfferModal}
-                  className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={handlePurchase}
-                  className="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  Purchase Book to Get Redemption Code
-                </button>
-              </div>
+                Close Preview
+              </Link>
+              <button
+                onClick={handlePurchase}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Sign Up to Buy
+              </button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
+         </div>
+       </div>
+     </div>
+   );
 }
 
 export default function BookPreview() {

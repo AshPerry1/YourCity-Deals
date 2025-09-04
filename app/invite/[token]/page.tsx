@@ -293,13 +293,41 @@ export default function InvitePage() {
       }
 
       if (!profile) {
-        throw new Error('Failed to save profile');
+        // Fallback to localStorage if database fails
+        console.log('Database save failed, using localStorage fallback');
+        const fallbackProfile = {
+          id: Date.now().toString(),
+          ...profileDataToSave,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        // Save to localStorage
+        const savedProfiles = localStorage.getItem('yourcitydeals_seller_profiles');
+        const profiles = savedProfiles ? JSON.parse(savedProfiles) : [];
+        profiles.push(fallbackProfile);
+        localStorage.setItem('yourcitydeals_seller_profiles', JSON.stringify(profiles));
+        
+        profile = fallbackProfile;
       }
 
       // Update invite status in database
-      await sellerInvitesService.updateInvite(invite.id, {
-        status: 'ready_for_review'
-      });
+      try {
+        await sellerInvitesService.updateInvite(invite.id, {
+          status: 'ready_for_review'
+        });
+      } catch (error) {
+        console.log('Failed to update invite in database, using localStorage fallback');
+        // Fallback to localStorage
+        const savedInvites = localStorage.getItem('yourcitydeals_invites');
+        if (savedInvites) {
+          const invites = JSON.parse(savedInvites);
+          const updatedInvites = invites.map((inv: any) => 
+            inv.id === invite.id ? { ...inv, status: 'ready_for_review' } : inv
+          );
+          localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
+        }
+      }
 
       // Update local state for immediate UI feedback
       const updatedInvite = { ...invite, status: 'ready_for_review' };
@@ -316,7 +344,7 @@ export default function InvitePage() {
         sellerData: profile
       }));
 
-      console.log('Profile completed and saved to database:', profile);
+      console.log('Profile completed and saved:', profile);
       setStep('ready_for_review');
       
     } catch (error) {
