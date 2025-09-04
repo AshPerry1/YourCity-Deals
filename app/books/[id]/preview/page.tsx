@@ -1,380 +1,162 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-interface Offer {
-  id: string;
-  bookId: string;
-  title: string;
-  description: string;
-  businessName: string;
-  businessLogo: string;
-  discountType: 'percentage' | 'fixed' | 'bogo';
-  discountValue: number;
-  originalPrice?: number;
-  newPrice?: number;
-  terms: string;
-  validUntil: string;
-  category: string;
-  heroImage: string;
-  isActive: boolean;
-}
-
-interface BookDetails {
+interface CouponBook {
   id: string;
   title: string;
   description: string;
-  school: string;
   price: number;
-  coverImage: string;
-  offersCount: number;
-  isActive: boolean;
-  category: string;
-  rating: number;
-  soldCount: number;
-  totalValue: number;
-  savings: number;
+  school: string;
+  totalOffers: number;
+  validFrom: string;
+  validTo: string;
+  coverImage?: string;
+  featured: boolean;
+  category: 'elementary' | 'middle' | 'high' | 'community';
+  purchased: boolean;
+  purchaseDate?: string;
 }
 
-function BookPreviewContent() {
-  const router = useRouter();
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const bookId = params.id as string;
-  const refCode = searchParams.get('ref');
-  
-  const [bookDetails, setBookDetails] = useState<BookDetails | null>(null);
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [filteredOffers, setFilteredOffers] = useState<Offer[]>([]);
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+}
+
+export default function BookPreviewPage({ params }: { params: Promise<{ id: string }> }) {
+  const [book, setBook] = useState<CouponBook | null>(null);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
-  const [showPurchasePrompt, setShowPurchasePrompt] = useState(false);
-
-  const categories = ['all', 'restaurant', 'retail', 'entertainment', 'services', 'health'];
+  const [error, setError] = useState<string | null>(null);
+  const [bookId, setBookId] = useState<string>('');
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    // Load book and offers data from localStorage or use default data
-    const loadBookData = () => {
-      try {
-        // Try to load from localStorage first
-        const savedBooks = localStorage.getItem('yourcitydeals_books');
-        const savedOffers = localStorage.getItem('yourcitydeals_offers');
-        
-        if (savedBooks && savedOffers) {
-          const books = JSON.parse(savedBooks);
-          const offers = JSON.parse(savedOffers);
-          
-          // Find the specific book by ID
-          const book = books.find((b: BookDetails) => b.id === bookId);
-          const bookOffers = offers.filter((o: Offer) => o.bookId === bookId);
-          
-          if (book && bookOffers.length > 0) {
-            setBookDetails(book);
-            setOffers(bookOffers);
-            setFilteredOffers(bookOffers);
-            setLoading(false);
-            return;
-          }
-        }
-        
-        // If no localStorage data or book not found, use default data and save it
-        const defaultBook: BookDetails = {
-          id: bookId,
-          title: 'Birmingham Restaurant Deals',
-          description: 'Amazing discounts at the best local restaurants in Birmingham. Save money while supporting local businesses!',
-          school: 'Mountain Brook High School',
-          price: 25,
-          coverImage: '/api/placeholder/300/400',
-          offersCount: 6,
-          isActive: true,
-          category: 'restaurant',
-          rating: 4.8,
-          soldCount: 234,
-          totalValue: 1250,
-          savings: 450
-        };
-
-        const defaultOffers: Offer[] = [
-          {
-            id: '1',
-            bookId: bookId,
-            title: '20% Off Any Purchase',
-            description: 'Get 20% off your entire bill at any participating restaurant',
-            businessName: 'Local Italian Restaurant',
-            businessLogo: '/api/placeholder/50/50',
-            discountType: 'percentage',
-            discountValue: 20,
-            terms: 'Valid for dine-in only. Cannot be combined with other offers. Expires 12/31/2024.',
-            validUntil: '2024-12-31',
-            category: 'restaurant',
-            heroImage: '/api/placeholder/300/200',
-            isActive: true
-          },
-          {
-            id: '2',
-            bookId: bookId,
-            title: 'Free Appetizer',
-            description: 'Get a free appetizer with any entrée purchase',
-            businessName: 'Downtown Grill',
-            businessLogo: '/api/placeholder/50/50',
-            discountType: 'bogo',
-            discountValue: 100,
-            originalPrice: 15,
-            newPrice: 0,
-            terms: 'Valid for dine-in only. Must purchase entrée. Expires 12/31/2024.',
-            validUntil: '2024-12-31',
-            category: 'restaurant',
-            heroImage: '/api/placeholder/300/200',
-            isActive: true
-          },
-          {
-            id: '3',
-            bookId: bookId,
-            title: '$10 Off $50 Purchase',
-            description: 'Save $10 on any purchase of $50 or more',
-            businessName: 'Fashion Boutique',
-            businessLogo: '/api/placeholder/50/50',
-            discountType: 'fixed',
-            discountValue: 10,
-            originalPrice: 50,
-            newPrice: 40,
-            terms: 'Valid for in-store purchases only. Cannot be combined with other offers.',
-            validUntil: '2024-12-31',
-            category: 'retail',
-            heroImage: '/api/placeholder/300/200',
-            isActive: true
-          },
-          {
-            id: '4',
-            bookId: bookId,
-            title: 'Buy One Get One Free',
-            description: 'Buy any item and get the second one free',
-            businessName: 'Movie Theater',
-            businessLogo: '/api/placeholder/50/50',
-            discountType: 'bogo',
-            discountValue: 100,
-            originalPrice: 12,
-            newPrice: 12,
-            terms: 'Valid for movie tickets only. Cannot be combined with other offers.',
-            validUntil: '2024-12-31',
-            category: 'entertainment',
-            heroImage: '/api/placeholder/300/200',
-            isActive: true
-          },
-          {
-            id: '5',
-            bookId: bookId,
-            title: '50% Off First Session',
-            description: 'Get 50% off your first tutoring session',
-            businessName: 'Academic Excellence',
-            businessLogo: '/api/placeholder/50/50',
-            discountType: 'percentage',
-            discountValue: 50,
-            originalPrice: 60,
-            newPrice: 30,
-            terms: 'Valid for first-time customers only. Must book in advance.',
-            validUntil: '2024-12-31',
-            category: 'services',
-            heroImage: '/api/placeholder/300/200',
-            isActive: true
-          },
-          {
-            id: '6',
-            bookId: bookId,
-            title: 'Free Gym Membership',
-            description: 'Get one month of free gym membership',
-            businessName: 'Fitness Center',
-            businessLogo: '/api/placeholder/50/50',
-            discountType: 'fixed',
-            discountValue: 50,
-            originalPrice: 50,
-            newPrice: 0,
-            terms: 'Valid for new members only. Must sign up for at least 3 months.',
-            validUntil: '2024-12-31',
-            category: 'health',
-            heroImage: '/api/placeholder/300/200',
-            isActive: true
-          }
-        ];
-
-        // Save to localStorage
-        const existingBooks = savedBooks ? JSON.parse(savedBooks) : [];
-        const existingOffers = savedOffers ? JSON.parse(savedOffers) : [];
-        
-        // Check if book already exists, if not add it
-        const bookExists = existingBooks.some((b: BookDetails) => b.id === bookId);
-        if (!bookExists) {
-          existingBooks.push(defaultBook);
-          localStorage.setItem('yourcitydeals_books', JSON.stringify(existingBooks));
-        }
-        
-        // Check if offers already exist, if not add them
-        const offersExist = existingOffers.some((o: Offer) => o.bookId === bookId);
-        if (!offersExist) {
-          existingOffers.push(...defaultOffers);
-          localStorage.setItem('yourcitydeals_offers', JSON.stringify(existingOffers));
-        }
-
-        setBookDetails(defaultBook);
-        setOffers(defaultOffers);
-        setFilteredOffers(defaultOffers);
-        setLoading(false);
-        
-      } catch (error) {
-        console.error('Error loading book data:', error);
-        // Fallback to default data if localStorage fails
-        const fallbackBook: BookDetails = {
-          id: bookId,
-          title: 'Birmingham Restaurant Deals',
-          description: 'Amazing discounts at the best local restaurants in Birmingham. Save money while supporting local businesses!',
-          school: 'Mountain Brook High School',
-          price: 25,
-          coverImage: '/api/placeholder/300/400',
-          offersCount: 6,
-          isActive: true,
-          category: 'restaurant',
-          rating: 4.8,
-          soldCount: 234,
-          totalValue: 1250,
-          savings: 450
-        };
-
-        const fallbackOffers: Offer[] = [
-          {
-            id: '1',
-            bookId: bookId,
-            title: '20% Off Any Purchase',
-            description: 'Get 20% off your entire bill at any participating restaurant',
-            businessName: 'Local Italian Restaurant',
-            businessLogo: '/api/placeholder/50/50',
-            discountType: 'percentage',
-            discountValue: 20,
-            terms: 'Valid for dine-in only. Cannot be combined with other offers. Expires 12/31/2024.',
-            validUntil: '2024-12-31',
-            category: 'restaurant',
-            heroImage: '/api/placeholder/300/200',
-            isActive: true
-          },
-          {
-            id: '2',
-            bookId: bookId,
-            title: 'Free Appetizer',
-            description: 'Get a free appetizer with any entrée purchase',
-            businessName: 'Downtown Grill',
-            businessLogo: '/api/placeholder/50/50',
-            discountType: 'bogo',
-            discountValue: 100,
-            originalPrice: 15,
-            newPrice: 0,
-            terms: 'Valid for dine-in only. Must purchase entrée. Expires 12/31/2024.',
-            validUntil: '2024-12-31',
-            category: 'restaurant',
-            heroImage: '/api/placeholder/300/200',
-            isActive: true
-          },
-          {
-            id: '3',
-            bookId: bookId,
-            title: '$10 Off $50 Purchase',
-            description: 'Save $10 on any purchase of $50 or more',
-            businessName: 'Fashion Boutique',
-            businessLogo: '/api/placeholder/50/50',
-            discountType: 'fixed',
-            discountValue: 10,
-            originalPrice: 50,
-            newPrice: 40,
-            terms: 'Valid for in-store purchases only. Cannot be combined with other offers.',
-            validUntil: '2024-12-31',
-            category: 'retail',
-            heroImage: '/api/placeholder/300/200',
-            isActive: true
-          }
-        ];
-
-        setBookDetails(fallbackBook);
-        setOffers(fallbackOffers);
-        setFilteredOffers(fallbackOffers);
-        setLoading(false);
-      }
+    // Handle async params
+    const getParams = async () => {
+      const resolvedParams = await params;
+      setBookId(resolvedParams.id);
+      checkAuthStatus();
+      fetchBookData(resolvedParams.id);
     };
+    getParams();
+  }, [params]);
 
-    loadBookData();
-  }, [bookId]);
-
-  useEffect(() => {
-    let filtered = offers.filter(offer => offer.isActive);
-
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(offer =>
-        offer.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        offer.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        offer.businessName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const checkAuthStatus = () => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setIsAuthenticated(true);
     }
+  };
 
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(offer => offer.category === selectedCategory);
+  const fetchBookData = async (id: string) => {
+    try {
+      // Try to load from localStorage first
+      const savedBooks = localStorage.getItem('yourcitydeals_books');
+      
+      if (savedBooks) {
+        const books = JSON.parse(savedBooks);
+        const foundBook = books.find((b: any) => b.id === id);
+        
+        if (foundBook) {
+          // Convert to CouponBook format
+          const couponBook: CouponBook = {
+            id: foundBook.id,
+            title: foundBook.title,
+            description: foundBook.description,
+            price: foundBook.price,
+            school: foundBook.school,
+            totalOffers: foundBook.offersCount || 8,
+            validFrom: '2025-01-01',
+            validTo: '2025-12-31',
+            featured: foundBook.featured || false,
+            category: foundBook.category || 'high',
+            purchased: false
+          };
+          
+          setBook(couponBook);
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Fallback to default data if not found
+      const defaultBook: CouponBook = {
+        id,
+        title: 'Lincoln High School 2025 Coupon Book',
+        description: 'Amazing discounts at the best local businesses. Save money while supporting your school!',
+        price: 25,
+        school: 'Lincoln High School',
+        totalOffers: 8,
+        validFrom: '2025-01-01',
+        validTo: '2025-12-31',
+        featured: true,
+        category: 'high',
+        purchased: false
+      };
+      
+      setBook(defaultBook);
+    } catch (error) {
+      console.error('Error fetching book data:', error);
+      setError('Book not found');
+    } finally {
+      setLoading(false);
     }
-
-    setFilteredOffers(filtered);
-  }, [offers, searchTerm, selectedCategory]);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
   };
 
   const handlePurchase = () => {
-    const purchaseUrl = refCode 
-      ? `/purchase?book=${bookId}&ref=${refCode}`
-      : `/purchase?book=${bookId}`;
-    router.push(purchaseUrl);
+    // Redirect to purchase flow
+    router.push(`/purchase?book=${bookId}`);
   };
 
-  const handleOfferClick = (offer: Offer) => {
-    setSelectedOffer(offer);
+  const handleSignup = () => {
+    // Redirect to signup
+    router.push(`/signup`);
   };
 
-  const closeOfferModal = () => {
-    setSelectedOffer(null);
+  const handleLogin = () => {
+    // Redirect to login
+    router.push(`/login`);
   };
 
-  const handleGetRedemptionCode = () => {
-    setShowPurchasePrompt(true);
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
+  const handleClose = () => {
+    router.back();
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading book preview...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading preview...</p>
         </div>
       </div>
     );
   }
 
-  if (!bookDetails) {
+  if (error || !book) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Book Not Found</h2>
-          <p className="text-gray-600 mb-6">The book you're looking for doesn't exist.</p>
-          <Link
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Book Not Found</h1>
+          <p className="text-gray-600 mb-6">This coupon book could not be found or may have been removed.</p>
+          <Link 
             href="/"
-            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Go Home
+            Go to Homepage
           </Link>
         </div>
       </div>
@@ -382,140 +164,187 @@ function BookPreviewContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <Link
-                href="/"
-                className="text-purple-600 hover:text-purple-700"
-              >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </Link>
-              <div>
-                <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Book Preview</h1>
-                <p className="text-sm sm:text-base text-gray-600">{bookDetails.title}</p>
-              </div>
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+                YourCity Deals
+              </h1>
             </div>
-            <div className="flex space-x-2 sm:space-x-3">
-              <button
-                onClick={handlePurchase}
-                className="bg-purple-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base"
-              >
-                Buy Now - {formatCurrency(bookDetails.price)}
-              </button>
+            <div className="flex items-center space-x-4">
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm text-gray-700">
+                    Welcome, {user?.firstName}!
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={handleLogin}
+                    className="text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    Sign In
+                  </button>
+                  <span className="text-gray-400">|</span>
+                  <button
+                    onClick={handleSignup}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Preview Notice */}
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+      {/* Modal Overlay */}
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
+
+      {/* Modal Content */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Preview: {book.title}
+            </h2>
+            <button
+              onClick={handleClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700">
-                <strong>Preview Mode:</strong> This is a preview of the offers in this book. Purchase the book to get your unique redemption codes and start saving!
-              </p>
-            </div>
+            </button>
           </div>
-        </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Book Details Section */}
-        <div className="bg-white rounded-xl shadow-sm border mb-8">
+          {/* Modal Body */}
           <div className="p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Book Details</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm font-medium text-gray-700">School:</span>
-                <p className="text-gray-900">{bookDetails.school}</p>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-700">Price:</span>
-                <p className="text-gray-900">{formatCurrency(bookDetails.price)}</p>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-700">Offers:</span>
-                <p className="text-gray-900">{bookDetails.offersCount} amazing deals</p>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-gray-700">Valid Until:</span>
-                <p className="text-gray-900">Dec 30, 2025</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Sample Offers Section */}
-        <div className="bg-white rounded-xl shadow-sm border mb-8">
-          <div className="p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Sample Offers</h2>
-            <div className="space-y-4">
-              {filteredOffers.slice(0, 3).map((offer) => (
-                <div key={offer.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{offer.businessName} - {offer.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{offer.terms}</p>
+            {/* Book Card */}
+            <div className="group mb-8">
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/30 overflow-hidden">
+                {/* Card Header with Organization Logo */}
+                <div className="relative h-32 bg-gray-100">
+                  <div className="absolute inset-0 bg-black/5"></div>
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                    <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full border border-gray-300 bg-white/80 backdrop-blur-sm text-gray-700">
+                      School
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/80 rounded-full flex items-center justify-center shadow-lg">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
                     </div>
-                    <div className="text-right ml-4">
-                      <span className="text-lg font-bold text-green-600">
-                        {offer.discountType === 'percentage' ? `${offer.discountValue}%` : formatCurrency(offer.discountValue)}
-                      </span>
-                      {offer.originalPrice && (
-                        <p className="text-sm text-gray-500 line-through">{formatCurrency(offer.originalPrice)}</p>
-                      )}
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-lg font-bold text-gray-800 leading-tight bg-white/80 px-2 py-1 rounded">{book.title}</h3>
+                  </div>
+                </div>
+                
+                <div className="p-6">
+                  <p className="text-gray-600 text-sm mb-6 leading-relaxed">{book.description}</p>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center text-sm text-gray-500">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                      </div>
+                      {book.school}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                        </svg>
+                      </div>
+                      {book.totalOffers} amazing offers
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      Valid until Dec 30, 2025
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-6">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                      ${(book.price).toFixed(2)}
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            </div>
+
+            {/* Sample Offers */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Sample Offers</h3>
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-gray-900">Local Restaurant - 20% Off</h4>
+                  </div>
+                  <p className="text-sm text-gray-600">Valid for dine-in or takeout. Cannot be combined with other offers.</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-gray-900">Coffee Shop - Buy One Get One Free</h4>
+                  </div>
+                  <p className="text-sm text-gray-600">Any size drink. Valid Monday-Friday before 3pm.</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-gray-900">Movie Theater - $5 Off</h4>
+                  </div>
+                  <p className="text-sm text-gray-600">Any movie, any time. Valid for up to 4 tickets per visit.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="text-center">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Ready to Purchase?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Get access to all {book.totalOffers} amazing offers and support local community initiatives!
+              </p>
+              <div className="flex items-center justify-center space-x-4">
+                <button
+                  onClick={handleClose}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 font-medium"
+                >
+                  Close Preview
+                </button>
+                <button
+                  onClick={handlePurchase}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:scale-105"
+                >
+                  Sign Up to Buy
+                </button>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Ready to Purchase Section */}
-        <div className="bg-white rounded-xl shadow-sm border">
-          <div className="p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Ready to Purchase?</h2>
-            <p className="text-gray-600 mb-6">
-              Get access to all {bookDetails.offersCount} amazing offers and support local community initiatives!
-            </p>
-            <div className="flex space-x-4">
-              <Link
-                href="/"
-                className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-              >
-                Close Preview
-              </Link>
-              <button
-                onClick={handlePurchase}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Sign Up to Buy
-              </button>
-            </div>
-          </div>
-         </div>
-       </div>
-     </div>
-   );
-}
-
-export default function BookPreview() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <BookPreviewContent />
-    </Suspense>
+      </div>
+    </div>
   );
 }
