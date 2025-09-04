@@ -59,7 +59,8 @@ const createMockClient = () => {
 const isValidUrl = (url: string) => {
   try {
     new URL(url);
-    return true; // Always return true if URL is valid
+    // Check if it's not a placeholder value
+    return !url.includes('your_supabase_project_url') && !url.includes('placeholder');
   } catch {
     return false;
   }
@@ -73,7 +74,8 @@ console.log('Supabase Client Configuration:', {
   hasAnonKey: !!supabaseAnonKey,
   isValidUrl: supabaseUrl ? isValidUrl(supabaseUrl) : false,
   usingRealClient: useRealClient,
-  url: supabaseUrl
+  url: supabaseUrl,
+  urlCheck: supabaseUrl ? `URL contains placeholder: ${supabaseUrl.includes('your_supabase_project_url')}` : 'No URL'
 });
 
 export const supabase = useRealClient
