@@ -737,6 +737,7 @@ function ApprovalsTab({
     organizationHub: '',
     couponBook: ''
   });
+  const [pendingEmail, setPendingEmail] = useState<any>(null);
 
   useEffect(() => {
     // Load ready for review invites from the main component
@@ -821,11 +822,18 @@ Best regards,
 The YourCity Deals Team
 support@yourcitydeals.com`;
 
-      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('🎉 APPROVED: YourCity Deals Seller Account')}&body=${encodeURIComponent(emailTemplate)}`;
-      window.open(mailtoLink, '_blank');
+      // Store email content for the Send Email button
+      setPendingEmail({
+        to: invite.email,
+        subject: '🎉 APPROVED: YourCity Deals Seller Account',
+        body: emailTemplate,
+        type: 'approval',
+        sellerUsername,
+        sellerPassword
+      });
 
       setShowInviteDetails(false);
-      alert(`Seller approved! Login credentials:\nUsername: ${sellerUsername}\nPassword: ${sellerPassword}\n\nEmail has been opened for you to review and send.`);
+      alert(`Seller approved! Login credentials:\nUsername: ${sellerUsername}\nPassword: ${sellerPassword}\n\nClick the "Send Email" button to send the approval email.`);
     }
   };
 
@@ -869,11 +877,17 @@ Best regards,
 The YourCity Deals Team
 support@yourcitydeals.com`;
 
-      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('❌ DECLINED: YourCity Deals Seller Application')}&body=${encodeURIComponent(emailTemplate)}`;
-      window.open(mailtoLink, '_blank');
+      // Store email content for the Send Email button
+      setPendingEmail({
+        to: invite.email,
+        subject: '❌ DECLINED: YourCity Deals Seller Application',
+        body: emailTemplate,
+        type: 'rejection',
+        reason: reason || 'Application did not meet our requirements'
+      });
 
       setShowInviteDetails(false);
-      alert('Seller rejected! Email has been opened for you to review and send.');
+      alert('Seller rejected! Click the "Send Email" button to send the rejection email.');
     }
   };
 
@@ -918,12 +932,28 @@ Best regards,
 The YourCity Deals Team
 support@yourcitydeals.com`;
 
-      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('📝 ACTION REQUIRED: Update YourCity Deals Seller Profile')}&body=${encodeURIComponent(emailTemplate)}`;
-      window.open(mailtoLink, '_blank');
+      // Store email content for the Send Email button
+      setPendingEmail({
+        to: invite.email,
+        subject: '📝 ACTION REQUIRED: Update YourCity Deals Seller Profile',
+        body: emailTemplate,
+        type: 'edit_request',
+        editRequest: editRequest
+      });
 
       setShowInviteDetails(false);
-      alert('Edit request ready! Email has been opened for you to review and send.');
+      alert('Edit request ready! Click the "Send Email" button to send the edit request email.');
     }
+  };
+
+  const handleSendEmail = () => {
+    if (!pendingEmail) return;
+    
+    const mailtoLink = `mailto:${pendingEmail.to}?subject=${encodeURIComponent(pendingEmail.subject)}&body=${encodeURIComponent(pendingEmail.body)}`;
+    window.open(mailtoLink, '_blank');
+    
+    // Clear the pending email
+    setPendingEmail(null);
   };
 
   const handleEditProfile = (invite: any) => {
@@ -1019,6 +1049,50 @@ The YourCity Deals Team`;
               <p className="text-sm text-orange-700 mt-1">
                 These sellers have completed their profiles and are waiting for your approval.
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Send Email Button */}
+      {pendingEmail && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800">
+                  {pendingEmail.type === 'approval' && 'Approval Email Ready'}
+                  {pendingEmail.type === 'rejection' && 'Rejection Email Ready'}
+                  {pendingEmail.type === 'edit_request' && 'Edit Request Email Ready'}
+                </h3>
+                <p className="text-sm text-blue-700 mt-1">
+                  Email to {pendingEmail.to} is ready to send. Click the button below to open your email client.
+                </p>
+                {pendingEmail.type === 'approval' && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    Credentials: {pendingEmail.sellerUsername} / {pendingEmail.sellerPassword}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={handleSendEmail}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Send Email
+              </button>
+              <button
+                onClick={() => setPendingEmail(null)}
+                className="px-4 py-2 text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200 transition-colors"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
