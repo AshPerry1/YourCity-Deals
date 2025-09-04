@@ -1,3 +1,10 @@
+// Test environment variables
+console.log('=== ENVIRONMENT VARIABLES TEST ===');
+console.log('NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'EXISTS' : 'MISSING');
+console.log('SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'EXISTS' : 'MISSING');
+console.log('=== END ENVIRONMENT TEST ===');
+
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -72,6 +79,15 @@ console.log('Supabase Client Configuration:', {
 export const supabase = useRealClient
   ? createClient(supabaseUrl, supabaseAnonKey)
   : createMockClient();
+
+// Test the client immediately
+console.log('=== SUPABASE CLIENT TEST ===');
+supabase.from('seller_invites').select('count').then(result => {
+  console.log('Supabase test result:', result);
+}).catch(error => {
+  console.error('Supabase test error:', error);
+});
+console.log('=== END CLIENT TEST ===');
 
 // Export createClient for direct use
 export { createClient };
