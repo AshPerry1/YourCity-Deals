@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 interface Offer {
   id: string;
+  bookId: string;
   title: string;
   description: string;
   businessName: string;
@@ -56,126 +57,252 @@ function BookPreviewContent() {
   const categories = ['all', 'restaurant', 'retail', 'entertainment', 'services', 'health'];
 
   useEffect(() => {
-    // Simulate loading book and offers data
-    setTimeout(() => {
-      const mockBook: BookDetails = {
-        id: bookId,
-        title: 'Birmingham Restaurant Deals',
-        description: 'Amazing discounts at the best local restaurants in Birmingham. Save money while supporting local businesses!',
-        school: 'Mountain Brook High School',
-        price: 25,
-        coverImage: '/api/placeholder/300/400',
-        offersCount: 45,
-        isActive: true,
-        category: 'restaurant',
-        rating: 4.8,
-        soldCount: 234,
-        totalValue: 1250,
-        savings: 450
-      };
-
-      const mockOffers: Offer[] = [
-        {
-          id: '1',
-          title: '20% Off Any Purchase',
-          description: 'Get 20% off your entire bill at any participating restaurant',
-          businessName: 'Local Italian Restaurant',
-          businessLogo: '/api/placeholder/50/50',
-          discountType: 'percentage',
-          discountValue: 20,
-          terms: 'Valid for dine-in only. Cannot be combined with other offers. Expires 12/31/2024.',
-          validUntil: '2024-12-31',
-          category: 'restaurant',
-          heroImage: '/api/placeholder/300/200',
-          isActive: true
-        },
-        {
-          id: '2',
-          title: 'Free Appetizer',
-          description: 'Get a free appetizer with any entrée purchase',
-          businessName: 'Downtown Grill',
-          businessLogo: '/api/placeholder/50/50',
-          discountType: 'bogo',
-          discountValue: 100,
-          originalPrice: 15,
-          newPrice: 0,
-          terms: 'Valid for dine-in only. Must purchase entrée. Expires 12/31/2024.',
-          validUntil: '2024-12-31',
-          category: 'restaurant',
-          heroImage: '/api/placeholder/300/200',
-          isActive: true
-        },
-        {
-          id: '3',
-          title: '$10 Off $50 Purchase',
-          description: 'Save $10 on any purchase of $50 or more',
-          businessName: 'Fashion Boutique',
-          businessLogo: '/api/placeholder/50/50',
-          discountType: 'fixed',
-          discountValue: 10,
-          originalPrice: 50,
-          newPrice: 40,
-          terms: 'Valid for in-store purchases only. Cannot be combined with other offers.',
-          validUntil: '2024-12-31',
-          category: 'retail',
-          heroImage: '/api/placeholder/300/200',
-          isActive: true
-        },
-        {
-          id: '4',
-          title: 'Buy One Get One Free',
-          description: 'Buy any item and get the second one free',
-          businessName: 'Movie Theater',
-          businessLogo: '/api/placeholder/50/50',
-          discountType: 'bogo',
-          discountValue: 100,
-          originalPrice: 12,
-          newPrice: 12,
-          terms: 'Valid for movie tickets only. Cannot be combined with other offers.',
-          validUntil: '2024-12-31',
-          category: 'entertainment',
-          heroImage: '/api/placeholder/300/200',
-          isActive: true
-        },
-        {
-          id: '5',
-          title: '50% Off First Session',
-          description: 'Get 50% off your first tutoring session',
-          businessName: 'Academic Excellence',
-          businessLogo: '/api/placeholder/50/50',
-          discountType: 'percentage',
-          discountValue: 50,
-          originalPrice: 60,
-          newPrice: 30,
-          terms: 'Valid for first-time customers only. Must book in advance.',
-          validUntil: '2024-12-31',
-          category: 'services',
-          heroImage: '/api/placeholder/300/200',
-          isActive: true
-        },
-        {
-          id: '6',
-          title: 'Free Gym Membership',
-          description: 'Get one month of free gym membership',
-          businessName: 'Fitness Center',
-          businessLogo: '/api/placeholder/50/50',
-          discountType: 'fixed',
-          discountValue: 50,
-          originalPrice: 50,
-          newPrice: 0,
-          terms: 'Valid for new members only. Must sign up for at least 3 months.',
-          validUntil: '2024-12-31',
-          category: 'health',
-          heroImage: '/api/placeholder/300/200',
-          isActive: true
+    // Load book and offers data from localStorage or use default data
+    const loadBookData = () => {
+      try {
+        // Try to load from localStorage first
+        const savedBooks = localStorage.getItem('yourcitydeals_books');
+        const savedOffers = localStorage.getItem('yourcitydeals_offers');
+        
+        if (savedBooks && savedOffers) {
+          const books = JSON.parse(savedBooks);
+          const offers = JSON.parse(savedOffers);
+          
+          // Find the specific book by ID
+          const book = books.find((b: BookDetails) => b.id === bookId);
+          const bookOffers = offers.filter((o: Offer) => o.bookId === bookId);
+          
+          if (book && bookOffers.length > 0) {
+            setBookDetails(book);
+            setOffers(bookOffers);
+            setFilteredOffers(bookOffers);
+            setLoading(false);
+            return;
+          }
         }
-      ];
+        
+        // If no localStorage data or book not found, use default data and save it
+        const defaultBook: BookDetails = {
+          id: bookId,
+          title: 'Birmingham Restaurant Deals',
+          description: 'Amazing discounts at the best local restaurants in Birmingham. Save money while supporting local businesses!',
+          school: 'Mountain Brook High School',
+          price: 25,
+          coverImage: '/api/placeholder/300/400',
+          offersCount: 6,
+          isActive: true,
+          category: 'restaurant',
+          rating: 4.8,
+          soldCount: 234,
+          totalValue: 1250,
+          savings: 450
+        };
 
-      setBookDetails(mockBook);
-      setOffers(mockOffers);
-      setFilteredOffers(mockOffers);
-      setLoading(false);
-    }, 1000);
+        const defaultOffers: Offer[] = [
+          {
+            id: '1',
+            bookId: bookId,
+            title: '20% Off Any Purchase',
+            description: 'Get 20% off your entire bill at any participating restaurant',
+            businessName: 'Local Italian Restaurant',
+            businessLogo: '/api/placeholder/50/50',
+            discountType: 'percentage',
+            discountValue: 20,
+            terms: 'Valid for dine-in only. Cannot be combined with other offers. Expires 12/31/2024.',
+            validUntil: '2024-12-31',
+            category: 'restaurant',
+            heroImage: '/api/placeholder/300/200',
+            isActive: true
+          },
+          {
+            id: '2',
+            bookId: bookId,
+            title: 'Free Appetizer',
+            description: 'Get a free appetizer with any entrée purchase',
+            businessName: 'Downtown Grill',
+            businessLogo: '/api/placeholder/50/50',
+            discountType: 'bogo',
+            discountValue: 100,
+            originalPrice: 15,
+            newPrice: 0,
+            terms: 'Valid for dine-in only. Must purchase entrée. Expires 12/31/2024.',
+            validUntil: '2024-12-31',
+            category: 'restaurant',
+            heroImage: '/api/placeholder/300/200',
+            isActive: true
+          },
+          {
+            id: '3',
+            bookId: bookId,
+            title: '$10 Off $50 Purchase',
+            description: 'Save $10 on any purchase of $50 or more',
+            businessName: 'Fashion Boutique',
+            businessLogo: '/api/placeholder/50/50',
+            discountType: 'fixed',
+            discountValue: 10,
+            originalPrice: 50,
+            newPrice: 40,
+            terms: 'Valid for in-store purchases only. Cannot be combined with other offers.',
+            validUntil: '2024-12-31',
+            category: 'retail',
+            heroImage: '/api/placeholder/300/200',
+            isActive: true
+          },
+          {
+            id: '4',
+            bookId: bookId,
+            title: 'Buy One Get One Free',
+            description: 'Buy any item and get the second one free',
+            businessName: 'Movie Theater',
+            businessLogo: '/api/placeholder/50/50',
+            discountType: 'bogo',
+            discountValue: 100,
+            originalPrice: 12,
+            newPrice: 12,
+            terms: 'Valid for movie tickets only. Cannot be combined with other offers.',
+            validUntil: '2024-12-31',
+            category: 'entertainment',
+            heroImage: '/api/placeholder/300/200',
+            isActive: true
+          },
+          {
+            id: '5',
+            bookId: bookId,
+            title: '50% Off First Session',
+            description: 'Get 50% off your first tutoring session',
+            businessName: 'Academic Excellence',
+            businessLogo: '/api/placeholder/50/50',
+            discountType: 'percentage',
+            discountValue: 50,
+            originalPrice: 60,
+            newPrice: 30,
+            terms: 'Valid for first-time customers only. Must book in advance.',
+            validUntil: '2024-12-31',
+            category: 'services',
+            heroImage: '/api/placeholder/300/200',
+            isActive: true
+          },
+          {
+            id: '6',
+            bookId: bookId,
+            title: 'Free Gym Membership',
+            description: 'Get one month of free gym membership',
+            businessName: 'Fitness Center',
+            businessLogo: '/api/placeholder/50/50',
+            discountType: 'fixed',
+            discountValue: 50,
+            originalPrice: 50,
+            newPrice: 0,
+            terms: 'Valid for new members only. Must sign up for at least 3 months.',
+            validUntil: '2024-12-31',
+            category: 'health',
+            heroImage: '/api/placeholder/300/200',
+            isActive: true
+          }
+        ];
+
+        // Save to localStorage
+        const existingBooks = savedBooks ? JSON.parse(savedBooks) : [];
+        const existingOffers = savedOffers ? JSON.parse(savedOffers) : [];
+        
+        // Check if book already exists, if not add it
+        const bookExists = existingBooks.some((b: BookDetails) => b.id === bookId);
+        if (!bookExists) {
+          existingBooks.push(defaultBook);
+          localStorage.setItem('yourcitydeals_books', JSON.stringify(existingBooks));
+        }
+        
+        // Check if offers already exist, if not add them
+        const offersExist = existingOffers.some((o: Offer) => o.bookId === bookId);
+        if (!offersExist) {
+          existingOffers.push(...defaultOffers);
+          localStorage.setItem('yourcitydeals_offers', JSON.stringify(existingOffers));
+        }
+
+        setBookDetails(defaultBook);
+        setOffers(defaultOffers);
+        setFilteredOffers(defaultOffers);
+        setLoading(false);
+        
+      } catch (error) {
+        console.error('Error loading book data:', error);
+        // Fallback to default data if localStorage fails
+        const fallbackBook: BookDetails = {
+          id: bookId,
+          title: 'Birmingham Restaurant Deals',
+          description: 'Amazing discounts at the best local restaurants in Birmingham. Save money while supporting local businesses!',
+          school: 'Mountain Brook High School',
+          price: 25,
+          coverImage: '/api/placeholder/300/400',
+          offersCount: 6,
+          isActive: true,
+          category: 'restaurant',
+          rating: 4.8,
+          soldCount: 234,
+          totalValue: 1250,
+          savings: 450
+        };
+
+        const fallbackOffers: Offer[] = [
+          {
+            id: '1',
+            bookId: bookId,
+            title: '20% Off Any Purchase',
+            description: 'Get 20% off your entire bill at any participating restaurant',
+            businessName: 'Local Italian Restaurant',
+            businessLogo: '/api/placeholder/50/50',
+            discountType: 'percentage',
+            discountValue: 20,
+            terms: 'Valid for dine-in only. Cannot be combined with other offers. Expires 12/31/2024.',
+            validUntil: '2024-12-31',
+            category: 'restaurant',
+            heroImage: '/api/placeholder/300/200',
+            isActive: true
+          },
+          {
+            id: '2',
+            bookId: bookId,
+            title: 'Free Appetizer',
+            description: 'Get a free appetizer with any entrée purchase',
+            businessName: 'Downtown Grill',
+            businessLogo: '/api/placeholder/50/50',
+            discountType: 'bogo',
+            discountValue: 100,
+            originalPrice: 15,
+            newPrice: 0,
+            terms: 'Valid for dine-in only. Must purchase entrée. Expires 12/31/2024.',
+            validUntil: '2024-12-31',
+            category: 'restaurant',
+            heroImage: '/api/placeholder/300/200',
+            isActive: true
+          },
+          {
+            id: '3',
+            bookId: bookId,
+            title: '$10 Off $50 Purchase',
+            description: 'Save $10 on any purchase of $50 or more',
+            businessName: 'Fashion Boutique',
+            businessLogo: '/api/placeholder/50/50',
+            discountType: 'fixed',
+            discountValue: 10,
+            originalPrice: 50,
+            newPrice: 40,
+            terms: 'Valid for in-store purchases only. Cannot be combined with other offers.',
+            validUntil: '2024-12-31',
+            category: 'retail',
+            heroImage: '/api/placeholder/300/200',
+            isActive: true
+          }
+        ];
+
+        setBookDetails(fallbackBook);
+        setOffers(fallbackOffers);
+        setFilteredOffers(fallbackOffers);
+        setLoading(false);
+      }
+    };
+
+    loadBookData();
   }, [bookId]);
 
   useEffect(() => {

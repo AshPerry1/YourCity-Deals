@@ -130,9 +130,56 @@ export default function YourCityDealsApp() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Try to load from localStorage first
+      const savedBooks = localStorage.getItem('yourcitydeals_books');
+      const savedOffers = localStorage.getItem('yourcitydeals_offers');
       
-      const mockBooks: CouponBook[] = [
+      if (savedBooks && savedOffers) {
+        const books = JSON.parse(savedBooks);
+        const offers = JSON.parse(savedOffers);
+        
+        // Convert to CouponBook format
+        const couponBooks: CouponBook[] = books.map((book: any) => ({
+          id: book.id,
+          title: book.title,
+          description: book.description,
+          price: book.price,
+          school: book.school,
+          totalOffers: book.offersCount,
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          featured: book.featured || false,
+          category: book.category || 'high',
+          purchased: false
+        }));
+        
+        // Convert to CouponOffer format
+        const couponOffers: CouponOffer[] = offers.map((offer: any) => ({
+          id: offer.id,
+          title: offer.title,
+          business: offer.businessName,
+          businessAddress: '123 Main St, Birmingham, AL',
+          businessCoordinates: { lat: 33.5207, lng: -86.8025 },
+          discount: offer.discountType === 'percentage' ? `${offer.discountValue}% Off` : `$${offer.discountValue} Off`,
+          category: offer.category,
+          description: offer.description,
+          validFrom: '2025-01-01',
+          validTo: '2025-12-31',
+          bookId: offer.bookId,
+          bookTitle: books.find((b: any) => b.id === offer.bookId)?.title || '',
+          school: books.find((b: any) => b.id === offer.bookId)?.school || '',
+          redeemed: false,
+          shared: false
+        }));
+        
+        setCouponBooks(couponBooks);
+        setUserCoupons(couponOffers);
+        setLoading(false);
+        return;
+      }
+      
+      // If no localStorage data, use default data and save it
+      const defaultBooks: CouponBook[] = [
         {
           id: '1',
           title: 'Lincoln High School 2025 Coupon Book',
@@ -174,7 +221,7 @@ export default function YourCityDealsApp() {
         }
       ];
 
-      const mockUserCoupons: CouponOffer[] = [
+      const defaultOffers: CouponOffer[] = [
         {
           id: '1',
           title: '20% Off Pizza',
@@ -211,8 +258,12 @@ export default function YourCityDealsApp() {
         }
       ];
       
-      setCouponBooks(mockBooks);
-      setUserCoupons(mockUserCoupons);
+      // Save to localStorage
+      localStorage.setItem('yourcitydeals_books', JSON.stringify(defaultBooks));
+      localStorage.setItem('yourcitydeals_offers', JSON.stringify(defaultOffers));
+      
+      setCouponBooks(defaultBooks);
+      setUserCoupons(defaultOffers);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
