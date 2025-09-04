@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('invites');
@@ -24,53 +25,56 @@ export default function AdminPage() {
   const [showInviteDetails, setShowInviteDetails] = useState(false);
 
   useEffect(() => {
-    const loadDashboardData = () => {
+    const loadDashboardData = async () => {
       try {
-        // Load seller invites from localStorage
-        const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
-        const savedProfiles = localStorage.getItem('yourcitydeals_seller_profiles');
-        const savedHubs = localStorage.getItem('yourcitydeals_organizational_hubs');
-        const savedBooks = localStorage.getItem('yourcitydeals_admin_coupon_books');
+        console.log('Loading dashboard data from Supabase...');
         
-        let invites = [];
-        let hubs = [];
-        let books = [];
-        
-        if (savedInvites) {
-          invites = JSON.parse(savedInvites);
-          console.log('Loaded invites from localStorage:', invites);
-          console.log('Total invites loaded:', invites.length);
-          console.log('Invites with ready_for_review status:', invites.filter((inv: any) => inv.status === 'ready_for_review'));
+        // Load seller invites from Supabase
+        let { data: invites, error: invitesError } = await supabase
+          .from('seller_invites')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (invitesError) {
+          console.error('Error loading invites from Supabase:', invitesError);
+          // Fallback to localStorage
+          const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
+          invites = savedInvites ? JSON.parse(savedInvites) : [];
         } else {
-          // Start with empty invites - let user add real people
-          localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify([]));
-          invites = [];
+          console.log('Loaded invites from Supabase:', invites);
+          console.log('Total invites loaded:', invites?.length || 0);
+          console.log('Invites with ready_for_review status:', invites?.filter((inv: any) => inv.status === 'ready_for_review'));
+        }
+
+        // Load organizational hubs from Supabase
+        let { data: hubs, error: hubsError } = await supabase
+          .from('organizational_hubs')
+          .select('*')
+          .order('name');
+
+        if (hubsError) {
+          console.error('Error loading hubs from Supabase:', hubsError);
+          // Fallback to localStorage
+          const savedHubs = localStorage.getItem('yourcitydeals_organizational_hubs');
+          hubs = savedHubs ? JSON.parse(savedHubs) : [];
+        }
+
+        // Load admin coupon books from Supabase
+        let { data: books, error: booksError } = await supabase
+          .from('admin_coupon_books')
+          .select('*')
+          .order('title');
+
+        if (booksError) {
+          console.error('Error loading books from Supabase:', booksError);
+          // Fallback to localStorage
+          const savedBooks = localStorage.getItem('yourcitydeals_admin_coupon_books');
+          books = savedBooks ? JSON.parse(savedBooks) : [];
         }
         
-        if (savedHubs) {
-          hubs = JSON.parse(savedHubs);
-        } else {
-          // Start with empty hubs - let user add real organizations
-          localStorage.setItem('yourcitydeals_organizational_hubs', JSON.stringify([]));
-          hubs = [];
-        }
-        
-        if (savedBooks) {
-          books = JSON.parse(savedBooks);
-        } else {
-          // Keep mock books for testing preview functionality
-          const defaultBooks = [
-            { id: '1', title: 'Birmingham Restaurant Deals', school: 'Mountain Brook High School' },
-            { id: '2', title: 'Lincoln High School 2025 Coupon Book', school: 'Lincoln High School' },
-            { id: '3', title: 'Washington Middle School Fundraiser', school: 'Washington Middle School' }
-          ];
-          localStorage.setItem('yourcitydeals_admin_coupon_books', JSON.stringify(defaultBooks));
-          books = defaultBooks;
-        }
-        
-        setSellerInvites(invites);
-        setOrganizationalHubs(hubs);
-        setCouponBooks(books);
+        setSellerInvites(invites || []);
+        setOrganizationalHubs(hubs || []);
+        setCouponBooks(books || []);
         setLoading(false);
       } catch (error) {
         console.error('Error loading dashboard data:', error);
@@ -108,42 +112,56 @@ export default function AdminPage() {
   };
 
   // Handle creating new invite
-  const handleCreateInvite = () => {
+  const handleCreateInvite = async () => {
     if (!inviteForm.firstName || !inviteForm.lastName || !inviteForm.email) {
       alert('Please fill in all required fields');
       return;
     }
 
-    // Check for duplicate email
-    const existingInvite = sellerInvites.find((invite: any) => 
-      invite.email.toLowerCase() === inviteForm.email.toLowerCase()
-    );
-    
-    if (existingInvite) {
+    // Check for duplicate email in Supabase
+    const { data: existingInvite, error: checkError } = await supabase
+      .from('seller_invites')
+      .select('*')
+      .eq('email', inviteForm.email.toLowerCase())
+      .single();
+
+    if (existingInvite && !checkError) {
       alert('An invite with this email already exists');
       return;
     }
 
     const inviteToken = generateInviteToken();
     const newInvite = {
-      id: Date.now().toString(),
       token: inviteToken,
       first_name: inviteForm.firstName,
       last_name: inviteForm.lastName,
       email: inviteForm.email,
       status: 'pending',
-      organizationHub: inviteForm.organizationHub,
-      couponBook: inviteForm.couponBook,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      sentAt: new Date().toLocaleString(),
-      emailSent: true,
-      linkClicked: false,
-      profileCompleted: false
+      organization_hub: inviteForm.organizationHub,
+      coupon_book: inviteForm.couponBook,
+      sent_at: new Date().toISOString(),
+      email_sent: true,
+      link_clicked: false,
+      profile_completed: false
     };
 
-    // Add to localStorage
-    const updatedInvites = [...sellerInvites, newInvite];
+    // Save to Supabase
+    const { data: savedInvite, error: saveError } = await supabase
+      .from('seller_invites')
+      .insert(newInvite)
+      .select()
+      .single();
+
+    if (saveError) {
+      console.error('Error saving invite to Supabase:', saveError);
+      alert('Failed to create invite. Please try again.');
+      return;
+    }
+
+    console.log('Invite saved to Supabase:', savedInvite);
+
+    // Also save to localStorage as fallback
+    const updatedInvites = [...sellerInvites, savedInvite];
     localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
     setSellerInvites(updatedInvites);
 
