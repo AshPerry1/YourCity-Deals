@@ -286,7 +286,7 @@ export default function InvitePage() {
       console.log('Creating profile data to save...');
       // Create or update seller profile in Supabase
       const profileDataToSave = {
-        invite_id: invite.id || 'test-invite',
+        invite_id: invite.id, // Use the actual UUID, not a fallback string
         first_name: profileData.firstName,
         last_name: profileData.lastName,
         email: invite.email,
@@ -342,11 +342,11 @@ export default function InvitePage() {
       console.log('Saving to localStorage as fallback...');
       const savedProfiles = localStorage.getItem('yourcitydeals_seller_profiles');
       const profiles = savedProfiles ? JSON.parse(savedProfiles) : [];
-      const existingProfile = profiles.find((p: any) => p.invite_id === (invite.id || 'test-invite'));
+      const existingProfile = profiles.find((p: any) => p.invite_id === invite.id);
       
       if (existingProfile) {
         const updatedProfiles = profiles.map((p: any) => 
-          p.invite_id === (invite.id || 'test-invite') ? { ...p, ...profileDataToSave, updated_at: new Date().toISOString() } : p
+          p.invite_id === invite.id ? { ...p, ...profileDataToSave, updated_at: new Date().toISOString() } : p
         );
         localStorage.setItem('yourcitydeals_seller_profiles', JSON.stringify(updatedProfiles));
       } else {
@@ -365,7 +365,7 @@ export default function InvitePage() {
       if (savedInvites) {
         const invites = JSON.parse(savedInvites);
         const updatedInvites = invites.map((inv: any) => 
-          inv.id === (invite.id || 'test-invite') ? { 
+          inv.id === invite.id ? { 
             ...inv, 
             status: 'ready_for_review', 
             updated_at: new Date().toISOString(),
