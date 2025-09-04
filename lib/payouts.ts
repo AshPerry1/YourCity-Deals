@@ -7,7 +7,7 @@ export interface Payout {
   payout_date: Date;
   payment_method: 'bank_transfer' | 'check' | 'digital_wallet';
   reference_number: string;
-  status: 'pending' | 'processed' | 'completed' | 'failed';
+  status: 'pending' | 'processed' | 'completed' | 'failed' | 'accepted' | 'declined';
   description: string;
   period_start: Date;
   period_end: Date;
@@ -386,8 +386,12 @@ export function getPayoutStatusLabel(status: Payout['status']): string {
       return 'Processed';
     case 'completed':
       return 'Completed';
+    case 'accepted':
+      return 'Accepted';
     case 'failed':
       return 'Failed';
+    case 'declined':
+      return 'Declined';
     default:
       return 'Unknown';
   }
