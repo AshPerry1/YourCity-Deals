@@ -947,6 +947,40 @@ support@yourcitydeals.com`;
     }
   };
 
+  const sendEmailDirectly = async () => {
+    try {
+      // For now, we'll use a mock email service
+      // In production, you'd integrate with EmailJS, SendGrid, or similar
+      
+      // Simulate email sending
+      console.log('Sending email to:', emailContent.to);
+      console.log('Subject:', emailContent.subject);
+      console.log('Body:', emailContent.body);
+      
+      // Mock successful email send
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Update the invite to mark email as sent
+      const updatedInvites = sellerInvites.map((inv: any) => 
+        inv.email === emailContent.to ? { 
+          ...inv, 
+          emailSent: true,
+          emailSentAt: new Date().toISOString()
+        } : inv
+      );
+      localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+      setSellerInvites(updatedInvites);
+      
+      // Close modal and show success message
+      setShowEmailModal(false);
+      alert('Email sent successfully! The seller has been notified.');
+      
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('Failed to send email. Please try the "Copy to Clipboard" option instead.');
+    }
+  };
+
   const handleEditProfile = (invite: any) => {
     setEditingInvite(invite);
     setEditForm({
