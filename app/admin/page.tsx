@@ -43,7 +43,18 @@ export default function AdminPage() {
         } else {
           console.log('Loaded invites from Supabase:', invites);
           console.log('Total invites loaded:', invites?.length || 0);
-          console.log('Invites with ready_for_review status:', invites?.filter((inv: any) => inv.status === 'ready_for_review'));
+          console.log('Current state has:', sellerInvites.length, 'invites');
+          
+          // Only update if we have more invites than current state
+          if (invites && invites.length > sellerInvites.length) {
+            console.log('New invites detected, updating state...');
+            setSellerInvites(invites || []);
+          } else if (invites && invites.length === sellerInvites.length) {
+            console.log('No new invites, keeping current state');
+          } else {
+            console.log('Using Supabase data (first load or fallback)');
+            setSellerInvites(invites || []);
+          }
         }
 
         // Load organizational hubs from Supabase
@@ -72,7 +83,6 @@ export default function AdminPage() {
           books = savedBooks ? JSON.parse(savedBooks) : [];
         }
         
-        setSellerInvites(invites || []);
         setOrganizationalHubs(hubs || []);
         setCouponBooks(books || []);
         setLoading(false);
@@ -84,11 +94,78 @@ export default function AdminPage() {
 
     loadDashboardData();
     
-    // Set up interval to refresh data every 10 seconds (reduced from 3 seconds)
-    const interval = setInterval(loadDashboardData, 10000);
-    
-    return () => clearInterval(interval);
+    // Disable auto-refresh for now to prevent overwriting local state
+    // const interval = setInterval(loadDashboardData, 10000);
+    // return () => clearInterval(interval);
   }, []);
+
+  // Move loadDashboardData outside useEffect so it can be used by the refresh button
+  const loadDashboardData = async () => {
+    try {
+      console.log('Loading dashboard data from Supabase...');
+      
+      // Load seller invites from Supabase
+      let { data: invites, error: invitesError } = await supabase
+        .from('seller_invites')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (invitesError) {
+        console.error('Error loading invites from Supabase:', invitesError);
+        // Fallback to localStorage
+        const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
+        invites = savedInvites ? JSON.parse(savedInvites) : [];
+      } else {
+        console.log('Loaded invites from Supabase:', invites);
+        console.log('Total invites loaded:', invites?.length || 0);
+        console.log('Current state has:', sellerInvites.length, 'invites');
+        
+        // Only update if we have more invites than current state
+        if (invites && invites.length > sellerInvites.length) {
+          console.log('New invites detected, updating state...');
+          setSellerInvites(invites || []);
+        } else if (invites && invites.length === sellerInvites.length) {
+          console.log('No new invites, keeping current state');
+        } else {
+          console.log('Using Supabase data (first load or fallback)');
+          setSellerInvites(invites || []);
+        }
+      }
+
+      // Load organizational hubs from Supabase
+      let { data: hubs, error: hubsError } = await supabase
+        .from('organizational_hubs')
+        .select('*')
+        .order('name');
+
+      if (hubsError) {
+        console.error('Error loading hubs from Supabase:', hubsError);
+        // Fallback to localStorage
+        const savedHubs = localStorage.getItem('yourcitydeals_organizational_hubs');
+        hubs = savedHubs ? JSON.parse(savedHubs) : [];
+      }
+
+      // Load admin coupon books from Supabase
+      let { data: books, error: booksError } = await supabase
+        .from('admin_coupon_books')
+        .select('*')
+        .order('title');
+
+      if (booksError) {
+        console.error('Error loading books from Supabase:', booksError);
+        // Fallback to localStorage
+        const savedBooks = localStorage.getItem('yourcitydeals_admin_coupon_books');
+        books = savedBooks ? JSON.parse(savedBooks) : [];
+      }
+      
+      setOrganizationalHubs(hubs || []);
+      setCouponBooks(books || []);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+      setLoading(false);
+    }
+  };
 
   // Filter invites based on search and filters
   const filteredInvites = sellerInvites.filter((invite: any) => {
@@ -270,6 +347,12 @@ The YourCity Deals Team`;
               <h1 className="text-3xl font-bold text-gray-900">Admin Console</h1>
               <p className="text-gray-600">Manage sellers, invites, and approvals</p>
             </div>
+            <button
+              onClick={loadDashboardData}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Refresh Data
+            </button>
           </div>
           
           {/* Navigation Tabs */}
