@@ -76,6 +76,11 @@ export default function AdminPage() {
     };
 
     loadDashboardData();
+    
+    // Set up interval to refresh data every 3 seconds
+    const interval = setInterval(loadDashboardData, 3000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // Filter invites based on search and filters
