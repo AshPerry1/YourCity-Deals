@@ -103,6 +103,33 @@ export default function AdminPage() {
     return invite.status === 'ready_for_review';
   });
 
+  const handleClearAllTestData = async () => {
+    if (confirm('Are you sure you want to delete ALL test data? This will remove all invites and cannot be undone.')) {
+      try {
+        // Delete all invites from Supabase
+        const { error: supabaseError } = await supabase
+          .from('seller_invites')
+          .delete()
+          .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+
+        if (supabaseError) {
+          console.error('Error clearing test data from Supabase:', supabaseError);
+          alert('Failed to clear test data from database. Please try again.');
+          return;
+        }
+
+        // Clear localStorage
+        localStorage.removeItem('yourcitydeals_seller_invites');
+        setSellerInvites([]);
+        
+        alert('All test data cleared successfully. You can now create new invites.');
+      } catch (error) {
+        console.error('Error clearing test data:', error);
+        alert('Failed to clear test data. Please try again.');
+      }
+    }
+  };
+
   // Generate unique invite token
   const generateInviteToken = () => {
     // Generate a unique token for each invite
@@ -299,11 +326,12 @@ The YourCity Deals Team`;
       
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'invites' && <InvitesTab 
+                {activeTab === 'invites' && <InvitesTab
           sellerInvites={sellerInvites}
           setSellerInvites={setSellerInvites}
           organizationalHubs={organizationalHubs}
           couponBooks={couponBooks}
+          handleClearAllTestData={handleClearAllTestData}
         />}
         {activeTab === 'approvals' && <ApprovalsTab 
           sellerInvites={sellerInvites}
@@ -320,16 +348,18 @@ The YourCity Deals Team`;
 }
 
 // Invites Tab Component
-function InvitesTab({ 
-  sellerInvites, 
-  setSellerInvites, 
-  organizationalHubs, 
-  couponBooks
+function InvitesTab({
+  sellerInvites,
+  setSellerInvites,
+  organizationalHubs,
+  couponBooks,
+  handleClearAllTestData
 }: {
   sellerInvites: any[];
   setSellerInvites: (invites: any[]) => void;
   organizationalHubs: any[];
   couponBooks: any[];
+  handleClearAllTestData: () => void;
 }) {
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteForm, setInviteForm] = useState({
@@ -443,26 +473,20 @@ function InvitesTab({
             {filteredInvites.length} total
           </span>
         </div>
-        <button 
-          onClick={() => setShowInviteForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Invite Seller
-        </button>
-        {filteredInvites.length > 0 && (
+        <div className="flex space-x-2">
           <button
-            onClick={() => {
-              if (confirm(`Are you sure you want to delete ALL ${filteredInvites.length} seller invites? This cannot be undone.`)) {
-                localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify([]));
-                setSellerInvites([]);
-                alert('All seller invites have been deleted.');
-              }
-            }}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            onClick={handleClearAllTestData}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
           >
-            Clear All
+            Clear All Test Data
           </button>
-        )}
+          <button 
+            onClick={() => setShowInviteForm(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Invite Seller
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -611,7 +635,7 @@ Here's what we're offering:
 • Access to our proven sales system and marketing materials
 
 To get started, please click the link below to complete your seller profile:
-https://yourcitydeals.com/invite/TEST123
+https://yourcitydeals.com/invite/${invite.token}
 
 The profile setup process is simple and takes just a few minutes. You'll be able to:
 • Complete your seller profile
@@ -654,12 +678,31 @@ support@yourcitydeals.com`;
                         View Details
                       </button>
                       <button 
-                        onClick={() => {
+                        onClick={async () => {
                           if (confirm(`Are you sure you want to delete ${invite.first_name || invite.firstName}? This will permanently remove all their data and cannot be undone.`)) {
-                            const updatedInvites = sellerInvites.filter((inv: any) => inv.id !== invite.id);
-                            localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
-                            setSellerInvites(updatedInvites);
-                            alert('Seller invite deleted successfully.');
+                            try {
+                              // Delete from Supabase
+                              const { error: supabaseError } = await supabase
+                                .from('seller_invites')
+                                .delete()
+                                .eq('id', invite.id);
+
+                              if (supabaseError) {
+                                console.error('Error deleting from Supabase:', supabaseError);
+                                alert('Failed to delete from database. Please try again.');
+                                return;
+                              }
+
+                              // Also delete from localStorage as fallback
+                              const updatedInvites = sellerInvites.filter((inv: any) => inv.id !== invite.id);
+                              localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+                              setSellerInvites(updatedInvites);
+                              
+                              alert('Seller invite deleted successfully from database.');
+                            } catch (error) {
+                              console.error('Error deleting invite:', error);
+                              alert('Failed to delete invite. Please try again.');
+                            }
                           }
                         }}
                         className="text-red-600 hover:text-red-900"
@@ -1026,18 +1069,62 @@ support@yourcitydeals.com`;
     setPendingEmail(null);
   };
 
-  const handleDeleteInvite = (invite: any) => {
+  const handleDeleteInvite = async (invite: any) => {
     if (confirm(`Are you sure you want to delete ${invite.first_name} ${invite.last_name}? This will permanently remove all their data and cannot be undone.`)) {
-      // Remove the invite from localStorage
-      const updatedInvites = sellerInvites.filter((inv: any) => inv.id !== invite.id);
-      localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
-      setSellerInvites(updatedInvites);
-      
-      // Close the modal
-      setShowInviteDetails(false);
-      setSelectedInvite(null);
-      
-      alert('Seller invite deleted successfully. You can now create a new invite with the same data for testing.');
+      try {
+        // Delete from Supabase
+        const { error: supabaseError } = await supabase
+          .from('seller_invites')
+          .delete()
+          .eq('id', invite.id);
+
+        if (supabaseError) {
+          console.error('Error deleting from Supabase:', supabaseError);
+          alert('Failed to delete from database. Please try again.');
+          return;
+        }
+
+        // Also delete from localStorage as fallback
+        const updatedInvites = sellerInvites.filter((inv: any) => inv.id !== invite.id);
+        localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+        setSellerInvites(updatedInvites);
+        
+        // Close the modal
+        setShowInviteDetails(false);
+        setSelectedInvite(null);
+        
+        alert('Seller invite deleted successfully from database.');
+      } catch (error) {
+        console.error('Error deleting invite:', error);
+        alert('Failed to delete invite. Please try again.');
+      }
+    }
+  };
+
+  const handleClearAllTestData = async () => {
+    if (confirm('Are you sure you want to delete ALL test data? This will remove all invites and cannot be undone.')) {
+      try {
+        // Delete all invites from Supabase
+        const { error: supabaseError } = await supabase
+          .from('seller_invites')
+          .delete()
+          .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
+
+        if (supabaseError) {
+          console.error('Error clearing test data from Supabase:', supabaseError);
+          alert('Failed to clear test data from database. Please try again.');
+          return;
+        }
+
+        // Clear localStorage
+        localStorage.removeItem('yourcitydeals_seller_invites');
+        setSellerInvites([]);
+        
+        alert('All test data cleared successfully. You can now create new invites.');
+      } catch (error) {
+        console.error('Error clearing test data:', error);
+        alert('Failed to clear test data. Please try again.');
+      }
     }
   };
 
