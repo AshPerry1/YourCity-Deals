@@ -138,19 +138,70 @@ export default function ReferralPage({ params }: { params: Promise<{ code: strin
         {/* Coupon Books */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {referralData.books.map((book) => (
-            <div key={book.id} className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">{book.title}</h3>
-              <p className="text-gray-600 mb-4">{book.description}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold text-blue-600">
-                  ${(book.price / 100).toFixed(2)}
-                </span>
-                <button
-                  onClick={() => handlePurchase(book.id)}
-                  className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Purchase
-                </button>
+            <div key={book.id} className="group">
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/30 overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105">
+                {/* Card Header with Organization Logo */}
+                <div className="relative h-32 bg-gray-100">
+                  <div className="absolute inset-0 bg-black/5"></div>
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                    <span className="inline-flex px-3 py-1 text-xs font-semibold rounded-full border border-gray-300 bg-white/80 backdrop-blur-sm text-gray-700">
+                      School
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/80 rounded-full flex items-center justify-center shadow-lg">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-lg font-bold text-gray-800 leading-tight bg-white/80 px-2 py-1 rounded">{book.title}</h3>
+                  </div>
+                </div>
+                
+                <div className="p-6">
+                  <p className="text-gray-600 text-sm mb-6 leading-relaxed">{book.description}</p>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center text-sm text-gray-500">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                      </div>
+                      {referralData.schoolName}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                        </svg>
+                      </div>
+                      Multiple offers available
+                    </div>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      Valid until Dec 30, 2025
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-6">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                      ${(book.price / 100).toFixed(2)}
+                    </div>
+                    <button
+                      onClick={() => handlePurchase(book.id)}
+                      className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
+                    >
+                      Buy Now
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}

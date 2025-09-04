@@ -139,12 +139,29 @@ function InvitesTab({
     organizationHub: '',
     couponBook: ''
   });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterOrganization, setFilterOrganization] = useState('');
+  const [filterBook, setFilterBook] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
 
-  // Filter invites based on search and filters (only pending invites)
+  // Filter invites based on search and filters
   const filteredInvites = sellerInvites.filter((invite: any) => {
-    // Only show pending invites (not ready_for_review, approved, rejected, etc.)
-    const isPending = invite.status === 'pending';
-    return isPending;
+    // Search filter
+    const matchesSearch = searchTerm === '' || 
+      invite.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invite.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Organization filter
+    const matchesOrganization = filterOrganization === '' || invite.organizationHub === filterOrganization;
+    
+    // Book filter
+    const matchesBook = filterBook === '' || invite.couponBook === filterBook;
+    
+    // Status filter
+    const matchesStatus = filterStatus === 'all' || invite.status === filterStatus;
+    
+    return matchesSearch && matchesOrganization && matchesBook && matchesStatus;
   });
 
   const generateInviteToken = () => {
@@ -211,7 +228,7 @@ function InvitesTab({
         <div className="flex items-center space-x-3">
           <h2 className="text-xl font-semibold text-gray-900">Seller Invites</h2>
           <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-            {filteredInvites.length} pending
+            {filteredInvites.length} total
           </span>
         </div>
         <button 
@@ -222,10 +239,285 @@ function InvitesTab({
         </button>
       </div>
 
+      {/* Search and Filters */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name or email..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Organization Hub</label>
+            <select
+              value={filterOrganization}
+              onChange={(e) => setFilterOrganization(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Organizations</option>
+              {organizationalHubs.map((hub) => (
+                <option key={hub.id} value={hub.name}>{hub.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Coupon Book</label>
+            <select
+              value={filterBook}
+              onChange={(e) => setFilterBook(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Books</option>
+              {couponBooks.map((book) => (
+                <option key={book.id} value={book.title}>{book.title}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="ready_for_review">Ready for Review</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="edit_requested">Edit Requested</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       {/* Rest of the InvitesTab content would go here */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <p className="text-gray-600">Pending invites will appear here. Sellers who complete their profiles will move to the "Seller Approvals" tab.</p>
       </div>
+
+      {/* Invite History Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">Invite History</h3>
+        </div>
+        
+        {filteredInvites.length === 0 ? (
+          <div className="px-6 py-8 text-center">
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No invites found</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {searchTerm || filterOrganization || filterBook || filterStatus !== 'all' 
+                ? 'Try adjusting your search or filters'
+                : 'Get started by inviting a new seller.'
+              }
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization Hub</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coupon Book</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sent Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredInvites.map((invite) => (
+                  <tr key={invite.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {invite.firstName} {invite.lastName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {invite.email}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {invite.organizationHub || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {invite.couponBook || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        invite.status === 'pending' ? 'bg-orange-100 text-orange-800' :
+                        invite.status === 'ready_for_review' ? 'bg-blue-100 text-blue-800' :
+                        invite.status === 'approved' ? 'bg-green-100 text-green-800' :
+                        invite.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        invite.status === 'edit_requested' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {invite.status === 'pending' ? 'Pending' :
+                         invite.status === 'ready_for_review' ? 'Ready for Review' :
+                         invite.status === 'approved' ? 'Approved' :
+                         invite.status === 'rejected' ? 'Rejected' :
+                         invite.status === 'edit_requested' ? 'Edit Requested' :
+                         invite.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {invite.sentAt}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button 
+                        onClick={() => {
+                          const inviteLink = `https://yourcitydeals.com/invite/${invite.inviteToken}`;
+                          navigator.clipboard.writeText(inviteLink);
+                          alert('Invite link copied to clipboard!');
+                        }}
+                        className="text-blue-600 hover:text-blue-900 mr-3"
+                      >
+                        Copy Link
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const emailTemplate = `Hi ${invite.firstName},
+
+You've been invited to become a seller with YourCity Deals! 
+
+We're excited to have you join our team of sellers who help local businesses grow while supporting great causes.
+
+To get started, please click the link below to complete your profile:
+https://yourcitydeals.com/invite/${invite.inviteToken}
+
+This link will take you through a simple process to:
+• Complete your seller profile
+• Set up your account
+• Get started with your first deals
+
+If you have any questions, please don't hesitate to reach out to us.
+
+We look forward to working with you!
+
+Best regards,
+The YourCity Deals Team`;
+
+                          const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('YourCity Deals - Seller Invitation')}&body=${encodeURIComponent(emailTemplate)}`;
+                          window.open(mailtoLink, '_blank');
+                        }}
+                        className="text-green-600 hover:text-green-900"
+                      >
+                        Resend Email
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Invite Form Modal */}
+      {showInviteForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Invite New Seller</h3>
+              <button
+                onClick={() => setShowInviteForm(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); handleCreateInvite(); }}>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    value={inviteForm.firstName}
+                    onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    value={inviteForm.lastName}
+                    onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={inviteForm.email}
+                    onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Organization Hub</label>
+                  <select
+                    value={inviteForm.organizationHub}
+                    onChange={(e) => setInviteForm({...inviteForm, organizationHub: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Organization Hub</option>
+                    {organizationalHubs.map((hub) => (
+                      <option key={hub.id} value={hub.name}>{hub.name}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Book</label>
+                  <select
+                    value={inviteForm.couponBook}
+                    onChange={(e) => setInviteForm({...inviteForm, couponBook: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Coupon Book</option>
+                    {couponBooks.map((book) => (
+                      <option key={book.id} value={book.title}>{book.title}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowInviteForm(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Send Invite
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -248,6 +540,17 @@ function ApprovalsTab({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterOrganization, setFilterOrganization] = useState('');
   const [filterBook, setFilterBook] = useState('');
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editingInvite, setEditingInvite] = useState<any>(null);
+  const [editForm, setEditForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    zipCode: '',
+    organizationHub: '',
+    couponBook: ''
+  });
 
   useEffect(() => {
     // Load ready for review invites from the main component
@@ -393,6 +696,65 @@ The YourCity Deals Team`;
     }
   };
 
+  const handleEditProfile = (invite: any) => {
+    setEditingInvite(invite);
+    setEditForm({
+      firstName: invite.first_name || '',
+      lastName: invite.last_name || '',
+      email: invite.email || '',
+      phone: invite.phone || '',
+      zipCode: invite.zip_code || '',
+      organizationHub: invite.organizationHub || '',
+      couponBook: invite.couponBook || ''
+    });
+    setShowEditProfileModal(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingInvite) return;
+
+    // Update the invite with edited data
+    const updatedInvites = readyForReviewInvites.map((inv: any) => 
+      inv.id === editingInvite.id ? {
+        ...inv,
+        first_name: editForm.firstName,
+        last_name: editForm.lastName,
+        email: editForm.email,
+        phone: editForm.phone,
+        zip_code: editForm.zipCode,
+        organizationHub: editForm.organizationHub,
+        couponBook: editForm.couponBook,
+        edited_at: new Date().toISOString()
+      } : inv
+    );
+    setReadyForReviewInvites(updatedInvites);
+
+    // Send notification email
+    const emailTemplate = `Hi ${editForm.firstName},
+
+Your seller profile has been updated by our admin team.
+
+Updated Information:
+• Name: ${editForm.firstName} ${editForm.lastName}
+• Email: ${editForm.email}
+• Phone: ${editForm.phone || 'Not provided'}
+• ZIP Code: ${editForm.zipCode || 'Not provided'}
+• Organization Hub: ${editForm.organizationHub || 'Not assigned'}
+• Coupon Book: ${editForm.couponBook || 'Not assigned'}
+
+If you notice any discrepancies or have questions about these changes, please contact us immediately.
+
+Best regards,
+The YourCity Deals Team`;
+
+    const mailtoLink = `mailto:${editForm.email}?subject=${encodeURIComponent('YourCity Deals - Profile Updated')}&body=${encodeURIComponent(emailTemplate)}`;
+    window.open(mailtoLink, '_blank');
+
+    setShowEditProfileModal(false);
+    setEditingInvite(null);
+    alert('Profile updated! Notification email has been opened.');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -431,6 +793,48 @@ The YourCity Deals Team`;
           </div>
         </div>
       )}
+
+      {/* Search and Filters */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name or email..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Organization Hub</label>
+            <select
+              value={filterOrganization}
+              onChange={(e) => setFilterOrganization(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Organizations</option>
+              {organizationalHubs.map((hub) => (
+                <option key={hub.id} value={hub.name}>{hub.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Coupon Book</label>
+            <select
+              value={filterBook}
+              onChange={(e) => setFilterBook(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Books</option>
+              {couponBooks.map((book) => (
+                <option key={book.id} value={book.title}>{book.title}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
 
       {/* Ready for Review Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -559,6 +963,12 @@ The YourCity Deals Team`;
                 <h4 className="text-md font-semibold text-gray-900 mb-3">Actions</h4>
                 <div className="flex flex-wrap gap-3">
                   <button
+                    onClick={() => handleEditProfile(selectedInvite)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    Edit Profile
+                  </button>
+                  <button
                     onClick={() => handleRequestEdits(selectedInvite)}
                     className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
                   >
@@ -584,6 +994,123 @@ The YourCity Deals Team`;
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Profile Modal */}
+      {showEditProfileModal && editingInvite && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Edit Seller Profile</h3>
+              <button
+                onClick={() => setShowEditProfileModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    value={editForm.firstName}
+                    onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    value={editForm.lastName}
+                    onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input
+                    type="tel"
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                  <input
+                    type="text"
+                    value={editForm.zipCode}
+                    onChange={(e) => setEditForm({...editForm, zipCode: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Organization Hub</label>
+                  <select
+                    value={editForm.organizationHub}
+                    onChange={(e) => setEditForm({...editForm, organizationHub: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Organization Hub</option>
+                    {organizationalHubs.map((hub) => (
+                      <option key={hub.id} value={hub.name}>{hub.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Coupon Book</label>
+                  <select
+                    value={editForm.couponBook}
+                    onChange={(e) => setEditForm({...editForm, couponBook: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Coupon Book</option>
+                    {couponBooks.map((book) => (
+                      <option key={book.id} value={book.title}>{book.title}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowEditProfileModal(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         </div>
