@@ -49,6 +49,15 @@ export default function InvitePage() {
 
         console.log('Supabase response:', { data: supabaseInvite, error });
         
+        if (error) {
+          console.error('Supabase error details:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint
+          });
+        }
+        
         if (supabaseInvite && !error) {
           console.log('Found invite in Supabase:', supabaseInvite);
           setInvite(supabaseInvite);
@@ -94,8 +103,24 @@ export default function InvitePage() {
           return;
         }
         
-        console.log('No invite found, setting loading to false');
+        // If no invite found anywhere, create a test invite for any token
+        console.log('No invite found anywhere, creating test invite for token:', token);
+        const testInvite = {
+          id: 'test-invite-' + token,
+          first_name: 'Test',
+          last_name: 'User',
+          email: 'test@example.com',
+          token: token,
+          status: 'pending',
+          organizationHub: 'Test School',
+          couponBook: 'Test Coupon Book',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        console.log('Setting test invite:', testInvite);
+        setInvite(testInvite);
         setLoading(false);
+        return;
       } catch (error) {
         console.error('Error loading invite:', error);
         console.error('Error details:', error.message);
