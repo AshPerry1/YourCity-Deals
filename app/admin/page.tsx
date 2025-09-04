@@ -246,12 +246,15 @@ export default function AdminPage() {
               last_name: inviteForm.lastName,
               email: inviteForm.email,
               status: 'pending',
-              organization_hub: inviteForm.organizationHub,
-              coupon_book: inviteForm.couponBook,
+              organization_hub: inviteForm.organizationHub || null,
+              coupon_book: inviteForm.couponBook || null,
               sent_at: new Date().toISOString(),
               email_sent: true,
               link_clicked: false,
-              profile_completed: false
+              profile_completed: false,
+              phone: null,
+              zip_code: null,
+              profile_picture_url: null
             };
 
             console.log('Saving invite to Supabase:', newInvite);
@@ -264,9 +267,14 @@ export default function AdminPage() {
               .single();
 
             console.log('Supabase save result:', { savedInvite, saveError });
+            console.log('Save error details:', saveError);
+            console.log('Saved invite details:', savedInvite);
 
             if (saveError) {
               console.error('Error saving invite to Supabase:', saveError);
+              console.error('Error code:', saveError.code);
+              console.error('Error message:', saveError.message);
+              console.error('Error details:', saveError.details);
               alert('Failed to create invite. Please try again.');
               return;
             }
