@@ -26,6 +26,7 @@ export default function InvitePage() {
     
     const loadInvite = () => {
       try {
+        console.log('Starting invite load process...');
         // Check for existing authentication
         const savedAuth = localStorage.getItem('yourcitydeals_seller_auth');
         if (savedAuth) {
@@ -39,12 +40,14 @@ export default function InvitePage() {
         
         // Load invite from localStorage
         const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
+        console.log('Saved invites from localStorage:', savedInvites);
         if (savedInvites) {
           const invites = JSON.parse(savedInvites);
           const foundInvite = invites.find((inv: any) => inv.token === token);
           console.log('Found invite from localStorage:', foundInvite);
           
           if (foundInvite) {
+            console.log('Setting found invite:', foundInvite);
             setInvite(foundInvite);
             setLoading(false);
             return;
@@ -66,12 +69,17 @@ export default function InvitePage() {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           };
+          console.log('Setting fallback invite:', fallbackInvite);
           setInvite(fallbackInvite);
+          setLoading(false);
+          return;
         }
         
+        console.log('No invite found, setting loading to false');
         setLoading(false);
       } catch (error) {
         console.error('Error loading invite:', error);
+        console.error('Error details:', error.message);
         setLoading(false);
       }
     };
