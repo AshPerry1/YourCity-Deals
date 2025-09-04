@@ -38,6 +38,9 @@ export default function AdminPage() {
         
         if (savedInvites) {
           invites = JSON.parse(savedInvites);
+          console.log('Loaded invites from localStorage:', invites);
+          console.log('Total invites loaded:', invites.length);
+          console.log('Invites with ready_for_review status:', invites.filter((inv: any) => inv.status === 'ready_for_review'));
         } else {
           // Start with empty invites - let user add real people
           localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify([]));
@@ -91,7 +94,10 @@ export default function AdminPage() {
   });
 
   // Get ready for review invites for the Approvals tab
-  const readyForReviewInvites = sellerInvites.filter((invite: any) => invite.status === 'ready_for_review');
+  const readyForReviewInvites = sellerInvites.filter((invite: any) => {
+    console.log('Checking invite:', invite.id, invite.status, invite.first_name);
+    return invite.status === 'ready_for_review';
+  });
 
   // Generate unique invite token
   const generateInviteToken = () => {
