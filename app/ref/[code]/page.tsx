@@ -192,8 +192,42 @@ export default function ReferralPage({ params }: { params: Promise<{ code: strin
 
   const fetchReferralData = async (code: string) => {
     try {
-      // In real implementation, fetch from your database
-      // For now, simulate the data
+      // Load actual invite data from localStorage
+      const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
+      if (savedInvites) {
+        const invites = JSON.parse(savedInvites);
+        const foundInvite = invites.find((inv: any) => inv.token === code);
+        
+        if (foundInvite) {
+          // Create referral data from the actual invite
+          const referralData: ReferralData = {
+            code,
+            studentName: `${foundInvite.firstName} ${foundInvite.lastName}`,
+            schoolId: foundInvite.id,
+            schoolName: foundInvite.organizationHub || 'Mountain Brook High School',
+            books: [
+              {
+                id: 'book-1',
+                title: foundInvite.couponBook || '2025 Spring Coupon Book',
+                price: 2500, // $25.00
+                description: 'Over 50 local business discounts and deals'
+              },
+              {
+                id: 'book-2',
+                title: 'Premium Coupon Book',
+                price: 3500, // $35.00
+                description: 'Premium deals with exclusive offers'
+              }
+            ]
+          };
+          
+          setReferralData(referralData);
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Fallback to mock data if no invite found
       const mockData: ReferralData = {
         code,
         studentName: 'John Smith',
@@ -328,7 +362,7 @@ export default function ReferralPage({ params }: { params: Promise<{ code: strin
             Welcome to {referralData.schoolName}!
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            You've been invited to join our digital coupon book program. 
+            Hi {referralData.studentName}, you've been invited to join our digital coupon book program. 
             Purchase a coupon book and start saving at local businesses while supporting your school.
           </p>
         </div>
