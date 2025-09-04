@@ -585,7 +585,7 @@ The YourCity Deals Team`;
                         }}
                         className={`mr-3 ${invite.emailSent ? 'text-green-600 hover:text-green-900' : 'text-blue-600 hover:text-blue-900'}`}
                       >
-                        {invite.emailSent ? 'Re-send Email' : 'Send Email'}
+                        {invite.emailSent ? 'Send Email Again' : 'Send Email'}
                       </button>
                       <button 
                         onClick={() => {
@@ -697,7 +697,7 @@ The YourCity Deals Team`;
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                 >
-                  Send Invite
+                  Send Invite & Email
                 </button>
               </div>
             </form>
@@ -825,7 +825,7 @@ support@yourcitydeals.com`;
       window.open(mailtoLink, '_blank');
 
       setShowInviteDetails(false);
-      alert(`Seller approved! Login credentials:\nUsername: ${sellerUsername}\nPassword: ${sellerPassword}\n\nApproval email has been opened.`);
+      alert(`Seller approved! Login credentials:\nUsername: ${sellerUsername}\nPassword: ${sellerPassword}\n\nApproval email has been opened for you to review and send.`);
     }
   };
 
@@ -873,7 +873,7 @@ support@yourcitydeals.com`;
       window.open(mailtoLink, '_blank');
 
       setShowInviteDetails(false);
-      alert('Seller rejected! Rejection email has been opened.');
+      alert('Seller rejected! Rejection email has been opened for you to review and send.');
     }
   };
 
@@ -922,7 +922,7 @@ support@yourcitydeals.com`;
       window.open(mailtoLink, '_blank');
 
       setShowInviteDetails(false);
-      alert('Edit request sent! Email has been opened.');
+      alert('Edit request sent! Email has been opened for you to review and send.');
     }
   };
 
@@ -1202,19 +1202,19 @@ The YourCity Deals Team`;
                     onClick={() => handleRequestEdits(selectedInvite)}
                     className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
                   >
-                    Request Edits
+                    Request Edits & Send Email
                   </button>
                   <button
                     onClick={() => handleApproveSeller(selectedInvite)}
                     className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
                   >
-                    Approve Seller
+                    Approve & Send Email
                   </button>
                   <button
                     onClick={() => handleRejectSeller(selectedInvite)}
                     className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
                   >
-                    Reject Seller
+                    Reject & Send Email
                   </button>
                   <button
                     onClick={() => setShowInviteDetails(false)}
