@@ -324,6 +324,7 @@ export default function InvitePage() {
       console.log('Profile data to save:', profileDataToSave);
 
       // Save profile to Supabase
+      console.log('Attempting to save profile to Supabase...');
       const { data: profile, error: profileError } = await supabase
         .from('seller_profiles')
         .upsert(profileDataToSave, { 
@@ -332,6 +333,8 @@ export default function InvitePage() {
         })
         .select()
         .single();
+
+      console.log('Supabase profile save response:', { data: profile, error: profileError });
 
       if (profileError) {
         console.error('Error saving profile to Supabase:', profileError);
@@ -348,6 +351,19 @@ export default function InvitePage() {
           return;
         }
         
+        // Check if it's a table not found error
+        if (profileError.message && profileError.message.includes('relation "seller_profiles" does not exist')) {
+          alert('Database table not found. Please contact support.');
+          return;
+        }
+        
+        // Check if it's a foreign key constraint error
+        if (profileError.message && profileError.message.includes('foreign key')) {
+          alert('Invalid invite reference. Please try again or contact support.');
+          return;
+        }
+        
+        alert(`Profile completion failed: ${profileError.message}`);
         throw profileError;
       }
 
