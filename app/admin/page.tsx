@@ -737,6 +737,12 @@ function ApprovalsTab({
     organizationHub: '',
     couponBook: ''
   });
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailContent, setEmailContent] = useState({
+    to: '',
+    subject: '',
+    body: ''
+  });
 
   useEffect(() => {
     // Load ready for review invites from the main component
@@ -821,11 +827,16 @@ Best regards,
 The YourCity Deals Team
 support@yourcitydeals.com`;
 
-      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('🎉 APPROVED: YourCity Deals Seller Account')}&body=${encodeURIComponent(emailTemplate)}`;
-      window.open(mailtoLink, '_blank');
+      // Show email modal instead of opening mailto link
+      setEmailContent({
+        to: invite.email,
+        subject: '🎉 APPROVED: YourCity Deals Seller Account',
+        body: emailTemplate
+      });
+      setShowEmailModal(true);
 
       setShowInviteDetails(false);
-      alert(`Seller approved! Login credentials:\nUsername: ${sellerUsername}\nPassword: ${sellerPassword}\n\nApproval email has been opened for you to review and send.`);
+      alert(`Seller approved! Login credentials:\nUsername: ${sellerUsername}\nPassword: ${sellerPassword}\n\nEmail content is ready for you to review and send.`);
     }
   };
 
@@ -869,11 +880,16 @@ Best regards,
 The YourCity Deals Team
 support@yourcitydeals.com`;
 
-      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('❌ DECLINED: YourCity Deals Seller Application')}&body=${encodeURIComponent(emailTemplate)}`;
-      window.open(mailtoLink, '_blank');
+      // Show email modal instead of opening mailto link
+      setEmailContent({
+        to: invite.email,
+        subject: '❌ DECLINED: YourCity Deals Seller Application',
+        body: emailTemplate
+      });
+      setShowEmailModal(true);
 
       setShowInviteDetails(false);
-      alert('Seller rejected! Rejection email has been opened for you to review and send.');
+      alert('Seller rejected! Email content is ready for you to review and send.');
     }
   };
 
@@ -918,11 +934,16 @@ Best regards,
 The YourCity Deals Team
 support@yourcitydeals.com`;
 
-      const mailtoLink = `mailto:${invite.email}?subject=${encodeURIComponent('📝 ACTION REQUIRED: Update YourCity Deals Seller Profile')}&body=${encodeURIComponent(emailTemplate)}`;
-      window.open(mailtoLink, '_blank');
+      // Show email modal instead of opening mailto link
+      setEmailContent({
+        to: invite.email,
+        subject: '📝 ACTION REQUIRED: Update YourCity Deals Seller Profile',
+        body: emailTemplate
+      });
+      setShowEmailModal(true);
 
       setShowInviteDetails(false);
-      alert('Edit request sent! Email has been opened for you to review and send.');
+      alert('Edit request ready! Email content is ready for you to review and send.');
     }
   };
 
