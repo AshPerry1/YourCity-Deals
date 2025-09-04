@@ -339,16 +339,16 @@ export default function InvitePage() {
 
       // Sign in the seller
       setIsAuthenticated(true);
-      setSellerAccount(profile);
+      setSellerAccount(updatedInvite);
       
       // Save authentication state
       localStorage.setItem('yourcitydeals_seller_auth', JSON.stringify({
         isAuthenticated: true,
-        sellerId: profile.id,
-        sellerData: profile
+        sellerId: updatedInvite.id,
+        sellerData: updatedInvite
       }));
 
-      console.log('Profile completed and saved:', profile);
+      console.log('Profile completed and saved:', updatedInvite);
       setStep('ready_for_review');
       
     } catch (error) {
