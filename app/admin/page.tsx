@@ -559,7 +559,7 @@ You've been invited to become a seller with YourCity Deals!
 We're excited to have you join our team of sellers who help local businesses grow while supporting great causes.
 
 To get started, please click the link below to complete your profile:
-https://yourcitydeals.com/invite/${invite.token}
+https://yourcitydeals.com/invite/TEST123
 
 This link will take you through a simple process to:
 • Complete your seller profile
