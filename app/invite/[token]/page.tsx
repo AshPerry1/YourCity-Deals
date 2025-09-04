@@ -282,8 +282,9 @@ export default function InvitePage() {
       // Check if profile already exists in localStorage
       const savedProfiles = localStorage.getItem('yourcitydeals_seller_profiles');
       const profiles = savedProfiles ? JSON.parse(savedProfiles) : [];
-      const existingProfile = profiles.find((p: any) => p.invite_id === invite.id);
+      const existingProfile = profiles.find((p: any) => p.invite_id === (invite.id || 'test-invite'));
       console.log('Existing profiles:', profiles);
+      console.log('Looking for invite_id:', invite.id || 'test-invite');
       console.log('Existing profile found:', existingProfile);
       
       let profile;
@@ -291,7 +292,7 @@ export default function InvitePage() {
         console.log('Updating existing profile...');
         // Update existing profile
         const updatedProfiles = profiles.map((p: any) => 
-          p.invite_id === invite.id ? { ...p, ...profileDataToSave, updated_at: new Date().toISOString() } : p
+          p.invite_id === (invite.id || 'test-invite') ? { ...p, ...profileDataToSave, updated_at: new Date().toISOString() } : p
         );
         localStorage.setItem('yourcitydeals_seller_profiles', JSON.stringify(updatedProfiles));
         profile = { ...existingProfile, ...profileDataToSave };
@@ -318,7 +319,7 @@ export default function InvitePage() {
         const invites = JSON.parse(savedInvites);
         console.log('Parsed invites:', invites);
         const updatedInvites = invites.map((inv: any) => 
-          inv.id === invite.id ? { 
+          inv.id === (invite.id || 'test-invite') ? { 
             ...inv, 
             status: 'ready_for_review', 
             updated_at: new Date().toISOString(),
