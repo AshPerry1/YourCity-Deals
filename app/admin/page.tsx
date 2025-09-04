@@ -417,6 +417,20 @@ function InvitesTab({
         >
           Invite Seller
         </button>
+        {filteredInvites.length > 0 && (
+          <button
+            onClick={() => {
+              if (confirm(`Are you sure you want to delete ALL ${filteredInvites.length} seller invites? This cannot be undone.`)) {
+                localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify([]));
+                setSellerInvites([]);
+                alert('All seller invites have been deleted.');
+              }
+            }}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Clear All
+          </button>
+        )}
       </div>
 
       {/* Search and Filters */}
@@ -592,9 +606,22 @@ The YourCity Deals Team`;
                           setSelectedInvite(invite);
                           setShowInviteDetails(true);
                         }}
-                        className="text-purple-600 hover:text-purple-900"
+                        className="text-purple-600 hover:text-purple-900 mr-3"
                       >
                         View Details
+                      </button>
+                      <button 
+                        onClick={() => {
+                          if (confirm(`Are you sure you want to delete ${invite.first_name || invite.firstName}? This will permanently remove all their data and cannot be undone.`)) {
+                            const updatedInvites = sellerInvites.filter((inv: any) => inv.id !== invite.id);
+                            localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+                            setSellerInvites(updatedInvites);
+                            alert('Seller invite deleted successfully.');
+                          }
+                        }}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
                       </button>
                     </td>
                   </tr>
