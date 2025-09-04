@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { sellerInvitesService, sellerProfilesService } from '@/lib/sellerDatabase';
 
 export default function InvitePage() {
   const params = useParams();
@@ -25,7 +24,7 @@ export default function InvitePage() {
   useEffect(() => {
     console.log('Loading invite for token:', token);
     
-    const loadInvite = async () => {
+    const loadInvite = () => {
       try {
         // Check for existing authentication
         const savedAuth = localStorage.getItem('yourcitydeals_seller_auth');
@@ -38,50 +37,36 @@ export default function InvitePage() {
           }
         }
         
-        // Load invite from database
-        const foundInvite = await sellerInvitesService.getInviteByToken(token);
-        console.log('Found invite from database:', foundInvite);
-        
-        if (foundInvite) {
-          setInvite(foundInvite);
-          setLoading(false);
-          return;
+        // Load invite from localStorage
+        const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
+        if (savedInvites) {
+          const invites = JSON.parse(savedInvites);
+          const foundInvite = invites.find((inv: any) => inv.token === token);
+          console.log('Found invite from localStorage:', foundInvite);
+          
+          if (foundInvite) {
+            setInvite(foundInvite);
+            setLoading(false);
+            return;
+          }
         }
         
-        // For testing: TEST123 is always valid - but we need to find the actual invite
+        // For testing: TEST123 is always valid - create fallback invite
         if (token === 'TEST123') {
-          console.log('TEST123 token detected, looking for TEST123 invite');
-          const savedInvites = localStorage.getItem('yourcitydeals_invites');
-          if (savedInvites) {
-            const invites = JSON.parse(savedInvites);
-            const testInvite = invites.find((inv: any) => inv.inviteToken === 'TEST123');
-            console.log('Found TEST123 invite:', testInvite);
-            if (testInvite) {
-              setInvite(testInvite);
-            } else {
-              // Fallback if no TEST123 invite exists
-              console.log('No TEST123 invite found, creating fallback');
-              setInvite({
-                id: 'test-invite',
-                first_name: 'John',
-                last_name: 'Seller',
-                email: 'john@example.com',
-                token: 'TEST123',
-                status: 'pending'
-              });
-            }
-          } else {
-            // Fallback if no invites exist
-            console.log('No invites exist, creating fallback');
-            setInvite({
-              id: 'test-invite',
-              first_name: 'John',
-              last_name: 'Seller',
-              email: 'john@example.com',
-              token: 'TEST123',
-              status: 'pending'
-            });
-          }
+          console.log('TEST123 token detected, creating fallback invite');
+          const fallbackInvite = {
+            id: 'test-invite',
+            firstName: 'John',
+            lastName: 'Seller',
+            email: 'john@example.com',
+            token: 'TEST123',
+            status: 'pending',
+            organizationHub: 'Mountain Brook High School',
+            couponBook: 'Birmingham Restaurant Deals',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setInvite(fallbackInvite);
         }
         
         setLoading(false);
@@ -266,7 +251,7 @@ export default function InvitePage() {
     }
 
     try {
-      // Create or update seller profile in database
+      // Create or update seller profile in localStorage
       const profileDataToSave = {
         invite_id: invite.id,
         first_name: profileData.firstName,
@@ -279,54 +264,40 @@ export default function InvitePage() {
         profile_completed_at: new Date().toISOString()
       };
 
-      // Check if profile already exists
-      const existingProfile = await sellerProfilesService.getProfileByInviteId(invite.id);
+      // Check if profile already exists in localStorage
+      const savedProfiles = localStorage.getItem('yourcitydeals_seller_profiles');
+      const profiles = savedProfiles ? JSON.parse(savedProfiles) : [];
+      const existingProfile = profiles.find((p: any) => p.invite_id === invite.id);
       
       let profile;
       if (existingProfile) {
         // Update existing profile
-        await sellerProfilesService.updateProfile(existingProfile.id, profileDataToSave);
+        const updatedProfiles = profiles.map((p: any) => 
+          p.invite_id === invite.id ? { ...p, ...profileDataToSave, updated_at: new Date().toISOString() } : p
+        );
+        localStorage.setItem('yourcitydeals_seller_profiles', JSON.stringify(updatedProfiles));
         profile = { ...existingProfile, ...profileDataToSave };
       } else {
         // Create new profile
-        profile = await sellerProfilesService.createProfile(profileDataToSave);
-      }
-
-      if (!profile) {
-        // Fallback to localStorage if database fails
-        console.log('Database save failed, using localStorage fallback');
-        const fallbackProfile = {
+        const newProfile = {
           id: Date.now().toString(),
           ...profileDataToSave,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
-        
-        // Save to localStorage
-        const savedProfiles = localStorage.getItem('yourcitydeals_seller_profiles');
-        const profiles = savedProfiles ? JSON.parse(savedProfiles) : [];
-        profiles.push(fallbackProfile);
+        profiles.push(newProfile);
         localStorage.setItem('yourcitydeals_seller_profiles', JSON.stringify(profiles));
-        
-        profile = fallbackProfile;
+        profile = newProfile;
       }
 
-      // Update invite status in database
-      try {
-        await sellerInvitesService.updateInvite(invite.id, {
-          status: 'ready_for_review'
-        });
-      } catch (error) {
-        console.log('Failed to update invite in database, using localStorage fallback');
-        // Fallback to localStorage
-        const savedInvites = localStorage.getItem('yourcitydeals_invites');
-        if (savedInvites) {
-          const invites = JSON.parse(savedInvites);
-          const updatedInvites = invites.map((inv: any) => 
-            inv.id === invite.id ? { ...inv, status: 'ready_for_review' } : inv
-          );
-          localStorage.setItem('yourcitydeals_invites', JSON.stringify(updatedInvites));
-        }
+      // Update invite status in localStorage
+      const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
+      if (savedInvites) {
+        const invites = JSON.parse(savedInvites);
+        const updatedInvites = invites.map((inv: any) => 
+          inv.id === invite.id ? { ...inv, status: 'ready_for_review', updated_at: new Date().toISOString() } : inv
+        );
+        localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
       }
 
       // Update local state for immediate UI feedback

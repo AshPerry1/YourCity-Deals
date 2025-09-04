@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { adminSellerService } from '@/lib/sellerDatabase';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('invites');
@@ -11,12 +10,81 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadDashboardData = async () => {
+    const loadDashboardData = () => {
       try {
-        const data = await adminSellerService.getDashboardData();
-        setSellerInvites(data.invites || []);
-        setOrganizationalHubs(data.hubs || []);
-        setCouponBooks(data.books || []);
+        // Load seller invites from localStorage
+        const savedInvites = localStorage.getItem('yourcitydeals_seller_invites');
+        const savedProfiles = localStorage.getItem('yourcitydeals_seller_profiles');
+        const savedHubs = localStorage.getItem('yourcitydeals_organizational_hubs');
+        const savedBooks = localStorage.getItem('yourcitydeals_admin_coupon_books');
+        
+        let invites = [];
+        let hubs = [];
+        let books = [];
+        
+        if (savedInvites) {
+          invites = JSON.parse(savedInvites);
+        } else {
+          // Create default invites if none exist
+          const defaultInvites = [
+            {
+              id: '1',
+              token: 'TEST123',
+              firstName: 'John',
+              lastName: 'Doe',
+              email: 'john.doe@example.com',
+              organizationHub: 'Mountain Brook High School',
+              couponBook: 'Birmingham Restaurant Deals',
+              status: 'pending',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            },
+            {
+              id: '2',
+              token: 'TEST456',
+              firstName: 'Jane',
+              lastName: 'Smith',
+              email: 'jane.smith@example.com',
+              organizationHub: 'Lincoln High School',
+              couponBook: 'Lincoln High School 2025 Coupon Book',
+              status: 'ready_for_review',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ];
+          localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(defaultInvites));
+          invites = defaultInvites;
+        }
+        
+        if (savedHubs) {
+          hubs = JSON.parse(savedHubs);
+        } else {
+          // Create default hubs if none exist
+          const defaultHubs = [
+            { id: '1', name: 'Mountain Brook High School', location: 'Birmingham, AL' },
+            { id: '2', name: 'Lincoln High School', location: 'Lincoln, NE' },
+            { id: '3', name: 'Washington Middle School', location: 'Washington, DC' }
+          ];
+          localStorage.setItem('yourcitydeals_organizational_hubs', JSON.stringify(defaultHubs));
+          hubs = defaultHubs;
+        }
+        
+        if (savedBooks) {
+          books = JSON.parse(savedBooks);
+        } else {
+          // Create default books if none exist
+          const defaultBooks = [
+            { id: '1', title: 'Birmingham Restaurant Deals', school: 'Mountain Brook High School' },
+            { id: '2', title: 'Lincoln High School 2025 Coupon Book', school: 'Lincoln High School' },
+            { id: '3', title: 'Washington Middle School Fundraiser', school: 'Washington Middle School' }
+          ];
+          localStorage.setItem('yourcitydeals_admin_coupon_books', JSON.stringify(defaultBooks));
+          books = defaultBooks;
+        }
+        
+        setSellerInvites(invites);
+        setOrganizationalHubs(hubs);
+        setCouponBooks(books);
         setLoading(false);
       } catch (error) {
         console.error('Error loading dashboard data:', error);
@@ -235,18 +303,22 @@ function InvitesTab({
 
     const newInvite = {
       id: Date.now().toString(),
+      token: inviteToken,
       firstName: inviteForm.firstName,
       lastName: inviteForm.lastName,
       email: inviteForm.email,
-      inviteToken: inviteToken,
       status: 'pending',
-      sentAt: new Date().toISOString().split('T')[0],
-      acceptedAt: null,
       organizationHub: inviteForm.organizationHub,
-      couponBook: inviteForm.couponBook
+      couponBook: inviteForm.couponBook,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
 
-    setSellerInvites([newInvite, ...sellerInvites]);
+    // Add to localStorage
+    const updatedInvites = [newInvite, ...sellerInvites];
+    localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+    setSellerInvites(updatedInvites);
+    
     setShowInviteForm(false);
     setInviteForm({ firstName: '', lastName: '', email: '', organizationHub: '', couponBook: '' });
 
@@ -619,16 +691,19 @@ function ApprovalsTab({
   };
 
   const handleApproveSeller = (invite: any) => {
-    if (confirm(`Are you sure you want to approve ${invite.first_name} ${invite.last_name}?`)) {
-      // Update invite status
-      const updatedInvites = readyForReviewInvites.map((inv: any) => 
+    if (confirm(`Are you sure you want to approve ${invite.firstName} ${invite.lastName}?`)) {
+      // Update invite status in localStorage
+      const updatedInvites = sellerInvites.map((inv: any) => 
         inv.id === invite.id ? { ...inv, status: 'approved', approvedAt: new Date().toISOString() } : inv
       );
-      setReadyForReviewInvites(updatedInvites);
+      
+      // Save to localStorage
+      localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+      setSellerInvites(updatedInvites);
 
       // Send approval email
       const approvalLink = `https://yourcitydeals.com/activate/${invite.token}`;
-      const emailTemplate = `Hi ${invite.first_name},
+      const emailTemplate = `Hi ${invite.firstName},
 
 Great news! Your seller application has been approved! 🎉
 
@@ -659,9 +734,9 @@ The YourCity Deals Team`;
 
   const handleRejectSeller = (invite: any) => {
     const reason = prompt('Please provide a reason for rejection (optional):');
-    if (confirm(`Are you sure you want to reject ${invite.first_name} ${invite.last_name}?`)) {
-      // Update invite status
-      const updatedInvites = readyForReviewInvites.map((inv: any) => 
+    if (confirm(`Are you sure you want to reject ${invite.firstName} ${invite.lastName}?`)) {
+      // Update invite status in localStorage
+      const updatedInvites = sellerInvites.map((inv: any) => 
         inv.id === invite.id ? { 
           ...inv, 
           status: 'rejected', 
@@ -669,10 +744,13 @@ The YourCity Deals Team`;
           rejectionReason: reason || 'Application did not meet our requirements'
         } : inv
       );
-      setReadyForReviewInvites(updatedInvites);
+      
+      // Save to localStorage
+      localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+      setSellerInvites(updatedInvites);
 
       // Send rejection email
-      const emailTemplate = `Hi ${invite.first_name},
+      const emailTemplate = `Hi ${invite.firstName},
 
 Thank you for your interest in becoming a seller with YourCity Deals.
 
@@ -698,14 +776,17 @@ The YourCity Deals Team`;
   const handleRequestEdits = (invite: any) => {
     const editRequest = prompt('Please specify what edits are needed:');
     if (editRequest) {
-      // Update invite status
-      const updatedInvites = readyForReviewInvites.map((inv: any) => 
+      // Update invite status in localStorage
+      const updatedInvites = sellerInvites.map((inv: any) => 
         inv.id === invite.id ? { ...inv, status: 'edit_requested', editRequest, editRequestedAt: new Date().toISOString() } : inv
       );
-      setReadyForReviewInvites(updatedInvites);
+      
+      // Save to localStorage
+      localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+      setSellerInvites(updatedInvites);
 
       // Send edit request email
-      const emailTemplate = `Hi ${invite.first_name},
+      const emailTemplate = `Hi ${invite.firstName},
 
 Thank you for your interest in becoming a seller with YourCity Deals.
 
