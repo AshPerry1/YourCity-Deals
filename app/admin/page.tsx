@@ -88,6 +88,90 @@ export default function AdminPage() {
   // Get ready for review invites for the Approvals tab
   const readyForReviewInvites = sellerInvites.filter((invite: any) => invite.status === 'ready_for_review');
 
+  // Generate unique invite token
+  const generateInviteToken = () => {
+    // Generate a unique token for each invite
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substring(2, 8);
+    return `${timestamp}${random}`.toUpperCase();
+  };
+
+  // Handle creating new invite
+  const handleCreateInvite = () => {
+    if (!inviteForm.firstName || !inviteForm.lastName || !inviteForm.email) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    // Check for duplicate email
+    const existingInvite = sellerInvites.find((invite: any) => 
+      invite.email.toLowerCase() === inviteForm.email.toLowerCase()
+    );
+    
+    if (existingInvite) {
+      alert('An invite with this email already exists');
+      return;
+    }
+
+    const inviteToken = generateInviteToken();
+    const newInvite = {
+      id: Date.now().toString(),
+      token: inviteToken,
+      first_name: inviteForm.firstName,
+      last_name: inviteForm.lastName,
+      email: inviteForm.email,
+      status: 'pending',
+      organizationHub: inviteForm.organizationHub,
+      couponBook: inviteForm.couponBook,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      sentAt: new Date().toLocaleString(),
+      emailSent: true,
+      linkClicked: false,
+      profileCompleted: false
+    };
+
+    // Add to localStorage
+    const updatedInvites = [...sellerInvites, newInvite];
+    localStorage.setItem('yourcitydeals_seller_invites', JSON.stringify(updatedInvites));
+    setSellerInvites(updatedInvites);
+
+    // Send initial email
+    const emailTemplate = `Hi ${inviteForm.firstName},
+
+You've been invited to become a seller with YourCity Deals! 
+
+We're excited to have you join our team of sellers who help local businesses grow while supporting great causes.
+
+To get started, please click the link below to complete your profile:
+https://yourcitydeals.com/invite/${inviteToken}
+
+This link will take you through a simple process to:
+• Complete your seller profile
+• Set up your account
+• Get started with your first deals
+
+If you have any questions, please don't hesitate to reach out to us.
+
+We look forward to working with you!
+
+Best regards,
+The YourCity Deals Team`;
+
+    const mailtoLink = `mailto:${inviteForm.email}?subject=${encodeURIComponent('YourCity Deals - Seller Invitation')}&body=${encodeURIComponent(emailTemplate)}`;
+    window.open(mailtoLink, '_blank');
+
+    // Reset form
+    setInviteForm({
+      firstName: '',
+      lastName: '',
+      email: '',
+      organizationHub: '',
+      couponBook: ''
+    });
+    setShowInviteForm(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -188,6 +272,8 @@ export default function AdminPage() {
           setSellerInvites={setSellerInvites}
           organizationalHubs={organizationalHubs}
           couponBooks={couponBooks}
+          setSelectedInvite={setSelectedInvite}
+          setShowInviteDetails={setShowInviteDetails}
         />}
         {activeTab === 'approvals' && <ApprovalsTab 
           sellerInvites={sellerInvites}
@@ -208,12 +294,16 @@ function InvitesTab({
   sellerInvites, 
   setSellerInvites, 
   organizationalHubs, 
-  couponBooks 
+  couponBooks,
+  setSelectedInvite,
+  setShowInviteDetails
 }: {
   sellerInvites: any[];
   setSellerInvites: (invites: any[]) => void;
   organizationalHubs: any[];
   couponBooks: any[];
+  setSelectedInvite: (invite: any) => void;
+  setShowInviteDetails: (show: boolean) => void;
 }) {
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteForm, setInviteForm] = useState({
@@ -615,6 +705,103 @@ The YourCity Deals Team`;
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      
+      {/* Invite Details Modal */}
+      {showInviteDetails && selectedInvite && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Invite Details</h3>
+              <button
+                onClick={() => setShowInviteDetails(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <p className="text-sm text-gray-900">{selectedInvite.first_name || selectedInvite.firstName} {selectedInvite.last_name || selectedInvite.lastName}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <p className="text-sm text-gray-900">{selectedInvite.email}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Organization Hub</label>
+                  <p className="text-sm text-gray-900">{selectedInvite.organizationHub || 'Not assigned'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Coupon Book</label>
+                  <p className="text-sm text-gray-900">{selectedInvite.couponBook || 'Not assigned'}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Status</label>
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    selectedInvite.status === 'pending' ? 'bg-orange-100 text-orange-800' :
+                    selectedInvite.status === 'ready_for_review' ? 'bg-blue-100 text-blue-800' :
+                    selectedInvite.status === 'approved' ? 'bg-green-100 text-green-800' :
+                    selectedInvite.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                    selectedInvite.status === 'edit_requested' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {selectedInvite.status === 'pending' ? 'Pending' :
+                     selectedInvite.status === 'ready_for_review' ? 'Ready for Review' :
+                     selectedInvite.status === 'approved' ? 'Approved' :
+                     selectedInvite.status === 'rejected' ? 'Rejected' :
+                     selectedInvite.status === 'edit_requested' ? 'Edit Requested' :
+                     selectedInvite.status}
+                  </span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Date Sent</label>
+                  <p className="text-sm text-gray-900">{selectedInvite.sentAt || selectedInvite.created_at ? new Date(selectedInvite.sentAt || selectedInvite.created_at).toLocaleString() : 'Not sent'}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Email Sent</label>
+                  <p className="text-sm text-gray-900">{selectedInvite.emailSent ? 'Yes' : 'No'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Link Clicked</label>
+                  <p className="text-sm text-gray-900">{selectedInvite.linkClicked ? 'Yes' : 'No'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Profile Completed</label>
+                  <p className="text-sm text-gray-900">{selectedInvite.profileCompleted ? 'Yes' : 'No'}</p>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Invite Link</label>
+                <p className="text-sm text-gray-900 break-all">{`https://yourcitydeals.com/invite/${selectedInvite.token}`}</p>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowInviteDetails(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
