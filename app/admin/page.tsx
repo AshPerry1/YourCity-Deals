@@ -249,8 +249,8 @@ function InvitesTab({
   const filteredInvites = sellerInvites.filter((invite: any) => {
     // Search filter
     const matchesSearch = searchTerm === '' || 
-      invite.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invite.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (invite.first_name || invite.firstName)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (invite.last_name || invite.lastName)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invite.email?.toLowerCase().includes(searchTerm.toLowerCase());
     
     // Organization filter
@@ -290,8 +290,8 @@ function InvitesTab({
 
     // Check for duplicate name combination
     const existingName = sellerInvites.find(invite => 
-      invite.firstName.toLowerCase() === inviteForm.firstName.toLowerCase() &&
-      invite.lastName.toLowerCase() === inviteForm.lastName.toLowerCase()
+      (invite.first_name || invite.firstName)?.toLowerCase() === inviteForm.firstName.toLowerCase() &&
+      (invite.last_name || invite.lastName)?.toLowerCase() === inviteForm.lastName.toLowerCase()
     );
     
     if (existingName) {
@@ -306,8 +306,8 @@ function InvitesTab({
     const newInvite = {
       id: Date.now().toString(),
       token: inviteToken,
-      firstName: inviteForm.firstName,
-      lastName: inviteForm.lastName,
+      first_name: inviteForm.firstName,
+      last_name: inviteForm.lastName,
       email: inviteForm.email,
       status: 'pending',
       organizationHub: inviteForm.organizationHub,
@@ -445,7 +445,7 @@ function InvitesTab({
                 {filteredInvites.map((invite) => (
                   <tr key={invite.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {invite.firstName} {invite.lastName}
+                      {invite.first_name || invite.firstName} {invite.last_name || invite.lastName}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {invite.email}
@@ -479,7 +479,7 @@ function InvitesTab({
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button 
                         onClick={() => {
-                          const inviteLink = `https://yourcitydeals.com/invite/${invite.inviteToken}`;
+                          const inviteLink = `https://yourcitydeals.com/invite/${invite.token}`;
                           navigator.clipboard.writeText(inviteLink);
                           alert('Invite link copied to clipboard!');
                         }}
@@ -489,14 +489,14 @@ function InvitesTab({
                       </button>
                       <button 
                         onClick={() => {
-                          const emailTemplate = `Hi ${invite.firstName},
+                          const emailTemplate = `Hi ${invite.first_name || invite.firstName},
 
 You've been invited to become a seller with YourCity Deals! 
 
 We're excited to have you join our team of sellers who help local businesses grow while supporting great causes.
 
 To get started, please click the link below to complete your profile:
-https://yourcitydeals.com/invite/${invite.inviteToken}
+https://yourcitydeals.com/invite/${invite.token}
 
 This link will take you through a simple process to:
 • Complete your seller profile
