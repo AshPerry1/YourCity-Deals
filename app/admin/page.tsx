@@ -30,8 +30,8 @@ export default function AdminPage() {
             {
               id: '1',
               token: 'TEST123',
-              firstName: 'John',
-              lastName: 'Doe',
+              first_name: 'John',
+              last_name: 'Doe',
               email: 'john.doe@example.com',
               organizationHub: 'Mountain Brook High School',
               couponBook: 'Birmingham Restaurant Deals',
@@ -42,8 +42,8 @@ export default function AdminPage() {
             {
               id: '2',
               token: 'TEST456',
-              firstName: 'Jane',
-              lastName: 'Smith',
+              first_name: 'Jane',
+              last_name: 'Smith',
               email: 'jane.smith@example.com',
               organizationHub: 'Lincoln High School',
               couponBook: 'Lincoln High School 2025 Coupon Book',

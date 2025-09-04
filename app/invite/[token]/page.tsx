@@ -56,8 +56,8 @@ export default function InvitePage() {
           console.log('TEST123 token detected, creating fallback invite');
           const fallbackInvite = {
             id: 'test-invite',
-            firstName: 'John',
-            lastName: 'Seller',
+            first_name: 'John',
+            last_name: 'Seller',
             email: 'john@example.com',
             token: 'TEST123',
             status: 'pending',
