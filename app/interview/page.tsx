@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ChevronRightIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { WordDocumentService, InterviewSnapshotData } from '../../lib/wordDocumentService';
 import { InterviewService } from '../../lib/interviewService';
@@ -1243,9 +1243,13 @@ Remove
 
 const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   const [availableQuestions, setAvailableQuestions] = useState<ResearchQuestion[]>([]);
-  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  
+  // Get selected questions from session (no local state)
+  const selectedQuestions = useMemo(() => {
+    return session?.selectedResearchQuestions?.map((q: any) => q.id) || [];
+  }, [session?.selectedResearchQuestions]);
   
   // Load research questions from Supabase
   useEffect(() => {
@@ -1272,63 +1276,57 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
     };
     loadResearchQuestions();
   }, [session?.audienceType]);
-  
-  
-  // Load selected questions from session
-  useEffect(() => {
-    if (session?.selectedResearchQuestions) {
-      setSelectedQuestions(session.selectedResearchQuestions.map(q => q.id));
-    }
-  }, [session?.selectedResearchQuestions]);
 
-  const handleQuestionToggle = (questionId: string) => {
-    setSelectedQuestions(prev => {
-      const newSelection = prev.includes(questionId) 
-        ? prev.filter(id => id !== questionId)
-        : [...prev, questionId];
-      
-      // Update session with selected questions
-      const selectedResearchQuestions = availableQuestions.filter(q => newSelection.includes(q.id));
-      setSession((prevSession: any) => ({
-        ...prevSession,
-        selectedResearchQuestions,
-      }));
-      
-      return newSelection;
-    });
-  };
-
-  const handleSelectAll = () => {
-    const allQuestionIds = availableQuestions.map(q => q.id);
-    setSelectedQuestions(allQuestionIds);
+  const handleQuestionToggle = useCallback((questionId: string) => {
+    const currentSelected = session?.selectedResearchQuestions || [];
+    const isSelected = currentSelected.some((q: any) => q.id === questionId);
     
-    // Update session with all questions
+    let newSelectedQuestions;
+    if (isSelected) {
+      newSelectedQuestions = currentSelected.filter((q: any) => q.id !== questionId);
+    } else {
+      const questionToAdd = availableQuestions.find(q => q.id === questionId);
+      if (questionToAdd) {
+        newSelectedQuestions = [...currentSelected, questionToAdd];
+      } else {
+        newSelectedQuestions = currentSelected;
+      }
+    }
+    
+    setSession((prevSession: any) => ({
+      ...prevSession,
+      selectedResearchQuestions: newSelectedQuestions,
+    }));
+  }, [session?.selectedResearchQuestions, availableQuestions, setSession]);
+
+  const handleSelectAll = useCallback(() => {
     setSession((prevSession: any) => ({
       ...prevSession,
       selectedResearchQuestions: availableQuestions,
     }));
-  };
+  }, [availableQuestions, setSession]);
 
-  const handleSelectNone = () => {
-    setSelectedQuestions([]);
-    
-    // Update session with no questions
+  const handleSelectNone = useCallback(() => {
     setSession((prevSession: any) => ({
       ...prevSession,
       selectedResearchQuestions: [],
     }));
-  };
+  }, [setSession]);
 
   // Filter questions by search term and category
-  const filteredQuestions = availableQuestions.filter(question => {
-    const matchesSearch = question.questionText.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         question.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || question.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredQuestions = useMemo(() => {
+    return availableQuestions.filter(question => {
+      const matchesSearch = question.questionText.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           question.category.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || question.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [availableQuestions, searchTerm, selectedCategory]);
 
   // Get unique categories
-  const categories = ['all', ...Array.from(new Set(availableQuestions.map(q => q.category)))];
+  const categories = useMemo(() => {
+    return ['all', ...Array.from(new Set(availableQuestions.map(q => q.category)))];
+  }, [availableQuestions]);
 
   return (
     <div>
