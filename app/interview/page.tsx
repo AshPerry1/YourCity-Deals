@@ -649,7 +649,7 @@ export default function InterviewTool() {
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <AudienceSelection onSelect={handleAudienceSelect} theme={theme} />;
+        return <AudienceSelection onSelect={handleAudienceSelect} />;
       case 1:
         return <ParticipantInfo session={session} setSession={setSession} theme={theme} onNext={handleNext} />;
       case 2:
@@ -733,7 +733,7 @@ export default function InterviewTool() {
 }
 
 // Audience Selection Component
-const AudienceSelection = ({ onSelect, theme }: { onSelect: (audience: AudienceType) => void; theme: any }) => {
+const AudienceSelection = ({ onSelect }: { onSelect: (audience: AudienceType) => void }) => {
   return (
     <div>
       <h2 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Select Your Audience</h2>
