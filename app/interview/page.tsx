@@ -1136,6 +1136,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   // Debug logging
   console.log('Available questions for', session?.audienceType, ':', availableQuestions.length);
   console.log('Questions:', availableQuestions.map(q => ({ id: q.id, text: q.questionText })));
+  console.log('Current selectedQuestions state:', selectedQuestions);
   
   // Load selected questions from session
   useEffect(() => {
@@ -1146,14 +1147,14 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
 
   // Update session when selected questions change
   useEffect(() => {
-    if (session) {
+    if (session && selectedQuestions.length > 0) {
       const selectedResearchQuestions = availableQuestions.filter(q => selectedQuestions.includes(q.id));
       setSession({
         ...session,
         selectedResearchQuestions,
       });
     }
-  }, [selectedQuestions, session, setSession, availableQuestions]);
+  }, [selectedQuestions, availableQuestions]);
 
   const handleQuestionToggle = (questionId: string) => {
     alert(`Clicked question: ${questionId}`);
@@ -1164,6 +1165,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
         ? prev.filter(id => id !== questionId)
         : [...prev, questionId];
       console.log('New selection:', newSelection);
+      alert(`New selection: ${JSON.stringify(newSelection)}`);
       return newSelection;
     });
   };
