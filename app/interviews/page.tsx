@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronRightIcon, TrashIcon, EyeIcon, DocumentIcon, CalendarIcon, UserIcon } from '@heroicons/react/24/outline';
+import { InterviewService } from '../../lib/interviewService';
+import { WordDocumentService, InterviewSnapshotData } from '../../lib/wordDocumentService';
 
 // Types (matching the interview tool)
 type AudienceType = 'buyer' | 'seller' | 'organization' | 'merchant';
@@ -252,26 +254,103 @@ export default function InterviewsDashboard() {
     loadSessions();
   }, []);
 
-  const loadSessions = () => {
+  const loadSessions = async () => {
     setLoading(true);
     try {
-      const allSessions = dataService.getAllSessions();
-      setSessions(allSessions);
+      console.log('Loading sessions from Supabase...');
+      const allSessions = await InterviewService.getInterviewSessions();
+      console.log('Loaded sessions:', allSessions);
+      
+      // Transform Supabase data to match frontend interface
+      const transformedSessions = allSessions.map(session => ({
+        id: session.session_id,
+        audienceType: session.audience_type,
+        interviewerName: session.interviewer_name || 'Unknown',
+        colorTheme: getColorTheme(session.audience_type),
+        summaryTakeaways: session.summary_takeaways || '',
+        summaryProblems: session.summary_problems || '',
+        summaryOpportunities: session.summary_opportunities || '',
+        summaryQuote: session.summary_quote || '',
+        selectedResearchQuestions: [], // Will be loaded separately if needed
+        responses: [], // Will be loaded separately if needed
+        participant: {
+          firstName: session.first_name || '',
+          lastName: session.last_name || '',
+          company: session.company || '',
+          email: session.email || '',
+          phone: session.phone || '',
+          jobTitle: session.job_title || '',
+          specialties: [],
+          background: '',
+          howGotJob: '',
+          age: session.age || '',
+          gender: session.gender || '',
+          zipCode: session.zip_code || '',
+          householdIncome: session.household_income || '',
+          education: session.education || '',
+          householdSize: session.household_size || '',
+          childrenInSchool: session.children_in_school || '',
+          commuteAreas: session.commute_areas || '',
+          photo: session.photo || undefined,
+        },
+        createdAt: session.created_at,
+        updatedAt: session.updated_at,
+      }));
+      
+      setSessions(transformedSessions);
     } catch (error) {
-      console.error('Error loading sessions:', error);
+      console.error('Error loading sessions from Supabase:', error);
+      
+      // Fallback to mock data if Supabase fails
+      try {
+        console.log('Falling back to mock data...');
+        const dataService = MockDataService.getInstance();
+        const allSessions = dataService.getAllSessions();
+        setSessions(allSessions);
+      } catch (mockError) {
+        console.error('Mock data also failed:', mockError);
+        setSessions([]);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteSession = (sessionId: string) => {
+  const getColorTheme = (audienceType: string) => {
+    switch (audienceType) {
+      case 'buyer': return 'blue';
+      case 'seller': return 'green';
+      case 'organization': return 'orange';
+      case 'merchant': return 'purple';
+      default: return 'blue';
+    }
+  };
+
+  const handleDeleteSession = async (sessionId: string) => {
     if (window.confirm('Are you sure you want to delete this interview? This action cannot be undone.')) {
-      const success = dataService.deleteSession(sessionId);
-      if (success) {
+      try {
+        console.log('Deleting session:', sessionId);
+        await InterviewService.deleteInterviewSession(sessionId);
+        console.log('Session deleted successfully');
         loadSessions();
         alert('Interview deleted successfully.');
-      } else {
-        alert('Error deleting interview.');
+      } catch (error) {
+        console.error('Error deleting session:', error);
+        
+        // Fallback to mock data service
+        try {
+          const dataService = MockDataService.getInstance();
+          const success = dataService.deleteSession(sessionId);
+          if (success) {
+            loadSessions();
+            alert('Interview deleted successfully (from local storage).');
+          } else {
+            alert('Error deleting interview.');
+          }
+        } catch (mockError) {
+          console.error('Mock delete also failed:', mockError);
+          alert('Error deleting interview.');
+        }
       }
     }
   };
@@ -549,13 +628,26 @@ export default function InterviewsDashboard() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <UserIcon className="w-6 h-6 text-green-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <UserIcon className="w-6 h-6 text-blue-600" />
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-600">Buyers</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {sessions.filter(s => s.audienceType === 'buyer').length}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <UserIcon className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-600">Sellers</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {sessions.filter(s => s.audienceType === 'seller').length}
                 </p>
               </div>
             </div>
