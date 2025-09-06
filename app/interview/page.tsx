@@ -679,8 +679,16 @@ export default function InterviewTool() {
                 <p className="text-sm text-gray-600">Discovery Interview Tool</p>
               </div>
             </div>
-            <div className="text-sm text-gray-500">
-              Interview Session
+            <div className="flex items-center space-x-3">
+              <a
+                href="/interviews"
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                View All Interviews
+              </a>
+              <div className="text-sm text-gray-500">
+                Interview Session
+              </div>
             </div>
           </div>
         </div>
