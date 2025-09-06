@@ -1281,22 +1281,19 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
     }
   }, [session?.selectedResearchQuestions]);
 
-  // Update session when selected questions change
-  useEffect(() => {
-    if (session && selectedQuestions.length > 0) {
-      const selectedResearchQuestions = availableQuestions.filter(q => selectedQuestions.includes(q.id));
-      setSession({
-        ...session,
-        selectedResearchQuestions,
-      });
-    }
-  }, [selectedQuestions, availableQuestions, session, setSession]);
-
   const handleQuestionToggle = (questionId: string) => {
     setSelectedQuestions(prev => {
       const newSelection = prev.includes(questionId) 
         ? prev.filter(id => id !== questionId)
         : [...prev, questionId];
+      
+      // Update session with selected questions
+      const selectedResearchQuestions = availableQuestions.filter(q => newSelection.includes(q.id));
+      setSession((prevSession: any) => ({
+        ...prevSession,
+        selectedResearchQuestions,
+      }));
+      
       return newSelection;
     });
   };
@@ -1304,10 +1301,22 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   const handleSelectAll = () => {
     const allQuestionIds = availableQuestions.map(q => q.id);
     setSelectedQuestions(allQuestionIds);
+    
+    // Update session with all questions
+    setSession((prevSession: any) => ({
+      ...prevSession,
+      selectedResearchQuestions: availableQuestions,
+    }));
   };
 
   const handleSelectNone = () => {
     setSelectedQuestions([]);
+    
+    // Update session with no questions
+    setSession((prevSession: any) => ({
+      ...prevSession,
+      selectedResearchQuestions: [],
+    }));
   };
 
   // Filter questions by search term and category
