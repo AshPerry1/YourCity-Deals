@@ -596,6 +596,25 @@ export default function InterviewTool() {
         summaryQuote: '',
         selectedResearchQuestions: [],
         responses: [],
+        participant: {
+          firstName: '',
+          lastName: '',
+          company: '',
+          email: '',
+          phone: '',
+          jobTitle: '',
+          specialties: [],
+          background: '',
+          howGotJob: '',
+          age: '',
+          gender: '',
+          zipCode: '',
+          householdIncome: '',
+          education: '',
+          householdSize: '',
+          childrenInSchool: '',
+          commuteAreas: '',
+        },
       };
       setSession(newSession);
     }
@@ -802,7 +821,7 @@ const ParticipantInfo = ({ session, setSession, theme, onNext }: any) => {
     setSession((prevSession: any) => ({
       ...prevSession,
       participant: {
-        ...prevSession.participant,
+        ...(prevSession?.participant || {}),
         [field]: value,
       },
     }));
