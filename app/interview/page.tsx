@@ -1950,6 +1950,181 @@ const Summary = ({ session, setSession, theme }: any) => {
     // This would need to be handled by the parent component to reset the step
   };
 
+  const submitForm = async () => {
+    try {
+      // Save the complete interview session
+      const dataService = MockDataService.getInstance();
+      await dataService.saveSession(session);
+      
+      alert('Interview submitted successfully! You can now create a snapshot.');
+    } catch (error) {
+      console.error('Error submitting interview:', error);
+      alert('Error submitting interview. Please try again.');
+    }
+  };
+
+  const createSnapshot = async () => {
+    if (!session?.participant?.firstName) {
+      alert('Please complete the participant information before creating a snapshot.');
+      return;
+    }
+
+    try {
+      // Create Google Doc snapshot
+      const snapshotData = {
+        participant: session.participant,
+        researchQuestions: session.selectedResearchQuestions,
+        responses: session.responses,
+        summary: {
+          takeaways: summary.takeaways,
+          problems: summary.problems,
+          opportunities: summary.opportunities,
+          quote: summary.quote,
+        },
+        session: {
+          id: session.id,
+          audienceType: session.audienceType,
+          interviewerName: session.interviewerName,
+          createdAt: session.createdAt,
+        }
+      };
+
+      // For now, we'll create a downloadable document
+      // Later we'll integrate with Google Docs API
+      const docContent = generateSnapshotDocument(snapshotData);
+      
+      const blob = new Blob([docContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Interview-Snapshot-${session.participant.firstName}-${session.participant.lastName}-${new Date().toISOString().split('T')[0]}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      alert('Snapshot created! In the future, this will automatically create a Google Doc in your folder.');
+    } catch (error) {
+      console.error('Error creating snapshot:', error);
+      alert('Error creating snapshot. Please try again.');
+    }
+  };
+
+  const generateSnapshotDocument = (data: any) => {
+    const participant = data.participant;
+    const researchQuestions = data.researchQuestions;
+    const responses = data.responses;
+    const summary = data.summary;
+    
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interview Snapshot - ${participant.firstName} ${participant.lastName}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; color: #333; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .title { font-size: 28px; font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
+        .subtitle { font-size: 16px; color: #7f8c8d; }
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 18px; font-weight: bold; color: #27ae60; margin-bottom: 15px; border-bottom: 2px solid #27ae60; padding-bottom: 5px; }
+        .participant-photo { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 20px; }
+        .info-item { margin-bottom: 8px; }
+        .info-label { font-weight: bold; color: #2c3e50; }
+        .research-question { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #27ae60; }
+        .response-item { margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+        .quote { font-style: italic; background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #27ae60; margin: 15px 0; }
+        .takeaway { margin-bottom: 10px; padding: 8px; background: #f0f8ff; border-radius: 5px; }
+        .problem { margin-bottom: 10px; padding: 8px; background: #fff5f5; border-radius: 5px; }
+        .opportunity { margin-bottom: 10px; padding: 8px; background: #f0fff0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">Interview Snapshot</div>
+        <div class="subtitle">YourCity Deals Discovery Interview</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Participant Information</div>
+        ${participant.photo ? `<img src="${participant.photo}" alt="Participant Photo" class="participant-photo">` : ''}
+        <div class="info-item"><span class="info-label">Name:</span> ${participant.firstName} ${participant.lastName}</div>
+        <div class="info-item"><span class="info-label">Job Title:</span> ${participant.jobTitle}</div>
+        <div class="info-item"><span class="info-label">Company:</span> ${participant.company}</div>
+        <div class="info-item"><span class="info-label">Email:</span> ${participant.email}</div>
+        <div class="info-item"><span class="info-label">Phone:</span> ${participant.phone}</div>
+        <div class="info-item"><span class="info-label">Age:</span> ${participant.age}</div>
+        <div class="info-item"><span class="info-label">Gender:</span> ${participant.gender}</div>
+        <div class="info-item"><span class="info-label">Zip Code:</span> ${participant.zipCode}</div>
+        <div class="info-item"><span class="info-label">Education:</span> ${participant.education}</div>
+        <div class="info-item"><span class="info-label">Household Size:</span> ${participant.householdSize}</div>
+        <div class="info-item"><span class="info-label">Children in School:</span> ${participant.childrenInSchool}</div>
+        <div class="info-item"><span class="info-label">Background:</span> ${participant.background}</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Research Questions</div>
+        ${researchQuestions?.map(q => `
+            <div class="research-question">
+                <strong>${q.questionText}</strong>
+                <div style="color: #666; font-size: 14px; margin-top: 5px;">Category: ${q.category}</div>
+            </div>
+        `).join('') || '<p>No research questions selected.</p>'}
+    </div>
+
+    <div class="section">
+        <div class="section-title">Interview Responses</div>
+        ${responses?.map(response => {
+            const researchQuestion = researchQuestions?.find(q => q.id === response.researchQuestionId);
+            const interviewQuestion = researchQuestion?.suggestedQuestions?.find(q => q.id === response.interviewQuestionId);
+            
+            let answer = '';
+            if (response.answerText) answer = response.answerText;
+            else if (response.answerYesno !== undefined) answer = response.answerYesno ? 'Yes' : 'No';
+            else if (response.answerScale !== undefined) answer = `${response.answerScale}/10`;
+            else if (response.answerCurrencyCents !== undefined) answer = `$${(response.answerCurrencyCents / 100).toFixed(2)}`;
+            else if (response.answerMultiselect?.length) answer = response.answerMultiselect.join(', ');
+            
+            return `
+                <div class="response-item">
+                    <strong>${interviewQuestion?.promptText || 'Notes'}</strong>
+                    <div style="margin-top: 5px;">${answer}</div>
+                    ${response.notes ? `<div style="margin-top: 5px; font-style: italic; color: #666;">Notes: ${response.notes}</div>` : ''}
+                </div>
+            `;
+        }).join('') || '<p>No responses recorded.</p>'}
+    </div>
+
+    <div class="section">
+        <div class="section-title">Key Takeaways</div>
+        ${summary.takeaways ? summary.takeaways.split('\n').map(takeaway => `<div class="takeaway">${takeaway}</div>`).join('') : '<p>No takeaways recorded.</p>'}
+    </div>
+
+    <div class="section">
+        <div class="section-title">Problems Observed</div>
+        ${summary.problems ? summary.problems.split('\n').map(problem => `<div class="problem">${problem}</div>`).join('') : '<p>No problems recorded.</p>'}
+    </div>
+
+    <div class="section">
+        <div class="section-title">Opportunities / Ideas</div>
+        ${summary.opportunities ? summary.opportunities.split('\n').map(opportunity => `<div class="opportunity">${opportunity}</div>`).join('') : '<p>No opportunities recorded.</p>'}
+    </div>
+
+    ${summary.quote ? `
+    <div class="section">
+        <div class="section-title">Great Quote from this Interview</div>
+        <div class="quote">"${summary.quote}"</div>
+    </div>
+    ` : ''}
+
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 12px;">
+        Generated on ${new Date().toLocaleString()} by ${data.session.interviewerName}
+    </div>
+</body>
+</html>
+    `;
+  };
+
   const responseCount = session?.responses?.filter(r => 
     r.answerText || r.answerYesno !== undefined || r.answerScale || r.answerCurrencyCents || r.answerMultiselect?.length
   ).length || 0;
@@ -2053,23 +2228,38 @@ const Summary = ({ session, setSession, theme }: any) => {
           {/* Export Actions */}
           <div className="space-y-3">
             <button
-              onClick={exportToJSON}
-              className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              onClick={submitForm}
+              className={`w-full px-4 py-2 ${theme.accent} text-white rounded-lg hover:opacity-90 transition-opacity font-medium`}
             >
-              Export JSON
+              📝 Submit Form
             </button>
             <button
-              onClick={exportToCSV}
-              className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              onClick={createSnapshot}
+              className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
-              Export CSV
+              📄 Create Snapshot
             </button>
-            <button
-              onClick={duplicateAsTemplate}
-              className={`w-full px-4 py-2 ${theme.accent} ${theme.text.replace('900', '50')} rounded-lg ${theme.accentHover} transition-colors`}
-            >
-              Duplicate as Template
-            </button>
+            <div className="border-t border-gray-200 pt-3">
+              <p className="text-xs text-gray-500 mb-3">Export Options:</p>
+              <button
+                onClick={exportToJSON}
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Export JSON
+              </button>
+              <button
+                onClick={exportToCSV}
+                className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors mt-2"
+              >
+                Export CSV
+              </button>
+              <button
+                onClick={duplicateAsTemplate}
+                className={`w-full px-4 py-2 ${theme.accent} ${theme.text.replace('900', '50')} rounded-lg ${theme.accentHover} transition-colors mt-2`}
+              >
+                Duplicate as Template
+              </button>
+            </div>
           </div>
 
           {/* Quick Stats */}
