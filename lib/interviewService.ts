@@ -39,6 +39,7 @@ export interface ResearchQuestion {
   audience_type: AudienceType;
   question_text: string;
   category: string;
+  suggested_questions?: any; // JSON field from database function
   created_at?: string;
   updated_at?: string;
 }

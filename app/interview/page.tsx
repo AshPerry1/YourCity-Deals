@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronRightIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { WordDocumentService, InterviewSnapshotData } from '../../lib/wordDocumentService';
 import { InterviewService } from '../../lib/interviewService';
 
 // Types
@@ -1240,6 +1241,7 @@ Remove
   );
 };
 
+const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   const [availableQuestions, setAvailableQuestions] = useState<ResearchQuestion[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -1248,20 +1250,28 @@ Remove
   // Load research questions from Supabase
   useEffect(() => {
     const loadResearchQuestions = async () => {
-      if (selectedAudience) {
+      if (session?.audienceType) {
         try {
-          const questions = await InterviewService.getResearchQuestions(selectedAudience);
-          setAvailableQuestions(questions);
+          const questions = await InterviewService.getResearchQuestions(session.audienceType);
+          // Transform database questions to match frontend interface
+          const transformedQuestions = questions.map(q => ({
+            id: q.id,
+            audienceType: q.audience_type,
+            questionText: q.question_text,
+            category: q.category,
+            suggestedQuestions: q.suggested_questions || []
+          }));
+          setAvailableQuestions(transformedQuestions);
         } catch (error) {
           console.error('Error loading research questions:', error);
           // Fallback to mock data if Supabase fails
           const dataService = MockDataService.getInstance();
-          setAvailableQuestions(dataService.getResearchQuestions(selectedAudience));
+          setAvailableQuestions(dataService.getResearchQuestions(session.audienceType));
         }
       }
     };
     loadResearchQuestions();
-  }, [selectedAudience]);
+  }, [session?.audienceType]);
   
   
   // Load selected questions from session
@@ -1303,14 +1313,6 @@ Remove
   // Filter questions by search term and category
   const filteredQuestions = availableQuestions.filter(question => {
     const matchesSearch = question.questionText.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         question.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || question.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  // Filter questions by search term and category
-  const filteredQuestions = availableQuestions.filter(question => {
-    const matchesSearch = question.question_text.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          question.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || question.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -1402,7 +1404,7 @@ Remove
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-gray-900">{question.question_text}</h3>
+                        <h3 className="font-medium text-gray-900">{question.questionText}</h3>
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         selectedQuestions.includes(question.id)
                           ? `${theme.accent} text-white`
@@ -1411,13 +1413,13 @@ Remove
                         {question.category}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">
-                      {question.suggestedQuestions.length} suggested interview questions
-                    </p>
-                    <div className="text-xs text-gray-500">
-                      Sample questions: {question.suggestedQuestions.slice(0, 2).map(q => q.promptText).join(', ')}
-                      {question.suggestedQuestions.length > 2 && '...'}
-                    </div>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {question.suggestedQuestions?.length || 0} suggested interview questions
+                      </p>
+                      <div className="text-xs text-gray-500">
+                        Sample questions: {question.suggestedQuestions?.slice(0, 2).map(q => q.promptText).join(', ') || 'Loading...'}
+                        {(question.suggestedQuestions?.length || 0) > 2 && '...'}
+                      </div>
                   </div>
                 </div>
               </div>
@@ -1444,7 +1446,7 @@ Remove
                   const question = availableQuestions.find(q => q.id === questionId);
                   return question ? (
                     <div key={questionId} className="text-sm">
-                        <div className="font-medium text-gray-900 truncate">{question.question_text}</div>
+                        <div className="font-medium text-gray-900 truncate">{question.questionText}</div>
                       <div className="text-gray-600">{question.category}</div>
                     </div>
                   ) : null;
