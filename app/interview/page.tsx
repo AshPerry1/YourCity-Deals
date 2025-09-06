@@ -454,43 +454,47 @@ class MockDataService {
   }
 }
 
-// Color themes
+// Color themes using YourCity Deals brand colors
 const colorThemes = {
   buyer: {
-    primary: 'blue',
+    primary: 'primary',
     bg: 'bg-blue-50',
-    text: 'text-blue-900',
+    text: 'text-gray-900',
     border: 'border-blue-200',
-    accent: 'bg-blue-500',
-    accentHover: 'hover:bg-blue-600',
-    accentText: 'text-blue-500',
+    accent: 'bg-blue-600',
+    accentHover: 'hover:bg-blue-700',
+    accentText: 'text-blue-600',
+    brand: 'bg-blue-600',
   },
   seller: {
-    primary: 'green',
-    bg: 'bg-green-50',
-    text: 'text-green-900',
-    border: 'border-green-200',
-    accent: 'bg-green-500',
-    accentHover: 'hover:bg-green-600',
-    accentText: 'text-green-500',
+    primary: 'secondary',
+    bg: 'bg-purple-50',
+    text: 'text-gray-900',
+    border: 'border-purple-200',
+    accent: 'bg-purple-600',
+    accentHover: 'hover:bg-purple-700',
+    accentText: 'text-purple-600',
+    brand: 'bg-purple-600',
   },
   organization: {
-    primary: 'orange',
-    bg: 'bg-orange-50',
-    text: 'text-orange-900',
-    border: 'border-orange-200',
-    accent: 'bg-orange-500',
-    accentHover: 'hover:bg-orange-600',
-    accentText: 'text-orange-500',
+    primary: 'success',
+    bg: 'bg-green-50',
+    text: 'text-gray-900',
+    border: 'border-green-200',
+    accent: 'bg-green-600',
+    accentHover: 'hover:bg-green-700',
+    accentText: 'text-green-600',
+    brand: 'bg-green-600',
   },
   merchant: {
-    primary: 'purple',
-    bg: 'bg-purple-50',
-    text: 'text-purple-900',
-    border: 'border-purple-200',
-    accent: 'bg-purple-500',
-    accentHover: 'hover:bg-purple-600',
-    accentText: 'text-purple-500',
+    primary: 'warning',
+    bg: 'bg-orange-50',
+    text: 'text-gray-900',
+    border: 'border-orange-200',
+    accent: 'bg-orange-600',
+    accentHover: 'hover:bg-orange-700',
+    accentText: 'text-orange-600',
+    brand: 'bg-orange-600',
   },
 };
 
@@ -509,7 +513,7 @@ const audiences = [
     name: 'Seller',
     subtitle: 'Ambassador',
     icon: '👥',
-    color: 'green',
+    color: 'purple',
     description: 'People who sell coupon books'
   },
   {
@@ -517,7 +521,7 @@ const audiences = [
     name: 'Organization',
     subtitle: 'Fundraiser',
     icon: '🏫',
-    color: 'orange',
+    color: 'green',
     description: 'Schools and organizations running fundraisers'
   },
   {
@@ -525,7 +529,7 @@ const audiences = [
     name: 'Merchant',
     subtitle: 'Business',
     icon: '🏪',
-    color: 'purple',
+    color: 'orange',
     description: 'Local businesses offering deals'
   },
 ];
@@ -539,19 +543,19 @@ const Stepper = ({ currentStep, totalSteps, theme }: { currentStep: number; tota
       <div className="flex items-center space-x-4">
         {steps.map((step, index) => (
           <div key={step} className="flex items-center">
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
+            <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
               index <= currentStep 
-                ? `${theme.accent} ${theme.text.replace('900', '50')} border-current` 
+                ? `${theme.accent} text-white border-current` 
                 : 'bg-gray-100 border-gray-300 text-gray-400'
             }`}>
               {index < currentStep ? (
                 <CheckIcon className="w-5 h-5" />
               ) : (
-                <span className="text-sm font-medium">{index + 1}</span>
+                <span className="text-sm font-semibold">{index + 1}</span>
               )}
             </div>
-            <span className={`ml-2 text-sm font-medium ${
-              index <= currentStep ? theme.text : 'text-gray-400'
+            <span className={`ml-3 text-sm font-medium ${
+              index <= currentStep ? 'text-gray-900' : 'text-gray-400'
             }`}>
               {step}
             </span>
@@ -660,10 +664,30 @@ export default function InterviewTool() {
   };
 
   return (
-    <div className={`min-h-screen ${theme.bg}`}>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with YourCity Deals branding */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className={`w-10 h-10 ${theme.brand} rounded-lg flex items-center justify-center`}>
+                <span className="text-white font-bold text-lg">YC</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">YourCity Deals</h1>
+                <p className="text-sm text-gray-600">Discovery Interview Tool</p>
+              </div>
+            </div>
+            <div className="text-sm text-gray-500">
+              Interview Session
+            </div>
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Discovery Interview</h1>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Discovery Interview</h2>
           <p className="text-gray-600">Capture insights from your target audience</p>
         </div>
 
@@ -680,7 +704,7 @@ export default function InterviewTool() {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
           {renderStep()}
         </div>
 
@@ -689,14 +713,14 @@ export default function InterviewTool() {
           <div className="flex justify-between mt-8">
             <button
               onClick={handleBack}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
             >
               Back
             </button>
             {currentStep < 4 && (
               <button
                 onClick={handleNext}
-                className={`px-6 py-2 ${theme.accent} ${theme.text.replace('900', '50')} rounded-lg ${theme.accentHover} transition-colors`}
+                className={`px-6 py-3 ${theme.accent} text-white rounded-lg ${theme.accentHover} transition-colors font-medium`}
               >
                 Next
               </button>
@@ -712,21 +736,23 @@ export default function InterviewTool() {
 const AudienceSelection = ({ onSelect, theme }: { onSelect: (audience: AudienceType) => void; theme: any }) => {
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Select Your Audience</h2>
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Select Your Audience</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {audiences.map((audience) => (
           <button
             key={audience.id}
             onClick={() => onSelect(audience.id)}
-            className={`p-6 rounded-lg border-2 border-transparent hover:border-current transition-all duration-200 ${
+            className={`p-8 rounded-xl border-2 border-transparent hover:border-current transition-all duration-200 ${
               colorThemes[audience.id].bg
-            } ${colorThemes[audience.id].text} hover:shadow-lg`}
+            } ${colorThemes[audience.id].text} hover:shadow-lg hover:scale-105`}
           >
             <div className="text-center">
-              <div className="text-4xl mb-3">{audience.icon}</div>
-              <h3 className="text-xl font-bold mb-1">{audience.name}</h3>
-              <p className="text-sm opacity-75 mb-2">{audience.subtitle}</p>
-              <p className="text-xs opacity-60">{audience.description}</p>
+              <div className={`w-16 h-16 ${colorThemes[audience.id].accent} rounded-full flex items-center justify-center mx-auto mb-4`}>
+                <span className="text-white font-bold text-xl">{audience.name.charAt(0)}</span>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">{audience.name}</h3>
+              <p className="text-sm text-gray-600 mb-3">{audience.subtitle}</p>
+              <p className="text-sm text-gray-500">{audience.description}</p>
             </div>
           </button>
         ))}
@@ -1107,9 +1133,6 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   const dataService = MockDataService.getInstance();
   const availableQuestions = dataService.getResearchQuestions(session?.audienceType || 'buyer');
   
-  // Debug logging
-  console.log('Available questions for', session?.audienceType, ':', availableQuestions.length);
-  
   // Load selected questions from session
   useEffect(() => {
     if (session?.selectedResearchQuestions) {
@@ -1129,14 +1152,11 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   }, [selectedQuestions, session, setSession, availableQuestions]);
 
   const handleQuestionToggle = (questionId: string) => {
-    console.log('Toggling question:', questionId);
-    setSelectedQuestions(prev => {
-      const newSelection = prev.includes(questionId) 
+    setSelectedQuestions(prev => 
+      prev.includes(questionId) 
         ? prev.filter(id => id !== questionId)
-        : [...prev, questionId];
-      console.log('New selection:', newSelection);
-      return newSelection;
-    });
+        : [...prev, questionId]
+    );
   };
 
   const handleSelectAll = () => {
