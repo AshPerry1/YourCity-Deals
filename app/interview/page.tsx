@@ -961,7 +961,7 @@ const ParticipantInfo = ({ session, setSession, theme, onNext }: any) => {
                         onClick={() => handleInputChange('photo', '')}
                         className="px-3 py-2 bg-red-500 text-white rounded-lg hover:opacity-90 transition-opacity"
                       >
-                        🗑️ Remove
+Remove
                       </button>
                     </div>
                   </div>
@@ -1247,17 +1247,13 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   const dataService = MockDataService.getInstance();
   const availableQuestions = dataService.getResearchQuestions(session?.audienceType || 'buyer');
   
-  // Debug logging
-  console.log('Available questions for', session?.audienceType, ':', availableQuestions.length);
-  console.log('Questions:', availableQuestions.map(q => ({ id: q.id, text: q.questionText })));
-  console.log('Current selectedQuestions state:', selectedQuestions);
   
   // Load selected questions from session
   useEffect(() => {
     if (session?.selectedResearchQuestions) {
       setSelectedQuestions(session.selectedResearchQuestions.map(q => q.id));
     }
-  }, [session]);
+  }, [session?.selectedResearchQuestions]);
 
   // Update session when selected questions change
   useEffect(() => {
@@ -1268,26 +1264,19 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
         selectedResearchQuestions,
       });
     }
-  }, [selectedQuestions, availableQuestions]);
+  }, [selectedQuestions, availableQuestions, session, setSession]);
 
   const handleQuestionToggle = (questionId: string) => {
-    alert(`Clicked question: ${questionId}`);
-    console.log('Toggling question:', questionId);
-    console.log('Current selectedQuestions:', selectedQuestions);
     setSelectedQuestions(prev => {
       const newSelection = prev.includes(questionId) 
         ? prev.filter(id => id !== questionId)
         : [...prev, questionId];
-      console.log('New selection:', newSelection);
-      alert(`New selection: ${JSON.stringify(newSelection)}`);
       return newSelection;
     });
   };
 
   const handleSelectAll = () => {
-    alert('Select All clicked');
     const allQuestionIds = availableQuestions.map(q => q.id);
-    console.log('All question IDs:', allQuestionIds);
     setSelectedQuestions(allQuestionIds);
   };
 
@@ -1844,7 +1833,7 @@ const InterviewGuide = ({ session, setSession, theme, onNext }: any) => {
                       disabled={isGeneratingSuggestions[researchQuestion.id]}
                       className="text-sm bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 disabled:opacity-50 font-medium"
                     >
-                      {isGeneratingSuggestions[researchQuestion.id] ? '🤖 Generating...' : '🤖 AI Suggestions'}
+                      {isGeneratingSuggestions[researchQuestion.id] ? 'Generating...' : 'AI Suggestions'}
                     </button>
                     <button
                       onClick={() => addCustomQuestion(researchQuestion.id)}
@@ -1858,7 +1847,7 @@ const InterviewGuide = ({ session, setSession, theme, onNext }: any) => {
                 {/* AI Suggestions Display */}
                 {aiSuggestions[researchQuestion.id] && (
                   <div className="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                    <h4 className="font-medium text-purple-900 mb-3">🤖 AI Suggested Follow-ups</h4>
+                    <h4 className="font-medium text-purple-900 mb-3">AI Suggested Follow-ups</h4>
                     <div className="space-y-2">
                       {aiSuggestions[researchQuestion.id].map((suggestion, index) => (
                         <div key={index} className="p-3 bg-white rounded border border-purple-100">
@@ -2366,19 +2355,19 @@ const Summary = ({ session, setSession, theme }: any) => {
               onClick={submitForm}
               className={`w-full px-4 py-2 ${theme.accent} text-white rounded-lg hover:opacity-90 transition-opacity font-medium`}
             >
-              📝 Submit Form
+Submit Form
             </button>
             <button
               onClick={generateAIInsights}
               className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
             >
-              🤖 Generate AI Insights
+Generate AI Insights
             </button>
             <button
               onClick={createSnapshot}
               className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
-              📄 Create Snapshot
+Create Snapshot
             </button>
             <div className="border-t border-gray-200 pt-3">
               <p className="text-xs text-gray-500 mb-3">Export Options:</p>
