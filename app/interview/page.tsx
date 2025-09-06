@@ -1133,6 +1133,10 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   const dataService = MockDataService.getInstance();
   const availableQuestions = dataService.getResearchQuestions(session?.audienceType || 'buyer');
   
+  // Debug logging
+  console.log('Available questions for', session?.audienceType, ':', availableQuestions.length);
+  console.log('Questions:', availableQuestions.map(q => ({ id: q.id, text: q.questionText })));
+  
   // Load selected questions from session
   useEffect(() => {
     if (session?.selectedResearchQuestions) {
@@ -1152,11 +1156,15 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   }, [selectedQuestions, session, setSession, availableQuestions]);
 
   const handleQuestionToggle = (questionId: string) => {
-    setSelectedQuestions(prev => 
-      prev.includes(questionId) 
+    console.log('Toggling question:', questionId);
+    console.log('Current selectedQuestions:', selectedQuestions);
+    setSelectedQuestions(prev => {
+      const newSelection = prev.includes(questionId) 
         ? prev.filter(id => id !== questionId)
-        : [...prev, questionId]
-    );
+        : [...prev, questionId];
+      console.log('New selection:', newSelection);
+      return newSelection;
+    });
   };
 
   const handleSelectAll = () => {
@@ -1243,7 +1251,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
                 key={question.id}
                 className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
                   selectedQuestions.includes(question.id)
-                    ? `${theme.border} ${theme.bg} border-current`
+                    ? `border-blue-500 bg-blue-50 border-current` 
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
                 onClick={() => handleQuestionToggle(question.id)}
@@ -1252,7 +1260,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
                   <div className="flex-shrink-0 mt-1">
                     <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                       selectedQuestions.includes(question.id)
-                        ? `${theme.accent} border-current`
+                        ? `bg-blue-500 border-blue-500`
                         : 'border-gray-300'
                     }`}>
                       {selectedQuestions.includes(question.id) && (
@@ -1265,7 +1273,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
                       <h3 className="font-medium text-gray-900">{question.questionText}</h3>
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         selectedQuestions.includes(question.id)
-                          ? `${theme.accent} ${theme.text.replace('900', '50')}`
+                          ? `bg-blue-500 text-white`
                           : 'bg-gray-100 text-gray-600'
                       }`}>
                         {question.category}
