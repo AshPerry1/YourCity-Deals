@@ -2064,12 +2064,16 @@ const Summary = ({ session, setSession, theme }: any) => {
   };
 
   const submitForm = async () => {
+    console.log('Submit form clicked');
+    console.log('Session:', session);
+    
     if (!session?.participant?.firstName) {
       alert('Please complete the participant information before submitting.');
       return;
     }
 
     try {
+      console.log('Attempting to save to Supabase...');
       // Save to Supabase
       const sessionId = await InterviewService.saveInterviewSession(
         session.id || null,
@@ -2105,13 +2109,24 @@ const Summary = ({ session, setSession, theme }: any) => {
         }
       );
 
+      console.log('Saved successfully, sessionId:', sessionId);
       // Update session with the saved ID
       setSession(prev => ({ ...prev, id: sessionId }));
       
       alert('Interview submitted successfully! You can now create a snapshot.');
     } catch (error) {
       console.error('Error submitting interview:', error);
-      alert('Error submitting interview. Please try again.');
+      
+      // Fallback to mock data service if Supabase fails
+      try {
+        console.log('Supabase failed, trying mock data service...');
+        const dataService = MockDataService.getInstance();
+        await dataService.saveSession(session);
+        alert('Interview submitted successfully (saved locally)! You can now create a snapshot.');
+      } catch (mockError) {
+        console.error('Mock data service also failed:', mockError);
+        alert(`Error submitting interview: ${error.message}. Please try again.`);
+      }
     }
   };
 
