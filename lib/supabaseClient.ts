@@ -67,7 +67,9 @@ const isValidUrl = (url: string) => {
 };
 
 // Use real Supabase client if environment variables are available and valid, otherwise use mock
-const useRealClient = (supabaseUrl && supabaseAnonKey && isValidUrl(supabaseUrl));
+const useRealClient = (supabaseUrl && supabaseAnonKey && isValidUrl(supabaseUrl) && 
+  !supabaseAnonKey.includes('your_supabase_anon_key') && 
+  !supabaseAnonKey.includes('placeholder'));
 
 console.log('Supabase Client Configuration:', {
   hasUrl: !!supabaseUrl,
