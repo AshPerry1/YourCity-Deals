@@ -17,6 +17,15 @@ interface Participant {
   specialties: string[];
   background: string;
   howGotJob: string;
+  // Demographic data
+  age: string;
+  gender: string;
+  zipCode: string;
+  householdIncome: string;
+  education: string;
+  householdSize: string;
+  childrenInSchool: string;
+  commuteAreas: string;
 }
 
 interface ResearchQuestion {
@@ -738,6 +747,15 @@ const ParticipantInfo = ({ session, setSession, theme, onNext }: any) => {
     specialties: [],
     background: '',
     howGotJob: '',
+    // Demographic data
+    age: '',
+    gender: '',
+    zipCode: '',
+    householdIncome: '',
+    education: '',
+    householdSize: '',
+    childrenInSchool: '',
+    commuteAreas: '',
   });
 
   // Load participant data from session
@@ -892,6 +910,130 @@ const ParticipantInfo = ({ session, setSession, theme, onNext }: any) => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
+
+            {/* Demographic Data Section */}
+            <div className="border-t pt-6 mt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Demographic Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Age Range</label>
+                  <select
+                    value={participant.age}
+                    onChange={(e) => handleInputChange('age', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select age range</option>
+                    <option value="18-24">18-24</option>
+                    <option value="25-34">25-34</option>
+                    <option value="35-44">35-44</option>
+                    <option value="45-54">45-54</option>
+                    <option value="55-64">55-64</option>
+                    <option value="65+">65+</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                  <select
+                    value={participant.gender}
+                    onChange={(e) => handleInputChange('gender', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Non-binary">Non-binary</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                  <input
+                    type="text"
+                    placeholder="Enter ZIP code"
+                    value={participant.zipCode}
+                    onChange={(e) => handleInputChange('zipCode', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Household Income</label>
+                  <select
+                    value={participant.householdIncome}
+                    onChange={(e) => handleInputChange('householdIncome', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select income range</option>
+                    <option value="Under $25,000">Under $25,000</option>
+                    <option value="$25,000-$49,999">$25,000-$49,999</option>
+                    <option value="$50,000-$74,999">$50,000-$74,999</option>
+                    <option value="$75,000-$99,999">$75,000-$99,999</option>
+                    <option value="$100,000-$149,999">$100,000-$149,999</option>
+                    <option value="$150,000-$199,999">$150,000-$199,999</option>
+                    <option value="$200,000+">$200,000+</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Education Level</label>
+                  <select
+                    value={participant.education}
+                    onChange={(e) => handleInputChange('education', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select education level</option>
+                    <option value="High School">High School</option>
+                    <option value="Some College">Some College</option>
+                    <option value="Associate Degree">Associate Degree</option>
+                    <option value="Bachelor's Degree">Bachelor's Degree</option>
+                    <option value="Master's Degree">Master's Degree</option>
+                    <option value="Doctorate">Doctorate</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Household Size</label>
+                  <select
+                    value={participant.householdSize}
+                    onChange={(e) => handleInputChange('householdSize', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select household size</option>
+                    <option value="1">1 person</option>
+                    <option value="2">2 people</option>
+                    <option value="3">3 people</option>
+                    <option value="4">4 people</option>
+                    <option value="5">5 people</option>
+                    <option value="6+">6+ people</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Children in School</label>
+                  <select
+                    value={participant.childrenInSchool}
+                    onChange={(e) => handleInputChange('childrenInSchool', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select option</option>
+                    <option value="Yes - Elementary">Yes - Elementary</option>
+                    <option value="Yes - Middle School">Yes - Middle School</option>
+                    <option value="Yes - High School">Yes - High School</option>
+                    <option value="Yes - Multiple Ages">Yes - Multiple Ages</option>
+                    <option value="No">No</option>
+                    <option value="Not applicable">Not applicable</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Commute Areas</label>
+                  <input
+                    type="text"
+                    placeholder="Where do you commute to/from?"
+                    value={participant.commuteAreas}
+                    onChange={(e) => handleInputChange('commuteAreas', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -965,6 +1107,9 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   const dataService = MockDataService.getInstance();
   const availableQuestions = dataService.getResearchQuestions(session?.audienceType || 'buyer');
   
+  // Debug logging
+  console.log('Available questions for', session?.audienceType, ':', availableQuestions.length);
+  
   // Load selected questions from session
   useEffect(() => {
     if (session?.selectedResearchQuestions) {
@@ -984,11 +1129,14 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   }, [selectedQuestions, session, setSession, availableQuestions]);
 
   const handleQuestionToggle = (questionId: string) => {
-    setSelectedQuestions(prev => 
-      prev.includes(questionId) 
+    console.log('Toggling question:', questionId);
+    setSelectedQuestions(prev => {
+      const newSelection = prev.includes(questionId) 
         ? prev.filter(id => id !== questionId)
-        : [...prev, questionId]
-    );
+        : [...prev, questionId];
+      console.log('New selection:', newSelection);
+      return newSelection;
+    });
   };
 
   const handleSelectAll = () => {
