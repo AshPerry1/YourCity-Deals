@@ -1156,6 +1156,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   }, [selectedQuestions, session, setSession, availableQuestions]);
 
   const handleQuestionToggle = (questionId: string) => {
+    alert(`Clicked question: ${questionId}`);
     console.log('Toggling question:', questionId);
     console.log('Current selectedQuestions:', selectedQuestions);
     setSelectedQuestions(prev => {
@@ -1168,7 +1169,9 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   };
 
   const handleSelectAll = () => {
+    alert('Select All clicked');
     const allQuestionIds = availableQuestions.map(q => q.id);
+    console.log('All question IDs:', allQuestionIds);
     setSelectedQuestions(allQuestionIds);
   };
 
