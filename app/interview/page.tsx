@@ -420,7 +420,7 @@ class MockDataService {
     return this.researchQuestions;
   }
 
-  saveSession(session: InterviewSession): void {
+  async saveSession(session: InterviewSession): Promise<void> {
     const existingIndex = this.sessions.findIndex(s => s.id === session.id);
     if (existingIndex >= 0) {
       this.sessions[existingIndex] = { ...session, updatedAt: new Date().toISOString() };
