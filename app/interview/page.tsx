@@ -468,16 +468,6 @@ const colorThemes = {
   },
   seller: {
     primary: 'secondary',
-    bg: 'bg-purple-50',
-    text: 'text-gray-900',
-    border: 'border-purple-200',
-    accent: 'bg-purple-600',
-    accentHover: 'hover:bg-purple-700',
-    accentText: 'text-purple-600',
-    brand: 'bg-purple-600',
-  },
-  organization: {
-    primary: 'success',
     bg: 'bg-green-50',
     text: 'text-gray-900',
     border: 'border-green-200',
@@ -486,8 +476,8 @@ const colorThemes = {
     accentText: 'text-green-600',
     brand: 'bg-green-600',
   },
-  merchant: {
-    primary: 'warning',
+  organization: {
+    primary: 'success',
     bg: 'bg-orange-50',
     text: 'text-gray-900',
     border: 'border-orange-200',
@@ -495,6 +485,16 @@ const colorThemes = {
     accentHover: 'hover:bg-orange-700',
     accentText: 'text-orange-600',
     brand: 'bg-orange-600',
+  },
+  merchant: {
+    primary: 'warning',
+    bg: 'bg-purple-50',
+    text: 'text-gray-900',
+    border: 'border-purple-200',
+    accent: 'bg-purple-600',
+    accentHover: 'hover:bg-purple-700',
+    accentText: 'text-purple-600',
+    brand: 'bg-purple-600',
   },
 };
 
@@ -1251,7 +1251,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
                 key={question.id}
                 className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
                   selectedQuestions.includes(question.id)
-                    ? `border-blue-500 bg-blue-50 border-current` 
+                    ? `${theme.border.replace('200', '500')} ${theme.bg} border-current` 
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
                 onClick={() => handleQuestionToggle(question.id)}
@@ -1260,7 +1260,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
                   <div className="flex-shrink-0 mt-1">
                     <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                       selectedQuestions.includes(question.id)
-                        ? `bg-blue-500 border-blue-500`
+                        ? `${theme.accent} border-current`
                         : 'border-gray-300'
                     }`}>
                       {selectedQuestions.includes(question.id) && (
@@ -1273,7 +1273,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
                       <h3 className="font-medium text-gray-900">{question.questionText}</h3>
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         selectedQuestions.includes(question.id)
-                          ? `bg-blue-500 text-white`
+                          ? `${theme.accent} text-white`
                           : 'bg-gray-100 text-gray-600'
                       }`}>
                         {question.category}
