@@ -26,6 +26,7 @@ interface Participant {
   householdSize: string;
   childrenInSchool: string;
   commuteAreas: string;
+  photo?: string; // Base64 encoded image data
 }
 
 interface ResearchQuestion {
@@ -813,6 +814,40 @@ const ParticipantInfo = ({ session, setSession, theme, onNext }: any) => {
     handleInputChange('specialties', specialties);
   };
 
+  const handlePhotoCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        handleInputChange('photo', result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCameraCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // For now, we'll use a simple file input with camera option
+      // In a production app, you'd want a more sophisticated camera interface
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'camera';
+      input.onchange = (e) => {
+        const target = e.target as HTMLInputElement;
+        if (target.files?.[0]) {
+          handlePhotoCapture({ target } as any);
+        }
+      };
+      input.click();
+    } catch (error) {
+      console.error('Camera access denied:', error);
+      alert('Camera access denied. Please use the file upload option instead.');
+    }
+  };
+
   const specialtiesString = participant.specialties.join(', ');
 
   return (
@@ -879,6 +914,77 @@ const ParticipantInfo = ({ session, setSession, theme, onNext }: any) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
+            </div>
+
+            {/* Photo Capture Section */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Participant Photo</label>
+              <div className="flex items-center space-x-4">
+                {participant.photo ? (
+                  <div className="flex items-center space-x-4">
+                    <img 
+                      src={participant.photo} 
+                      alt="Participant" 
+                      className="w-20 h-20 object-cover rounded-lg border border-gray-300"
+                    />
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={handleCameraCapture}
+                        className={`px-3 py-2 ${theme.accent} text-white rounded-lg hover:opacity-90 transition-opacity`}
+                      >
+                        📷 Take New Photo
+                      </button>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoCapture}
+                        className="hidden"
+                        id="photo-upload"
+                      />
+                      <label
+                        htmlFor="photo-upload"
+                        className={`px-3 py-2 ${theme.accent} text-white rounded-lg hover:opacity-90 transition-opacity cursor-pointer`}
+                      >
+                        📁 Upload Photo
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleInputChange('photo', '')}
+                        className="px-3 py-2 bg-red-500 text-white rounded-lg hover:opacity-90 transition-opacity"
+                      >
+                        🗑️ Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex space-x-2">
+                    <button
+                      type="button"
+                      onClick={handleCameraCapture}
+                      className={`px-4 py-2 ${theme.accent} text-white rounded-lg hover:opacity-90 transition-opacity`}
+                    >
+                      📷 Take Photo
+                    </button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoCapture}
+                      className="hidden"
+                      id="photo-upload-empty"
+                    />
+                    <label
+                      htmlFor="photo-upload-empty"
+                      className={`px-4 py-2 ${theme.accent} text-white rounded-lg hover:opacity-90 transition-opacity cursor-pointer`}
+                    >
+                      📁 Upload Photo
+                    </label>
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                This photo will be used in the interview snapshot for easy identification.
+              </p>
             </div>
             
             <div>
