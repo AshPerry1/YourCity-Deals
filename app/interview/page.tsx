@@ -774,57 +774,46 @@ const AudienceSelection = ({ onSelect }: { onSelect: (audience: AudienceType) =>
 
 // Participant Info Component
 const ParticipantInfo = ({ session, setSession, theme, onNext }: any) => {
-  const [participant, setParticipant] = useState<Participant>({
-    firstName: '',
-    lastName: '',
-    company: '',
-    email: '',
-    phone: '',
-    jobTitle: '',
-    specialties: [],
-    background: '',
-    howGotJob: '',
-    // Demographic data
-    age: '',
-    gender: '',
-    zipCode: '',
-    householdIncome: '',
-    education: '',
-    householdSize: '',
-    childrenInSchool: '',
-    commuteAreas: '',
-  });
+  // Get participant data from session (no local state)
+  const participant = useMemo(() => {
+    return session?.participant || {
+      firstName: '',
+      lastName: '',
+      company: '',
+      email: '',
+      phone: '',
+      jobTitle: '',
+      specialties: [],
+      background: '',
+      howGotJob: '',
+      // Demographic data
+      age: '',
+      gender: '',
+      zipCode: '',
+      householdIncome: '',
+      education: '',
+      householdSize: '',
+      childrenInSchool: '',
+      commuteAreas: '',
+    };
+  }, [session?.participant]);
 
-  // Load participant data from session
-  useEffect(() => {
-    if (session?.participant) {
-      setParticipant(session.participant);
-    }
-  }, [session]);
-
-  // Update session when participant data changes
-  useEffect(() => {
-    if (session) {
-      setSession({
-        ...session,
-        participant,
-      });
-    }
-  }, [participant, session, setSession]);
-
-  const handleInputChange = (field: keyof Participant, value: string | string[]) => {
-    setParticipant(prev => ({
-      ...prev,
-      [field]: value,
+  const handleInputChange = useCallback((field: keyof Participant, value: string | string[]) => {
+    setSession((prevSession: any) => ({
+      ...prevSession,
+      participant: {
+        ...prevSession.participant,
+        [field]: value,
+      },
     }));
-  };
+  }, [setSession]);
 
-  const handleSpecialtiesChange = (value: string) => {
+  const handleSpecialtiesChange = useCallback((value: string) => {
     const specialties = value.split(',').map(s => s.trim()).filter(s => s.length > 0);
     handleInputChange('specialties', specialties);
-  };
+  }, [handleInputChange]);
 
-  const handlePhotoCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoCapture = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -834,9 +823,9 @@ const ParticipantInfo = ({ session, setSession, theme, onNext }: any) => {
       };
       reader.readAsDataURL(file);
     }
-  };
+  }, [handleInputChange]);
 
-  const handleCameraCapture = async () => {
+  const handleCameraCapture = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       // For now, we'll use a simple file input with camera option
@@ -856,9 +845,11 @@ const ParticipantInfo = ({ session, setSession, theme, onNext }: any) => {
       console.error('Camera access denied:', error);
       alert('Camera access denied. Please use the file upload option instead.');
     }
-  };
+  }, [handlePhotoCapture]);
 
-  const specialtiesString = participant.specialties.join(', ');
+  const specialtiesString = useMemo(() => {
+    return participant.specialties.join(', ');
+  }, [participant.specialties]);
 
   return (
     <div>
@@ -1494,16 +1485,6 @@ const InterviewGuide = ({ session, setSession, theme, onNext }: any) => {
     }
   }, [session]);
 
-  // Update session when responses change
-  useEffect(() => {
-    if (session) {
-      setSession({
-        ...session,
-        responses,
-      });
-    }
-  }, [responses, session, setSession]);
-
   const toggleSection = (questionId: string) => {
     setExpandedSections(prev => {
       const newSet = new Set(prev);
@@ -1517,46 +1498,57 @@ const InterviewGuide = ({ session, setSession, theme, onNext }: any) => {
   };
 
   const updateResponse = (researchQuestionId: string, interviewQuestionId: string, field: string, value: any) => {
-    setResponses(prev => {
-      const existingIndex = prev.findIndex(r => 
-        r.researchQuestionId === researchQuestionId && r.interviewQuestionId === interviewQuestionId
-      );
-      
-      if (existingIndex >= 0) {
-        const updated = [...prev];
-        updated[existingIndex] = { ...updated[existingIndex], [field]: value };
-        return updated;
-      } else {
-        return [...prev, {
-          id: `response_${Date.now()}_${Math.random()}`,
-          sessionId: session?.id || '',
-          researchQuestionId,
-          interviewQuestionId,
-          [field]: value,
-        }];
-      }
-    });
+    const currentResponses = session?.responses || [];
+    const existingIndex = currentResponses.findIndex(r => 
+      r.researchQuestionId === researchQuestionId && r.interviewQuestionId === interviewQuestionId
+    );
+    
+    let newResponses;
+    if (existingIndex >= 0) {
+      newResponses = [...currentResponses];
+      newResponses[existingIndex] = { ...newResponses[existingIndex], [field]: value };
+    } else {
+      newResponses = [...currentResponses, {
+        id: `response_${Date.now()}_${Math.random()}`,
+        sessionId: session?.id || '',
+        researchQuestionId,
+        interviewQuestionId,
+        [field]: value,
+        createdAt: new Date().toISOString(),
+      }];
+    }
+    
+    setSession((prevSession: any) => ({
+      ...prevSession,
+      responses: newResponses,
+    }));
   };
 
   const updateNotes = (researchQuestionId: string, notes: string) => {
-    setResponses(prev => {
-      const existingIndex = prev.findIndex(r => 
-        r.researchQuestionId === researchQuestionId && !r.interviewQuestionId
-      );
-      
-      if (existingIndex >= 0) {
-        const updated = [...prev];
-        updated[existingIndex] = { ...updated[existingIndex], notes };
-        return updated;
-      } else {
-        return [...prev, {
-          id: `notes_${Date.now()}_${Math.random()}`,
-          sessionId: session?.id || '',
-          researchQuestionId,
-          notes,
-        }];
-      }
-    });
+    const currentResponses = session?.responses || [];
+    const existingIndex = currentResponses.findIndex(r => 
+      r.researchQuestionId === researchQuestionId && !r.interviewQuestionId
+    );
+    
+    let newResponses;
+    if (existingIndex >= 0) {
+      newResponses = [...currentResponses];
+      newResponses[existingIndex] = { ...newResponses[existingIndex], notes };
+    } else {
+      newResponses = [...currentResponses, {
+        id: `notes_${Date.now()}_${Math.random()}`,
+        sessionId: session?.id || '',
+        researchQuestionId,
+        interviewQuestionId: '',
+        notes,
+        createdAt: new Date().toISOString(),
+      }];
+    }
+    
+    setSession((prevSession: any) => ({
+      ...prevSession,
+      responses: newResponses,
+    }));
   };
 
   const addCustomQuestion = (researchQuestionId: string) => {
@@ -1920,32 +1912,22 @@ const InterviewGuide = ({ session, setSession, theme, onNext }: any) => {
 };
 
 const Summary = ({ session, setSession, theme }: any) => {
-  const [summary, setSummary] = useState({
-    takeaways: session?.summaryTakeaways || '',
-    problems: session?.summaryProblems || '',
-    opportunities: session?.summaryOpportunities || '',
-    quote: session?.summaryQuote || '',
-  });
+  // Get summary data from session (no local state)
+  const summary = useMemo(() => {
+    return {
+      takeaways: session?.summaryTakeaways || '',
+      problems: session?.summaryProblems || '',
+      opportunities: session?.summaryOpportunities || '',
+      quote: session?.summaryQuote || '',
+    };
+  }, [session?.summaryTakeaways, session?.summaryProblems, session?.summaryOpportunities, session?.summaryQuote]);
 
-  // Update session when summary changes
-  useEffect(() => {
-    if (session) {
-      setSession({
-        ...session,
-        summaryTakeaways: summary.takeaways,
-        summaryProblems: summary.problems,
-        summaryOpportunities: summary.opportunities,
-        summaryQuote: summary.quote,
-      });
-    }
-  }, [summary, session, setSession]);
-
-  const handleSummaryChange = (field: keyof typeof summary, value: string) => {
-    setSummary(prev => ({
-      ...prev,
-      [field]: value,
+  const handleSummaryChange = useCallback((field: keyof typeof summary, value: string) => {
+    setSession((prevSession: any) => ({
+      ...prevSession,
+      [`summary${field.charAt(0).toUpperCase() + field.slice(1)}`]: value,
     }));
-  };
+  }, [setSession]);
 
   const exportToJSON = () => {
     const exportData = {
@@ -2192,12 +2174,12 @@ const Summary = ({ session, setSession, theme }: any) => {
       const insights = result.data;
 
       // Update summary with AI insights
-      setSummary(prev => ({
-        ...prev,
-        takeaways: insights.keyTakeaways?.join('\n') || prev.takeaways,
-        problems: insights.problems?.join('\n') || prev.problems,
-        opportunities: insights.opportunities?.join('\n') || prev.opportunities,
-        quote: insights.memorableQuotes?.[0] || prev.quote,
+      setSession((prevSession: any) => ({
+        ...prevSession,
+        summaryTakeaways: insights.keyTakeaways?.join('\n') || prevSession.summaryTakeaways || '',
+        summaryProblems: insights.problems?.join('\n') || prevSession.summaryProblems || '',
+        summaryOpportunities: insights.opportunities?.join('\n') || prevSession.summaryOpportunities || '',
+        summaryQuote: insights.memorableQuotes?.[0] || prevSession.summaryQuote || '',
       }));
 
       alert('AI insights generated successfully! Check the summary sections.');
