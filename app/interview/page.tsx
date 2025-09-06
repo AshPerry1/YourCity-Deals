@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronRightIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { WordDocumentService, InterviewSnapshotData } from '../../lib/wordDocumentService';
+import { InterviewService } from '../../lib/interviewService';
 
 // Types
 type AudienceType = 'buyer' | 'seller' | 'organization' | 'merchant';
@@ -1240,13 +1240,28 @@ Remove
   );
 };
 
-const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
+  const [availableQuestions, setAvailableQuestions] = useState<ResearchQuestion[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  const dataService = MockDataService.getInstance();
-  const availableQuestions = dataService.getResearchQuestions(session?.audienceType || 'buyer');
+  // Load research questions from Supabase
+  useEffect(() => {
+    const loadResearchQuestions = async () => {
+      if (selectedAudience) {
+        try {
+          const questions = await InterviewService.getResearchQuestions(selectedAudience);
+          setAvailableQuestions(questions);
+        } catch (error) {
+          console.error('Error loading research questions:', error);
+          // Fallback to mock data if Supabase fails
+          const dataService = MockDataService.getInstance();
+          setAvailableQuestions(dataService.getResearchQuestions(selectedAudience));
+        }
+      }
+    };
+    loadResearchQuestions();
+  }, [selectedAudience]);
   
   
   // Load selected questions from session
@@ -1288,6 +1303,14 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
   // Filter questions by search term and category
   const filteredQuestions = availableQuestions.filter(question => {
     const matchesSearch = question.questionText.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         question.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || question.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Filter questions by search term and category
+  const filteredQuestions = availableQuestions.filter(question => {
+    const matchesSearch = question.question_text.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          question.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || question.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -1379,7 +1402,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-medium text-gray-900">{question.questionText}</h3>
+                        <h3 className="font-medium text-gray-900">{question.question_text}</h3>
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         selectedQuestions.includes(question.id)
                           ? `${theme.accent} text-white`
@@ -1421,7 +1444,7 @@ const ResearchQuestions = ({ session, setSession, theme, onNext }: any) => {
                   const question = availableQuestions.find(q => q.id === questionId);
                   return question ? (
                     <div key={questionId} className="text-sm">
-                      <div className="font-medium text-gray-900 truncate">{question.questionText}</div>
+                        <div className="font-medium text-gray-900 truncate">{question.question_text}</div>
                       <div className="text-gray-600">{question.category}</div>
                     </div>
                   ) : null;
@@ -2031,10 +2054,49 @@ const Summary = ({ session, setSession, theme }: any) => {
   };
 
   const submitForm = async () => {
+    if (!session?.participant?.firstName) {
+      alert('Please complete the participant information before submitting.');
+      return;
+    }
+
     try {
-      // Save the complete interview session
-      const dataService = MockDataService.getInstance();
-      await dataService.saveSession(session);
+      // Save to Supabase
+      const sessionId = await InterviewService.saveInterviewSession(
+        session.id || null,
+        session.audienceType,
+        session.interviewerName,
+        {
+          firstName: session.participant.firstName,
+          lastName: session.participant.lastName,
+          company: session.participant.company,
+          email: session.participant.email,
+          phone: session.participant.phone,
+          jobTitle: session.participant.jobTitle,
+          specialties: session.participant.specialties,
+          background: session.participant.background,
+          howGotJob: session.participant.howGotJob,
+          age: session.participant.age,
+          gender: session.participant.gender,
+          zipCode: session.participant.zipCode,
+          householdIncome: session.participant.householdIncome,
+          education: session.participant.education,
+          householdSize: session.participant.householdSize,
+          childrenInSchool: session.participant.childrenInSchool,
+          commuteAreas: session.participant.commuteAreas,
+          photo: session.participant.photo
+        },
+        session.selectedResearchQuestions.map(q => q.id),
+        session.responses,
+        {
+          takeaways: summary.takeaways,
+          problems: summary.problems,
+          opportunities: summary.opportunities,
+          quote: summary.quote
+        }
+      );
+
+      // Update session with the saved ID
+      setSession(prev => ({ ...prev, id: sessionId }));
       
       alert('Interview submitted successfully! You can now create a snapshot.');
     } catch (error) {
