@@ -1462,6 +1462,8 @@ const InterviewGuide = ({ session, setSession, theme, onNext }: any) => {
   const [responses, setResponses] = useState<SessionResponse[]>([]);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [customQuestions, setCustomQuestions] = useState<{[key: string]: string}>({});
+  const [aiSuggestions, setAiSuggestions] = useState<Record<string, any[]>>({});
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState<Record<string, boolean>>({});
 
   // Load responses from session
   useEffect(() => {
@@ -1541,6 +1543,55 @@ const InterviewGuide = ({ session, setSession, theme, onNext }: any) => {
       setCustomQuestions(prev => ({
         ...prev,
         [`${researchQuestionId}_custom`]: customQuestion,
+      }));
+    }
+  };
+
+  const generateAISuggestions = async (researchQuestionId: string) => {
+    if (!session?.responses?.length) {
+      alert('Please complete some responses before generating AI suggestions.');
+      return;
+    }
+
+    setIsGeneratingSuggestions(prev => ({
+      ...prev,
+      [researchQuestionId]: true
+    }));
+
+    try {
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'suggestFollowUps',
+          data: {
+            responses: session.responses,
+            currentQuestion: session.selectedResearchQuestions?.find(q => q.id === researchQuestionId)?.questionText || 'Current research question'
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('AI service unavailable');
+      }
+
+      const result = await response.json();
+      const suggestions = result.data;
+
+      setAiSuggestions(prev => ({
+        ...prev,
+        [researchQuestionId]: suggestions
+      }));
+
+    } catch (error) {
+      console.error('Error generating AI suggestions:', error);
+      alert('Error generating AI suggestions. Please check your OpenAI API key configuration.');
+    } finally {
+      setIsGeneratingSuggestions(prev => ({
+        ...prev,
+        [researchQuestionId]: false
       }));
     }
   };
@@ -1785,15 +1836,46 @@ const InterviewGuide = ({ session, setSession, theme, onNext }: any) => {
                   </div>
                 )}
 
-                {/* Add Custom Question Button */}
+                {/* AI Suggestions and Custom Question Buttons */}
                 <div className="flex items-center justify-between pt-4 border-t">
-                  <button
-                    onClick={() => addCustomQuestion(researchQuestion.id)}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    + Add custom question
-                  </button>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => generateAISuggestions(researchQuestion.id)}
+                      disabled={isGeneratingSuggestions[researchQuestion.id]}
+                      className="text-sm bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 disabled:opacity-50 font-medium"
+                    >
+                      {isGeneratingSuggestions[researchQuestion.id] ? '🤖 Generating...' : '🤖 AI Suggestions'}
+                    </button>
+                    <button
+                      onClick={() => addCustomQuestion(researchQuestion.id)}
+                      className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      + Add custom question
+                    </button>
+                  </div>
                 </div>
+
+                {/* AI Suggestions Display */}
+                {aiSuggestions[researchQuestion.id] && (
+                  <div className="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <h4 className="font-medium text-purple-900 mb-3">🤖 AI Suggested Follow-ups</h4>
+                    <div className="space-y-2">
+                      {aiSuggestions[researchQuestion.id].map((suggestion, index) => (
+                        <div key={index} className="p-3 bg-white rounded border border-purple-100">
+                          <p className="text-sm font-medium text-gray-900 mb-1">
+                            {suggestion.question}
+                          </p>
+                          <p className="text-xs text-purple-700">
+                            {suggestion.reasoning}
+                          </p>
+                          <span className="inline-block mt-1 px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded">
+                            {suggestion.category}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Notes Section */}
                 <div className="space-y-2">
@@ -2015,6 +2097,51 @@ const Summary = ({ session, setSession, theme }: any) => {
     } catch (error) {
       console.error('Error creating snapshot:', error);
       alert('Error creating snapshot. Please try again.');
+    }
+  };
+
+  const generateAIInsights = async () => {
+    if (!session?.participant || !session?.responses?.length) {
+      alert('Please complete some interview responses before generating AI insights.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'extractInsights',
+          data: {
+            responses: session.responses,
+            participant: session.participant,
+            audienceType: session.audienceType,
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('AI service unavailable');
+      }
+
+      const result = await response.json();
+      const insights = result.data;
+
+      // Update summary with AI insights
+      setSummary(prev => ({
+        ...prev,
+        takeaways: insights.keyTakeaways?.join('\n') || prev.takeaways,
+        problems: insights.problems?.join('\n') || prev.problems,
+        opportunities: insights.opportunities?.join('\n') || prev.opportunities,
+        quote: insights.memorableQuotes?.[0] || prev.quote,
+      }));
+
+      alert('AI insights generated successfully! Check the summary sections.');
+    } catch (error) {
+      console.error('Error generating AI insights:', error);
+      alert('Error generating AI insights. Please check your OpenAI API key configuration.');
     }
   };
 
@@ -2240,6 +2367,12 @@ const Summary = ({ session, setSession, theme }: any) => {
               className={`w-full px-4 py-2 ${theme.accent} text-white rounded-lg hover:opacity-90 transition-opacity font-medium`}
             >
               📝 Submit Form
+            </button>
+            <button
+              onClick={generateAIInsights}
+              className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+            >
+              🤖 Generate AI Insights
             </button>
             <button
               onClick={createSnapshot}
